@@ -1,0 +1,19 @@
+name: Nightjar Radio release notes
+on:
+  push:
+    branches: [main]
+    paths: ['android/RELEASE_NOTES.md']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update release page text
+        env: { GH_TOKEN: '${{ github.token }}' }
+        run: |
+          n=$(gh release view radio-app --json name -q .name | grep -o '[0-9]*$')
+          { cat android/RELEASE_NOTES.md; echo; echo "_Build ${n}_"; } > notes.md
+          gh release edit radio-app --notes-file notes.md

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="horizontal" android:background="@drawable/widget_bg" android:padding="6dp">
+    <LinearLayout android:id="@+id/f_globe" style="@style/WCell"><ImageView style="@style/WCellIc" android:src="@drawable/ic_globe" /><TextView style="@style/WCellTx" android:text="Spin globe" /></LinearLayout>
+    <LinearLayout android:id="@+id/f_dial" style="@style/WCell"><ImageView style="@style/WCellIc" android:src="@drawable/ic_dial" /><TextView style="@style/WCellTx" android:text="Spin dial" /></LinearLayout>
+    <LinearLayout android:id="@+id/f_bed" style="@style/WCell"><ImageView style="@style/WCellIc" android:src="@drawable/ic_moon" /><TextView style="@style/WCellTx" android:text="Bedtime" /></LinearLayout>
+    <LinearLayout android:id="@+id/f_play" style="@style/WCell"><ImageView android:id="@+id/w_play" android:layout_width="34dp" android:layout_height="34dp" android:padding="5dp" android:src="@drawable/ic_play" android:background="@drawable/play_bg" android:contentDescription="Play or pause" /><TextView android:id="@+id/f_playtx" style="@style/WCellTx" android:text="Play" /></LinearLayout>
+</LinearLayout>

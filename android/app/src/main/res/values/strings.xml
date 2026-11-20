@@ -1,0 +1,6 @@
+<resources>
+    <string name="widget_desc">Your presets and what\'s playing</string>
+    <string name="wd_mini">A little radio with the station logo, song, clock and preset buttons</string>
+    <string name="wd_bar">Slim bar: station, song, play and next</string>
+    <string name="wd_fun">Spin the globe, spin the dial, bedtime and play</string>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@drawable/wr_body" android:padding="10dp">
+    <LinearLayout android:id="@+id/w_text" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:orientation="horizontal"
+        android:gravity="center_vertical" android:background="@drawable/wr_screen" android:padding="10dp">
+        <ImageView android:id="@+id/w_logo" android:layout_width="58dp" android:layout_height="58dp" android:scaleType="fitCenter" android:src="@mipmap/ic_launcher" android:contentDescription="Station logo" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:layout_marginStart="12dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <TextClock android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:format12Hour="h:mm" android:format24Hour="HH:mm" android:textColor="#B3FFFFFF" android:textSize="11sp" android:fontFamily="monospace" />
+                <TextView android:id="@+id/w_live" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="● LIVE" android:textColor="#FF6B4A" android:textSize="10sp" android:fontFamily="monospace" android:textStyle="bold" />
+            </LinearLayout>
+            <TextView android:id="@+id/w_station" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Nightjar Radio" android:textColor="#FFFFFF" android:textSize="17sp" android:fontFamily="serif" android:textStyle="italic" android:maxLines="1" android:ellipsize="end" />
+            <TextView android:id="@+id/w_song" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Tap a preset to tune in" android:textColor="#C8CCDA" android:textSize="12sp" android:maxLines="1" android:ellipsize="end" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp" android:orientation="horizontal" android:gravity="center_vertical">
+        <ImageButton android:id="@+id/w_prev" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_prev" android:background="@android:color/transparent" android:contentDescription="Previous station" />
+        <ImageButton android:id="@+id/w_play" android:layout_width="42dp" android:layout_height="42dp" android:src="@drawable/ic_play" android:background="@drawable/play_bg" android:contentDescription="Play or pause" />
+        <ImageButton android:id="@+id/w_next" android:layout_width="36dp" android:layout_height="36dp" android:src="@drawable/ic_next" android:background="@android:color/transparent" android:contentDescription="Next station" />
+        <TextView android:id="@+id/w_p1" style="@style/WKey" android:text="1" /><TextView android:id="@+id/w_p2" style="@style/WKey" android:text="2" /><TextView android:id="@+id/w_p3" style="@style/WKey" android:text="3" />
+        <TextView android:id="@+id/w_p4" style="@style/WKey" android:text="4" /><TextView android:id="@+id/w_p5" style="@style/WKey" android:text="5" /><TextView android:id="@+id/w_p6" style="@style/WKey" android:text="6" />
+    </LinearLayout>
+</LinearLayout>
