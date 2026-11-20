@@ -27,4 +27,6 @@ Tap **nightjar-radio.apk** under **Assets** below.
 
 **iPhone or computer?** Use it in your browser instead: https://daniturn3.github.io/nightjar-radio/
 
+☕ Enjoying it? [Buy me a coffee](https://buymeacoffee.com/Daniturn3)
+
 Nicer download page: https://daniturn3.github.io/nightjar-radio/get/

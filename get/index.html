@@ -37,6 +37,7 @@ figure{margin:0;flex:none;width:200px;scroll-snap-align:center;text-align:center
 .phone img{display:block;width:100%;aspect-ratio:540/1169;border-radius:24px;background:#0c0e16}
 figcaption{margin-top:10px;font-size:13.5px;color:var(--mut)}
 @media(min-width:700px){.strip{flex-wrap:wrap;justify-content:center;overflow:visible}figure{width:240px}}
+footer .bmc{display:inline-block;margin:14px 0 12px;padding:11px 20px;border-radius:999px;background:#ffdd00;color:#1a1210;font-weight:600;text-decoration:none}
 footer{text-align:center;margin-top:44px;color:var(--mut);font-size:13px}footer b{display:block;font:600 18px 'Fraunces',serif;color:var(--cream)}footer b em{font-style:italic;font-weight:400;color:#ffd08a}
 </style>
 </head>
@@ -84,7 +85,7 @@ footer{text-align:center;margin-top:44px;color:var(--mut);font-size:13px}footer 
     </ol>
   </div>
 
-  <footer><b>Nightjar <em>Radio</em></b>Made in the UK 🇬🇧 · Free, no adverts, no sign-up<br>Stations from radio-browser.info</footer>
+  <footer><b>Nightjar <em>Radio</em></b>Made in the UK 🇬🇧 · Free, no adverts, no sign-up<br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Enjoying it? Buy me a coffee</a><br>Stations from radio-browser.info</footer>
 </main>
 <script>
 fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-app').then(r=>r.json()).then(d=>{
