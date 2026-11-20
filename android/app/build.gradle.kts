@@ -15,10 +15,12 @@ android {
     }
     signingConfigs {
         create("rel") {
-            storeFile = rootProject.file("njr.keystore")
-            storePassword = "nightjarradio"
+            // The key file is encrypted; its password lives only in GitHub's private Secrets.
+            storeFile = rootProject.file("njr-release.p12")
+            storePassword = System.getenv("NJR_KS_PASS")
             keyAlias = "njr"
-            keyPassword = "nightjarradio"
+            keyPassword = System.getenv("NJR_KS_PASS")
+            storeType = "pkcs12"
         }
     }
     buildTypes {
