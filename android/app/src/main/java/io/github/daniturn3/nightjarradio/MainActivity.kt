@@ -49,6 +49,9 @@ class MainActivity : Activity() {
     private var fileCb: ValueCallback<Array<Uri>>? = null
     private var geoCb: Pair<String, GeolocationPermissions.Callback>? = null
     private var pageReady = false
+    /** True only while one of our own Nightjar Radio pages is showing. Phone features answer only then. */
+    @Volatile private var trusted = false
+    private fun ours(url: String?) = url != null && url.startsWith(HOME)
     private var pendingAct: String? = null
 
     private fun handleIntent(i: Intent?) {
@@ -77,6 +80,10 @@ class MainActivity : Activity() {
             mediaPlaybackRequiresUserGesture = false
             setGeolocationEnabled(true)
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+            allowFileAccess = false
+            allowContentAccess = false
+            javaScriptCanOpenWindowsAutomatically = false
+            setSupportMultipleWindows(false)
             userAgentString = "$userAgentString NightjarRadioApp/${BuildConfig.VERSION_CODE}"
         }
         web.addJavascriptInterface(Bridge(), "NJR")
@@ -88,7 +95,16 @@ class MainActivity : Activity() {
                 return true
             }
 
+            override fun onPageStarted(view: WebView, url: String?, favicon: android.graphics.Bitmap?) {
+                trusted = ours(url)
+            }
+
+            override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
+                trusted = ours(url)
+            }
+
             override fun onPageFinished(view: WebView, url: String?) {
+                trusted = ours(url)
                 if (url?.startsWith(HOME) == true) {
                     pageReady = true
                     pendingAct?.let { a -> view.postDelayed({ js("window.njrAction&&window.njrAction('$a')") }, 900) }
@@ -102,6 +118,7 @@ class MainActivity : Activity() {
         }
         web.webChromeClient = object : WebChromeClient() {
             override fun onGeolocationPermissionsShowPrompt(origin: String, callback: GeolocationPermissions.Callback) {
+                if (!origin.startsWith("https://daniturn3.github.io")) { callback.invoke(origin, false, false); return }
                 if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                     callback.invoke(origin, true, false)
                 } else {
@@ -111,6 +128,7 @@ class MainActivity : Activity() {
             }
 
             override fun onShowFileChooser(view: WebView, cb: ValueCallback<Array<Uri>>, params: FileChooserParams): Boolean {
+                if (!trusted) { cb.onReceiveValue(null); return true }
                 fileCb?.onReceiveValue(null)
                 fileCb = cb
                 return try {
@@ -212,16 +230,20 @@ class MainActivity : Activity() {
         if (c != null) f(c) else pending.add(f)
     }
 
-    private fun ui(f: () -> Unit) = runOnUiThread { try { f() } catch (_: Exception) { } }
+    private fun ui(f: () -> Unit) { if (!trusted) return; runOnUiThread { try { if (trusted) f() } catch (_: Exception) { } } }
 
+    /** Only ever hands secure web links (https) to the browser. */
     private fun openUrl(u: String) {
-        try { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(u))) } catch (_: Exception) { }
+        val uri = try { Uri.parse(u) } catch (e: Exception) { return }
+        if (uri.scheme != "https") return
+        try { startActivity(Intent(Intent.ACTION_VIEW, uri).addCategory(Intent.CATEGORY_BROWSABLE)) } catch (_: Exception) { }
     }
 
     inner class Bridge {
         @JavascriptInterface fun version(): Int = BuildConfig.VERSION_CODE
 
         @JavascriptInterface fun playList(json: String, index: Int) = ui {
+            if (json.length > 200_000) return@ui
             val a = JSONArray(json)
             val items = (0 until a.length()).map { Store.item(a.getJSONObject(it), "q/") }
             Store.put(this@MainActivity, "queue", json)
@@ -241,11 +263,13 @@ class MainActivity : Activity() {
         @JavascriptInterface fun setVolume(v: Float) = ui { withCtl { it.volume = v.coerceIn(0f, 1f) } }
 
         @JavascriptInterface fun sync(key: String, json: String) {
+            if (!trusted || json.length > 500_000) return
             if (key in listOf("presets", "favs", "recent")) Store.put(this@MainActivity, key, json)
             if (key == "presets") RadioWidget.refresh(this@MainActivity)
         }
 
         @JavascriptInterface fun setAlarm(json: String): String {
+            if (!trusted || json.length > 20_000) return "0"
             Store.put(this@MainActivity, "alarm", json)
             return Alarm.schedule(this@MainActivity).toString()
         }
@@ -293,6 +317,7 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface fun saveFile(name: String, text: String) = ui {
+            if (text.length > 5_000_000) return@ui
             val f = File(cacheDir, name.replace(Regex("[^A-Za-z0-9._-]"), "_"))
             f.writeText(text)
             val u = FileProvider.getUriForFile(this@MainActivity, "$packageName.files", f)

@@ -734,6 +734,7 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
 const RV=3;
 const NEWS=[
+  {app:102,i:'🔒',c:'var(--h-green)',t:'Extra safety',d:'The app’s phone features (alarm, files, links) now only respond to Nightjar Radio itself, and only secure links open.'},
   {app:5,i:'🧩',c:'var(--h-blue)',t:'Choose your widget',d:'Four widgets now: Presets, Mini radio (with the station logo and clock), Now playing (a slim bar) and Shortcuts (spin the globe, spin the dial, bedtime).'},
   {v:3,i:'📻',c:'var(--h-orange)',t:'Radio skins',d:'In the full player, switch the radio between Modern, Wooden, Boombox and Car stereo.'},
   {v:3,i:'🌙',c:'var(--h-purple)',t:'Bedtime',d:'One tap: a calm station, a quieter volume, a sleep timer and the night-light clock. In the player, or on Home in the evening.'},
