@@ -21,7 +21,7 @@ jobs:
         run: |
           if [ -z "$NJR_KS_PASS" ]; then echo "::error::Add the NJR_KS_PASS secret first"; exit 1; fi
           NJR_KS_PASS=$(printf '%s' "$NJR_KS_PASS" | tr -d '[:space:]'); export NJR_KS_PASS
-          echo "Secret length after trimming: ${#NJR_KS_PASS} (should be 32)"
+          echo "Secret length after trimming: ${#NJR_KS_PASS} (should be 35)"
           gradle -p android assembleRelease -PvCode=$((${{ github.run_number }} + 100)) --no-daemon --stacktrace
       - name: Check signature
         run: test -f android/app/build/outputs/apk/release/app-release.apk
