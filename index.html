@@ -289,6 +289,7 @@ body.playing:not(.calm) .bspk i{animation:cone .46s ease-in-out infinite alterna
 .w-axis{display:flex;justify-content:space-between;width:100%;max-width:320px;font:500 10px var(--mono);color:rgba(255,255,255,.6)}
 .w-btns{display:flex;gap:10px;margin-top:14px}
 a.pill{color:inherit}
+.bmc{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:11px 20px;border-radius:999px;background:#ffdd00;color:#1a1210!important;font-weight:600;font-size:14.5px;text-decoration:none}
 .about{text-align:center;margin:26px 0 4px;padding-top:20px;border-top:1px solid var(--line)}.about img{width:56px;height:56px;border-radius:14px;box-shadow:0 10px 24px -10px #000}
 .about b{display:block;font:600 22px var(--serif);margin-top:10px}.about b em{font-style:italic;font-weight:400;color:var(--acc2)}.about .mono{display:block;margin-top:4px;font-size:10px}
 .about p{margin:10px 0 2px;font:italic 400 16px var(--serif);color:var(--cream)}.about i{display:block;font-size:13px;color:var(--mut);font-style:normal}.about small{display:block;margin-top:10px;font-size:10.5px;color:var(--dim)}
@@ -617,7 +618,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <button class="pill" id="s_share" style="margin-top:14px">${ic('share')}Share the app</button>
   ${NAT?`<button class="pill" id="s_upd" style="margin-top:14px">${ic('dl')}Check for app updates</button>`:`<a class="pill" href="${APK}" style="margin-top:14px;text-decoration:none">${ic('dl')}Get the Android app</a>`}
   <input type="file" id="s_file" accept=".txt,.json,text/plain,application/json" hidden>
-  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono">${NAT?'App build '+NAT.version():'Web version'} · beta</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><small>Stations from radio-browser.info</small></div>`);
+  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono">${NAT?'App build '+NAT.version():'Web version'} · beta</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info</small></div>`);
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
@@ -831,6 +832,7 @@ window.njrAction=a=>{if(modalOpen)closeModal();if(npOpen)closeNP();if(sheetOpen)
   if(a==='globe'){go('home');setTimeout(()=>{$('#globe')?.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(globeSpin,700)},500)}
   else if(a==='dial'){go('dial');const t=setInterval(()=>{if(window.dialSpin&&$('.tk.has')){clearInterval(t);setTimeout(()=>window.dialSpin(),400)}},200);setTimeout(()=>clearInterval(t),12000)}
   else if(a==='bed')bedtime()};
+document.addEventListener('click',e=>{const a=e.target.closest('a.bmc');if(a&&NAT){e.preventDefault();NAT.openUrl(a.href)}});
 /* ---------- start ---------- */
 go('home');renderMini();if(cur)meta();poke();setTimeout(onboard,700);
 if(!NAT&&'serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
