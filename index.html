@@ -409,6 +409,13 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .schip:active{background:rgba(184,162,255,.22)}.schip.rec{border-color:rgba(134,180,255,.35);background:rgba(134,180,255,.08);color:#cfe0ff}
 .sempty{margin:18px 0;padding:28px 20px;border-radius:24px;text-align:center;border:1px dashed rgba(184,162,255,.3);background:rgba(184,162,255,.04)}.semo{font-size:42px;margin-bottom:8px;filter:drop-shadow(0 6px 14px rgba(123,92,255,.5))}
 .sempty b{display:block;font:italic 500 22px var(--serif)}.sempty span{display:block;font-size:13px;color:var(--mut);margin-top:6px;line-height:1.5}
+.lstats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:10px 0 4px}.lstats div{position:relative;overflow:hidden;padding:13px 12px 11px;border-radius:20px;text-align:left;
+ background:radial-gradient(110% 90% at 0 0,color-mix(in srgb,var(--a) 22%,transparent),transparent 65%),rgba(255,255,255,.03);border:1px solid color-mix(in srgb,var(--a) 32%,transparent)}
+.lstats b{display:block;font:600 26px/1 var(--mono);color:var(--a);text-shadow:0 0 14px color-mix(in srgb,var(--a) 45%,transparent)}.lstats small{font-size:12px;margin-left:2px;opacity:.7}
+.lstats span{display:block;margin-top:6px;font-size:11.5px;color:var(--mut)}
+.hcard .alarm{background:rgba(0,0,0,.18);border-color:color-mix(in srgb,var(--a) 28%,transparent)}.hcard .recap{border-color:color-mix(in srgb,var(--a) 28%,transparent)}
+.lempty{padding:18px 10px 8px;text-align:center;color:var(--mut);font-size:13px;line-height:1.5}.lempty span{display:block;font-size:34px;margin-bottom:6px;filter:drop-shadow(0 4px 12px color-mix(in srgb,var(--a) 50%,transparent))}
+.lempty b{display:block;color:var(--cream);font:italic 500 19px var(--serif);margin-bottom:3px}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -830,7 +837,7 @@ function fxWire(tok){const d=$('#fx');if(!d)return;
   d.querySelector('[data-fxgo]').onclick=()=>$('#spcc')?.scrollIntoView({behavior:'smooth',block:'start'});
   fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)});
   const iv=setInterval(()=>{if(tok!==renderTok||!document.body.contains(d))return clearInterval(iv);if(!document.hidden&&d.open)fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})},60e3)}
-const scard=(html,ic,a,b)=>html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${a};--b:${b};--hc:${a}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${ic}</span>`);
+const scard=(html,ic,a,b)=>html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${a};--b:${b};--hc:${a}">`).replace(/<h2><i>[^<]*<\/i>/,`<h2><span class="hico">${ic}</span>`);
 VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];
   el.innerHTML=`<div class="hero"><div class="mono">Sports radio</div><h1>Sport<b>.</b></h1></div>
   <div class="spban"><div class="spfl l"></div><div class="spfl r"></div><div class="spbt"><b>Live sport on the radio</b><span>Commentary, phone-ins and match-day shows from ${esc(cn)} ${flag(S.country)} and around the world</span></div>
@@ -844,12 +851,15 @@ VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.co
   const uniq=a=>{const m=new Map();a.forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});return[...m.values()]};
   sportStations(S.country).then(r=>{if(tok!==renderTok||!$('#spcc'))return;$('#spcc').innerHTML=r.length?rows(r,'Sports radio · '+cn):'<div class="empty"><b>No sports stations listed for '+esc(cn)+'</b>The station directory doesn’t have any tagged for sport here yet — try the worldwide list below.</div>';mark()});
   stations({tag:'sports'},20).then(r=>{if(tok===renderTok&&$('#spww'))$('#spww').innerHTML=r.length?cards(r,'Sports radio worldwide'):'<div class="empty">Nothing here right now.</div>';mark()}).catch(()=>{if($('#spww'))$('#spww').innerHTML=errBox()})};
-VIEWS.library=(el)=>{setTimeout(alarmWire,0);el.innerHTML=`<div class="hero"><div class="mono">Your stations</div><h1>Library<b>.</b></h1></div>
-  ${sec('Wake-up radio',alarmH(),NAT?'Wake up to a station, fading in gently':'','⏰')}
-  ${recapH()}${recapH()?'':(wrapBtn()?sec('Radio Wrapped',wrapBtn(),'Your year on the radio so far','✦'):'')}
-  ${sec('Favourites',S.favs.length?rows(S.favs,'Favourites'):'<div class="empty"><b>No favourites yet</b>Tap the ☆ next to any station.</div>','','01')}
-  ${sec('Recently played',S.recent.length?rows(S.recent.slice(0,20),'Recently played'):'<div class="empty">Nothing yet — go tune in.</div>','','02')}
-  ${sec('Presets',presetsH(),'Long-press a preset to clear or replace it','03')}`};
+function libStats(){const wk=Date.now()-7*864e5,secs=S.log.filter(e=>e.t>wk).reduce((a,e)=>a+e.s,0),h=secs/3600,ps=S.presets.filter(Boolean).length;
+  return`<div class="lstats"><div style="--a:#ffd166"><b>${S.favs.length}</b><span>favourite${S.favs.length===1?'':'s'}</span></div><div style="--a:#86d9a8"><b>${ps}<small>/6</small></b><span>presets</span></div><div style="--a:#86b4ff"><b>${h>=10?Math.round(h):h>=1?h.toFixed(1):Math.round(secs/60)}<small>${h>=1?'h':'m'}</small></b><span>this week</span></div></div>`}
+VIEWS.library=(el)=>{setTimeout(alarmWire,0);const rc=recapH();el.innerHTML=`<div class="hero"><div class="mono">Your stations</div><h1>Library<b>.</b></h1></div>
+  ${libStats()}
+  ${scard(sec('Wake-up radio',alarmH(),NAT?'Wake up to a station, fading in gently':'','⏰'),'⏰','#ffb36b','#ff7a59')}
+  ${rc}${rc?'':(wrapBtn()?scard(sec('Radio Wrapped',wrapBtn(),'Your year on the radio so far','✦'),'✦','#ff9ccc','#c56cf0'):'')}
+  ${scard(sec('Favourites',S.favs.length?rows(S.favs,'Favourites'):'<div class="lempty"><span>⭐</span><b>No favourites yet</b>Tap the ☆ next to any station to keep it here.</div>','','01'),'⭐','#ffd166','#ff9f43')}
+  ${scard(sec('Recently played',S.recent.length?rows(S.recent.slice(0,20),'Recently played'):'<div class="lempty"><span>📻</span><b>Nothing yet</b>Go tune in — stations you play will show up here.</div>','','02'),'↺','#b8a2ff','#7b5cff')}
+  ${scard(sec('Presets',presetsH(),'Long-press a preset to clear or replace it','03'),'🎛️','#86d9a8','#2fb38a')}`};
 function wrapBtn(){const y=new Date().getFullYear(),secs=S.log.filter(e=>new Date(e.t).getFullYear()===y).reduce((a,e)=>a+e.s,0);return secs>=60?`<button class="pill amb wide" data-act="wrap" style="margin-top:12px">${icf('play')}Play your ${y} Radio Wrapped</button>`:''}
 function recapH(){const wk=Date.now()-7*864e5,L7=S.log.filter(e=>e.t>wk),secs=L7.reduce((a,e)=>a+e.s,0);if(secs<60)return'';
   const by={};L7.forEach(e=>{by[e.n]=(by[e.n]||0)+e.s});const top=Object.entries(by).sort((a,b)=>b[1]-a[1]);
