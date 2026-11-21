@@ -331,6 +331,10 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .fxm{display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--line)}.fxlg+.fxm{border-top:0}.fxm em{font:normal 600 12px var(--mono);color:var(--mut);width:44px;flex:none}.fxm em.lv{color:#86d9a8}
 .fxm div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px}.fxm div span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fxm b{font:600 14px var(--mono);text-align:right;line-height:1.35}.fxm.in b{color:#86d9a8}
 .fxnone{font-size:13px;color:var(--mut);padding:8px 0 4px}.fxfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 12px;font-size:11.5px;color:var(--mut)}.fxfoot button{font:inherit;font-size:12.5px;background:none;border:0;color:#86d9a8;padding:4px 0;white-space:nowrap}
+.npl{display:block;font-style:normal;font-size:12px;color:#86d9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.npl:empty{display:none}
+.pre .npl{font-size:10px;max-width:100%;margin-top:0;line-height:1.2}.card .npl{font-size:11.5px}
+.npbtn{font:inherit;font-size:12px;margin-left:auto;padding:5px 11px;border-radius:99px;border:1px solid rgba(134,217,168,.4);background:rgba(134,217,168,.08);color:#86d9a8;white-space:nowrap;flex:none}.npbtn[disabled]{opacity:.6}
+.sh:has(.npbtn){display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px}.sh:has(.npbtn)>p{flex-basis:100%;order:3}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 .sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
@@ -763,6 +767,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="mono" style="display:block;margin:16px 0 6px">Seasonal themes</label><select class="sel" id="s_th"><option value="auto" ${S.theme==='auto'?'selected':''}>Automatic — UK calendar</option><option value="off" ${S.theme==='off'?'selected':''}>Off</option>${Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${S.theme===k?'selected':''}>Preview: ${t.name}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Your birthday (optional)</label><div style="display:flex;gap:8px;align-items:center"><input type="date" class="sel" id="s_bday" style="flex:1;color-scheme:dark" value="${S.bday?'2000-'+S.bday:''}">${S.bday?'<button class="pill" id="s_bdx">Clear</button>':''}</div><p class="dim" style="font-size:12px;margin:6px 0 0">Get a little celebration on the day. Only the day and month are kept, on this phone.</p>
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
+  ${NAT&&NAT.peek?`<label class="mono" style="display:block;margin:16px 0 6px">Song titles in station lists</label><select class="sel" id="s_np">${[['wifi','On Wi-Fi only'],['always','Always (uses a little mobile data)'],['off','Off']].map(([v,l])=>`<option value="${v}" ${npMode()===v?'selected':''}>${l}</option>`).join('')}</select><p class="dim" style="font-size:12px;margin:6px 0 0">Shows what’s playing on your presets and favourites, and on any list when you tap “What’s on?”. Not every station sends song titles.</p>`:''}
   <label class="mono" style="display:block;margin:16px 0 6px">Late-night dim</label><select class="sel" id="s_ld">${[['auto','At night (8pm – 5am)'],['on','Always'],['off','Off']].map(([v,l])=>`<option value="${v}" ${S.ldim===v?'selected':''}>${l}</option>`).join('')}</select>
   <div style="margin-top:12px"><label class="tog"><input type="checkbox" id="s_sfx" ${S.staticfx?'checked':''}>Radio static while tuning</label>
   <label class="tog"><input type="checkbox" id="s_fx" ${S.sfx?'checked':''}>Sound effects — globe whoosh, ticks and chime</label>
@@ -781,6 +786,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
   $('#s_nl').onchange=e=>{S.nightlight=e.target.checked;save('nightlight');poke()};
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
+  if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
@@ -1044,8 +1050,27 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
+/* ---------- now playing in lists (Android app: peeks at each stream's song title) ---------- */
+const NPC={},npMode=()=>LS.get('npMode','wifi'),NPFRESH=90e3;
+const npOK=()=>!!(NAT&&NAT.peek);
+function npUrl(el){if(el.dataset.pre!=null)return S.presets[+el.dataset.pre]?.u;const l=L[el.dataset.st];return l?.arr[+el.dataset.i]?.u}
+function npPaint(root){(root||document).querySelectorAll('[data-st],.pre[data-pre]').forEach(el=>{const u=npUrl(el);if(!u)return;let n=el.querySelector('.npl');
+  if(!n){n=document.createElement('i');n.className='npl';(el.querySelector('.meta')||el).appendChild(n)}const c=NPC[u],t=c&&Date.now()-c.at<6e5&&c.t?'♪ '+c.t:'';if(n.textContent!==t)n.textContent=t})}
+function npPeek(urls,force){if(!npOK())return;const m=npMode();if(!force&&(m==='off'||(m==='wifi'&&!NAT.unmetered())))return;
+  const now=Date.now(),need=[...new Set(urls.filter(Boolean))].filter(u=>{const c=NPC[u];if(!c)return true;if(c.pending&&now-c.pending<15e3)return false;return now-c.at>NPFRESH}).slice(0,30);
+  if(!need.length)return 0;need.forEach(u=>{NPC[u]=Object.assign(NPC[u]||{t:'',at:0},{pending:now})});try{NAT.peek(JSON.stringify(need))}catch{}return need.length}
+window.njrPeek=e=>{if(!e||!e.u)return;NPC[e.u]={t:String(e.t||''),at:Date.now(),pending:0};npPaint()};
+const npAuto=()=>S.presets.filter(Boolean).map(p=>p.u).concat(S.favs.map(f=>f.u));
+function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.querySelector('.npbtn')||!sc.querySelector('[data-st]'))return;const h=sc.querySelector('.sh');if(!h)return;
+  const b=document.createElement('button');b.className='npbtn';b.textContent='♪ What’s on?';b.onclick=ev=>{ev.stopPropagation();const us=[...sc.querySelectorAll('[data-st]')].map(npUrl);
+    if(npMode()==='wifi'&&!NAT.unmetered()&&!b.dataset.ok){b.dataset.ok=1;b.textContent='Uses mobile data — tap again';return}
+    const n=npPeek(us,true);b.disabled=true;b.textContent=n===0?'♪ Up to date':'♪ Checking…';setTimeout(()=>{b.disabled=false;b.textContent='♪ Refresh'},6000)};h.appendChild(b)})}
+function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
+let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
+  setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=10;
 const NEWS=[
+  {app:106,i:'♪',c:'var(--h-green)',t:'What’s playing now',d:'Your presets and favourites now show the song that’s on right now. On any other list, tap “♪ What’s on?”. Works on Wi-Fi by default — change it in Settings.'},
   {v:10,i:'⚽',c:'var(--h-green)',t:'Football today',d:'The Sport tab now has a fold-out list of today’s and tomorrow’s football for your home country — kick-off times in your time zone, plus live scores and full-times. Tap it to open.'},
   {v:9,i:'🌍',c:'var(--h-blue)',t:'Sport for your country',d:'Sport moments and the Coming up calendar now follow your home country — Super Bowl and the Kentucky Derby in the US, Melbourne Cup and AFL in Australia, All-Ireland finals in Ireland, IPL in India, and more.'},
   {v:8,i:'🏟️',c:'var(--h-green)',t:'Sport section',d:'Tap the Sport chip on Home for sports radio in your country, sports stations worldwide and a calendar of big events coming up.'},
