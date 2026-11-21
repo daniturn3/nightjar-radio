@@ -635,33 +635,38 @@ function fxLeagues(cc){let l=(FXL[cc]||'').split(' ').filter(Boolean);
 const ymd=(d,s='')=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join(s);
 const dOff=n=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d};
 const fxTidy=n=>String(n||'').replace(/^(English|Spanish|German|Italian|French|Dutch|Portuguese|Belgian|Turkish|Greek|Austrian|Swiss|Danish|Swedish|Norwegian|Australian|Japanese|Mexican|Brazilian|Argentine|Argentinian|Colombian|Chilean) (?=\S)/,'').replace(/^UEFA /,'');
-async function fxEspn(cc){const L0=fxLeagues(cc),rng=ymd(dOff(-1))+'-'+ymd(dOff(2));let ok=0;
-  const res=await Promise.all(L0.map(async(lg,li)=>{try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),9000);
-    const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/scoreboard?dates=${rng}&limit=200`,{signal:ctl.signal});clearTimeout(tm);
-    if(!r.ok)return[];const j=await r.json();ok++;const ln=fxTidy(j.leagues?.[0]?.abbreviation||j.leagues?.[0]?.name||lg);
+const ptDay=t=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(t));return p.replace(/-/g,'')};
+function espnDates(days){const s=new Set();days.forEach(n=>{const a=dOff(n);a.setHours(0,0,0,0);const b=new Date(a);b.setHours(23,59,0,0);for(let t=a.getTime();t<=b.getTime()+1;t+=3*36e5)s.add(ptDay(t));s.add(ptDay(b))});return[...s]}
+async function fxEspn(cc,days){const L0=fxLeagues(cc),ds=espnDates(days);let ok=0;
+  const one=async(lg,li,d)=>{try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),9000);
+    const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/scoreboard?dates=${d}`,{signal:ctl.signal});clearTimeout(tm);
+    if(r.status===400){ok++;return[]}if(!r.ok)return[];const j=await r.json();ok++;const ln=fxTidy(j.leagues?.[0]?.abbreviation||j.leagues?.[0]?.name||lg);
     return(j.events||[]).map(e=>{const c=e.competitions?.[0]||{},cs=c.competitors||[],h=cs.find(x=>x.homeAway==='home')||cs[0]||{},a=cs.find(x=>x.homeAway==='away')||cs[1]||{},st=e.status?.type||{};
       return{id:e.id,t:Date.parse(e.date),h:h.team?.shortDisplayName||h.team?.displayName||'?',a:a.team?.shortDisplayName||a.team?.displayName||'?',hs:h.score??'',as:a.score??'',
-        s:/POSTPONED|CANCELED|CANCELLED|SUSPENDED/.test(st.name||'')?'off':st.state||'pre',clk:st.state==='in'?(/HALF/.test(st.name||'')?'HT':e.status?.displayClock||''):'',lg:ln,o:li}})}catch{return[]}}));
+        s:/POSTPONED|CANCELED|CANCELLED|SUSPENDED/.test(st.name||'')?'off':st.state||'pre',clk:st.state==='in'?(/HALF/.test(st.name||'')?'HT':e.status?.displayClock||''):'',lg:ln,o:li}})}catch{return[]}};
+  const res=await Promise.all(L0.flatMap((lg,li)=>ds.map(d=>one(lg,li,d))));
   if(!ok)throw new Error('espn');return res.flat()}
-async function fxDb(cc){const cn=cName(cc),uk={GB:['England','Scotland','Wales','Northern Ireland']}[cc]||[cn];let all=[];
-  for(const n of[0,1]){const r=await fetch(`https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d=${ymd(dOff(n),'-')}&s=Soccer`);if(!r.ok)throw new Error('tsdb');const j=await r.json();all=all.concat(j.events||[])}
+async function fxDb(cc,days){const cn=cName(cc),uk={GB:['England','Scotland','Wales','Northern Ireland']}[cc]||[cn];let all=[];
+  for(const n of days){const r=await fetch(`https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d=${ymd(dOff(n),'-')}&s=Soccer`);if(!r.ok)throw new Error('tsdb');const j=await r.json();all=all.concat(j.events||[])}
   const mine=all.filter(e=>uk.includes(e.strCountry)),use=mine.length?mine:all;
   return use.map(e=>({id:e.idEvent,t:Date.parse((e.strTimestamp||e.dateEvent+'T'+(e.strTime||'00:00:00')).replace(/(\+00:00)?$/,'')+'Z'),h:e.strHomeTeam,a:e.strAwayTeam,hs:e.intHomeScore??'',as:e.intAwayScore??'',
     s:/FT|AET|PEN|Match Finished/i.test(e.strStatus||'')?'post':/Postp|Cancel/i.test(e.strStatus||'')?'off':(e.intHomeScore!=null&&Date.parse(e.strTimestamp+'Z')<Date.now()?'in':'pre'),clk:'',lg:e.strLeague||'Football',o:0}))}
 let fxBusy=null,fxDay=0;
-async function fxLoad(force){const k=S.country+'|'+ymd(new Date()),c=LS.get('fx',null),live=c&&c.ev.some(e=>e.s==='in'),age=c?Date.now()-c.at:1e12;
-  if(c&&c.k===k&&!force&&age<(live?120e3:600e3))return c;if(fxBusy)return fxBusy;
-  fxBusy=(async()=>{let ev,src='ESPN';try{ev=await fxEspn(S.country)}catch{try{ev=await fxDb(S.country);src='TheSportsDB'}catch{ev=null}}
-    fxBusy=null;if(!ev)return c&&c.k===k?Object.assign({},c,{stale:1}):null;const seen=new Set();ev=ev.filter(e=>e.t&&!seen.has(e.id)&&seen.add(e.id));
-    const o={k,at:Date.now(),src,ev};LS.set('fx',o);return o})();return fxBusy}
+async function fxLoad(force){const k=S.country+'|'+ymd(new Date()),c0=LS.get('fx',null),c=c0&&c0.k===k?c0:null,live=c&&c.ev.some(e=>e.s==='in'),age=c?Date.now()-c.at:1e12;
+  const need=fxDay?[0,1]:[0],have=c?c.days||[0]:[],miss=need.filter(n=>!have.includes(n)),stale=force||age>(live?120e3:600e3);
+  if(c&&!stale&&!miss.length)return c;if(fxBusy)return fxBusy;const get=stale?need:miss;
+  fxBusy=(async()=>{let ev,src='ESPN';try{ev=await fxEspn(S.country,get)}catch{try{ev=await fxDb(S.country,get);src='TheSportsDB'}catch{ev=null}}
+    fxBusy=null;if(!ev)return c?Object.assign({},c,{stale:1}):null;
+    if(c&&!stale)ev=c.ev.concat(ev);const seen=new Set();ev=ev.filter(e=>e.t&&!seen.has(e.id)&&seen.add(e.id));
+    const o={k,at:stale||!c?Date.now():c.at,days:stale||!c?get:[...new Set(have.concat(get))],src,ev};LS.set('fx',o);return o})();return fxBusy}
 const fxOn=(e,n)=>ymd(new Date(e.t))===ymd(dOff(n));
 function fxRows(o,n){const ev=o.ev.filter(e=>fxOn(e,n)).sort((a,b)=>a.o-b.o||a.t-b.t);if(!ev.length)return`<div class="fxnone">No ${n?'matches tomorrow':'more matches today'} in the leagues we follow for ${esc(cName(S.country))}.</div>`;
   let lg='',h='';ev.forEach(e=>{if(e.lg!==lg){lg=e.lg;h+=`<div class="fxlg">${esc(lg)}</div>`}
     const tm=new Date(e.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),sc=e.s==='in'||e.s==='post';
     const left=e.s==='in'?`<em class="lv">${esc(e.clk||'Live')}</em>`:e.s==='post'?'<em>FT</em>':e.s==='off'?'<em>P–P</em>':`<em>${tm}</em>`;
     h+=`<div class="fxm${e.s==='in'?' in':''}">${left}<div><span>${esc(e.h)}</span><span>${esc(e.a)}</span></div>${sc?`<b>${esc(e.hs)}<br>${esc(e.as)}</b>`:''}</div>`});return h}
-function fxSub(o){if(!o)return'Fixtures unavailable right now';const t=o.ev.filter(e=>fxOn(e,0)),lv=t.filter(e=>e.s==='in').length,tm=o.ev.filter(e=>fxOn(e,1)).length;
-  return t.length?`${t.length} match${t.length>1?'es':''} today${lv?` · <i class="lvdot"></i>${lv} live`:''}`:tm?`No matches today · ${tm} tomorrow`:'No matches today or tomorrow'}
+function fxSub(o){if(!o)return'Fixtures unavailable right now';const t=o.ev.filter(e=>fxOn(e,0)),lv=t.filter(e=>e.s==='in').length,tm=(o.days||[]).includes(1)?o.ev.filter(e=>fxOn(e,1)).length:0;
+  return t.length?`${t.length} match${t.length>1?'es':''} today${lv?` · <i class="lvdot"></i>${lv} live`:''}`:tm?`No matches today · ${tm} tomorrow`:'No matches today — check Tomorrow'}
 function fxH(){return`<details class="fx" id="fx"${LS.get('fxOpen',false)?' open':''}><summary><span class="spb">⚽</span><div><b>Football · ${esc(cName(S.country))}</b><span id="fxsub">Checking today’s matches…</span></div><i class="fxchev">▾</i></summary>
   <div class="fxtabs"><button data-fxd="0" class="${fxDay?'':'on'}">Today</button><button data-fxd="1" class="${fxDay?'on':''}">Tomorrow</button></div><div id="fxbody">${skRows(3)}</div>
   <div class="fxfoot"><span id="fxupd"></span><button data-fxgo>Find sports radio ›</button></div></details>`}
