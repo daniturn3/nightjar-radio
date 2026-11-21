@@ -340,7 +340,7 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .vc{margin:22px 0 4px;padding:16px 0 14px;border-radius:24px;background:linear-gradient(135deg,rgba(255,95,162,.20),rgba(255,166,92,.12) 45%,rgba(64,214,214,.16));border:1px solid rgba(255,120,180,.35);overflow:hidden}
 .vctop{padding:0 16px}.vctop b{display:block;font:italic 600 24px var(--serif,Georgia),serif;background:linear-gradient(90deg,#ff6fb5,#ffb36b,#5fe3e0);-webkit-background-clip:text;background-clip:text;color:transparent}.vctop span{font-size:12.5px;color:var(--mut)}
 .vcchips{padding:12px 16px 4px;margin:0}.vcchips .chip.on{background:rgba(255,111,181,.22);border-color:#ff6fb5;color:var(--cream)}.vc #vclist{padding:4px 0 0 16px}
-.vcfoot{display:flex;align-items:center;gap:12px;padding:10px 16px 0;font-size:11px;line-height:1.4;color:var(--mut)}.vcfoot .pill{flex:none;font-size:12.5px}
+.vcfoot{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:10px 16px 0;font-size:11px;line-height:1.4;color:var(--mut)}.vcalb{font:500 12px inherit;font-family:inherit;padding:6px 12px;border-radius:99px;border:1px solid rgba(255,111,181,.5);background:rgba(255,111,181,.14);color:var(--cream);white-space:nowrap}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 .sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
@@ -577,7 +577,7 @@ let vcSel=LS.get('vcSel',0);
 function vcH(){return`<div class="vc"><div class="vctop"><b>Vice City drive 🌴</b><span>Real stations with a Leonida feel, for GTA 6 launch month · until 18 Dec</span></div>
   <div class="chips vcchips">${VC.map(([e,l],i)=>`<button class="chip${i===vcSel?' on':''}" data-vc="${i}">${e} ${l}</button>`).join('')}</div>
   <div id="vclist">${skCards()}</div>
-  <div class="vcfoot"><button class="pill" id="vcalb">▶ GTA VI: The Album on YouTube</button><span>Unofficial — not affiliated with Rockstar Games. The in-game stations aren’t streamed anywhere, so these are real stations in the same styles.</span></div></div>`}
+  <div class="vcfoot"><button class="vcalb" id="vcalb">▶ Album on YouTube</button><span>Unofficial — not affiliated with Rockstar Games. The in-game stations aren’t streamed anywhere, so these are real stations in the same styles.</span></div></div>`}
 async function vcFill(tok){const el=$('#vclist');if(!el)return;el.innerHTML=skCards();const [,l,q,q2]=VC[vcSel];
   try{let r=await stations(q,16);if(r.length<4&&q2)r=r.concat(await stations(q2,16));if(tok!==renderTok||!$('#vclist'))return;$('#vclist').innerHTML=r.length?cards(r.slice(0,16),'Vice City drive · '+l):'<div class="empty">Nothing here right now.</div>';mark()}
   catch{if($('#vclist'))$('#vclist').innerHTML=errBox()}}
