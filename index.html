@@ -331,7 +331,7 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .fxm{display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--line)}.fxlg+.fxm{border-top:0}.fxm em{font:normal 600 12px var(--mono);color:var(--mut);width:44px;flex:none}.fxm em.lv{color:#86d9a8}
 .fxm div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px}.fxm div span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fxm b{font:600 14px var(--mono);text-align:right;line-height:1.35}.fxm.in b{color:#86d9a8}
 .fxnone{font-size:13px;color:var(--mut);padding:8px 0 4px}.fxfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 12px;font-size:11.5px;color:var(--mut)}.fxfoot button{font:inherit;font-size:12.5px;background:none;border:0;color:#86d9a8;padding:4px 0;white-space:nowrap}
-.npl{display:block;font-style:normal;font-size:12px;color:#86d9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.npl:empty{display:none}
+.npl{display:block;font-style:normal;font-size:12px;color:#86d9a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.npl:empty{display:none}.npl.none{color:var(--mut);opacity:.7;font-size:11px}
 .pre .npl{font-size:10px;max-width:100%;margin-top:0;line-height:1.2}.card .npl{font-size:11.5px}
 .npbtn{font:inherit;font-size:12px;margin-left:auto;padding:5px 11px;border-radius:99px;border:1px solid rgba(134,217,168,.4);background:rgba(134,217,168,.08);color:#86d9a8;white-space:nowrap;flex:none}.npbtn[disabled]{opacity:.6}
 .sh:has(.npbtn){display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px}.sh:has(.npbtn)>p{flex-basis:100%;order:3}
@@ -1201,20 +1201,23 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
 /* ---------- now playing in lists (Android app: peeks at each stream's song title) ---------- */
-const NPC={},npMode=()=>LS.get('npMode','wifi'),NPFRESH=90e3;
+const NPC={},NPU={},npMode=()=>LS.get('npMode','wifi'),NPFRESH=90e3;
 const npOK=()=>!!(NAT&&NAT.peek);
-function npUrl(el){if(el.dataset.pre!=null)return S.presets[+el.dataset.pre]?.u;const l=L[el.dataset.st];return l?.arr[+el.dataset.i]?.u}
-function npPaint(root){(root||document).querySelectorAll('[data-st],.pre[data-pre]').forEach(el=>{const u=npUrl(el);if(!u)return;let n=el.querySelector('.npl');
-  if(!n){n=document.createElement('i');n.className='npl';(el.querySelector('.meta')||el).appendChild(n)}const c=NPC[u],t=c&&Date.now()-c.at<6e5&&c.t?'♪ '+c.t:'';if(n.textContent!==t)n.textContent=t})}
-function npPeek(urls,force){if(!npOK())return;const m=npMode();if(!force&&(m==='off'||(m==='wifi'&&!NAT.unmetered())))return;
-  const now=Date.now(),need=[...new Set(urls.filter(Boolean))].filter(u=>{const c=NPC[u];if(!c)return true;if(c.pending&&now-c.pending<15e3)return false;return now-c.at>NPFRESH}).slice(0,30);
-  if(!need.length)return 0;need.forEach(u=>{NPC[u]=Object.assign(NPC[u]||{t:'',at:0},{pending:now})});try{NAT.peek(JSON.stringify(need))}catch{}return need.length}
-window.njrPeek=e=>{if(!e||!e.u)return;NPC[e.u]={t:String(e.t||''),at:Date.now(),pending:0};npPaint()};
-const npAuto=()=>S.presets.filter(Boolean).map(p=>p.u).concat(S.favs.map(f=>f.u));
+function npSt(el){if(el.dataset.pre!=null)return S.presets[+el.dataset.pre];const l=L[el.dataset.st];return l?.arr[+el.dataset.i]}
+function npPaint(root){(root||document).querySelectorAll('[data-st],.pre[data-pre]').forEach(el=>{const st=npSt(el);if(!st)return;let n=el.querySelector('.npl');
+  if(!n){n=document.createElement('i');n.className='npl';(el.querySelector('.meta')||el).appendChild(n)}const c=NPC[st.u],fresh=c&&Date.now()-c.at<6e5;
+  const t=fresh&&c.t?'♪ '+c.t:fresh&&c.ask&&!c.t?'no song info':'';n.classList.toggle('none',!(fresh&&c.t));if(n.textContent!==t)n.textContent=t})}
+function npPeek(sts,force){if(!npOK())return 0;const m=npMode();if(!force&&(m==='off'||(m==='wifi'&&!NAT.unmetered())))return 0;
+  const now=Date.now(),seen=new Set(),need=sts.filter(st=>st&&st.u&&/^https?:/i.test(st.url||'')&&!st.hls&&!seen.has(st.u)&&seen.add(st.u)).filter(st=>{const c=NPC[st.u];if(force&&c)c.ask=1;if(!c)return true;if(c.pending&&now-c.pending<15e3)return false;return now-c.at>NPFRESH}).slice(0,30);
+  if(!need.length){npPaint();return 0}need.forEach(st=>{NPU[st.url]=st.u;NPC[st.u]=Object.assign(NPC[st.u]||{t:'',at:0},{pending:now},force?{ask:1}:{})});
+  try{NAT.peek(JSON.stringify(need.map(st=>st.url)))}catch{}return need.length}
+window.njrPeek=e=>{if(!e||!e.u)return;const id=NPU[e.u];if(!id)return;const o=NPC[id]||{};NPC[id]={t:String(e.t||''),at:Date.now(),pending:0,ask:o.ask};npPaint()};
+const npAuto=()=>S.presets.filter(Boolean).concat(S.favs);
 function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.querySelector('.npbtn')||!sc.querySelector('[data-st]'))return;const h=sc.querySelector('.sh');if(!h)return;
-  const b=document.createElement('button');b.className='npbtn';b.textContent='♪ What’s on?';b.onclick=ev=>{ev.stopPropagation();const us=[...sc.querySelectorAll('[data-st]')].map(npUrl);
+  const b=document.createElement('button');b.className='npbtn';b.textContent='♪ What’s on?';b.onclick=ev=>{ev.stopPropagation();const sts=[...sc.querySelectorAll('[data-st]')].map(npSt);
     if(npMode()==='wifi'&&!NAT.unmetered()&&!b.dataset.ok){b.dataset.ok=1;b.textContent='Uses mobile data — tap again';return}
-    const n=npPeek(us,true);b.disabled=true;b.textContent=n===0?'♪ Up to date':'♪ Checking…';setTimeout(()=>{b.disabled=false;b.textContent='♪ Refresh'},6000)};h.appendChild(b)})}
+    npPeek(sts,true);b.disabled=true;b.textContent='♪ Checking…';
+    setTimeout(()=>{const got=sts.filter(st=>st&&NPC[st.u]?.t).length;b.disabled=false;b.textContent=got?`♪ ${got} found · refresh`:'♪ No titles · retry'},7000)};h.appendChild(b)})}
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
