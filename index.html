@@ -338,7 +338,7 @@ const P={home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1
  shuffle:'M3 7h3.5c4 0 6 10 10 10H21M18 14l3 3-3 3M3 17h3.5c1.6 0 2.8-1.6 3.8-3.6M14 8.6C15 7.6 15.8 7 16.5 7H21M18 4l3 3-3 3',vol:'M4 9.5h3.5L12 6v12l-4.5-3.5H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',plus:'M12 5v14M5 12h14',dl:'M12 4v11M7 10.5l5 5 5-5M5 20h14',ul:'M12 20V9M7 13.5l5-5 5 5M5 4h14',globe:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18'};
 const ic=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]}" ${['play','pause','star'].includes(n)&&n!=='star'?'fill="currentColor" stroke="none"':''}/></svg>`;
 const icf=n=>`<svg class="i" viewBox="0 0 24 24"><path d="${P[n]}" fill="currentColor"/></svg>`;
-const S={skin:LS.get('skin','modern'),svol:LS.get('svol',{}),bedMin:LS.get('bedMin',30),presets:LS.get('presets',[null,null,null,null,null,null]),favs:LS.get('favs',[]),recent:LS.get('recent',[]),log:LS.get('log',[]),country:LS.get('country','GB'),
+const S={sfx:LS.get('sfx',true),skin:LS.get('skin','modern'),svol:LS.get('svol',{}),bedMin:LS.get('bedMin',30),presets:LS.get('presets',[null,null,null,null,null,null]),favs:LS.get('favs',[]),recent:LS.get('recent',[]),log:LS.get('log',[]),country:LS.get('country','GB'),
   vol:LS.get('vol',.9),last:LS.get('last',null),ldim:LS.get('ldim','auto'),playful:LS.get('playful','auto'),nightlight:LS.get('nightlight',false),staticfx:LS.get('staticfx',true),lastBackup:LS.get('lastBackup',0)};
 S.geo=LS.get('geo',null);S.gper=LS.get('gper','night');
 const NAT=window.NJR||null;let natList=[],natLoaded=false,natErr='',song='';
@@ -466,9 +466,21 @@ function gSetup(){const cv=$('#globe');if(!cv)return;G.drawn=false;gDraw();gLoop
   cv.onpointermove=e=>{if(!drag)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>4){G.rot[0]=drag.r[0]+dx*.5;G.rot[1]=Math.max(-60,Math.min(60,drag.r[1]-(e.clientY-drag.y)*.3));if(!playful())gDraw()}};
   ['pointerup','pointercancel','pointerleave'].forEach(v=>cv.addEventListener(v,()=>drag=null))}
 if(!window.d3)document.querySelector('script[src="geo.js"]')?.addEventListener('load',()=>{if($('#globe'))gDraw()});
-function gSpinTo(lat,lon,label,feat){return new Promise(res=>{G.sel=null;G.pin=null;G.label='';const from=[...G.rot];let to0=-lon;while(to0<from[0]+380)to0+=360;const to1=Math.max(-55,Math.min(55,-lat*.85)),dur=playful()?4500:0,t0=performance.now();G.spinning=true;
-  const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;G.rot=[from[0]+(to0-from[0])*e,from[1]+(to1-from[1])*e,0];if(!playful())gDraw();
-    if(k<1)requestAnimationFrame(step);else{G.rot[0]=((G.rot[0]%360)+540)%360-180;G.spinning=false;G.sel=feat||null;G.pin=[lon,lat];G.label=label;G.t0=performance.now();gDraw();res()}};requestAnimationFrame(step)})}
+/* globe sound effects */
+function sfxCtx(){if(!S.sfx)return null;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx}catch{return null}}
+function sfxTick(v){const c=sfxCtx();if(!c)return;const t=c.currentTime,o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.type='triangle';o.frequency.value=1500+Math.random()*350;f.type='highpass';f.frequency.value=700;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.002,.06*v),t+.002);g.gain.exponentialRampToValueAtTime(.0001,t+.04);o.connect(f).connect(g).connect(c.destination);o.start(t);o.stop(t+.05)}
+function sfxChime(){const c=sfxCtx();if(!c)return;const t=c.currentTime+.02;
+  const th=c.createOscillator(),tg=c.createGain();th.type='sine';th.frequency.setValueAtTime(180,t);th.frequency.exponentialRampToValueAtTime(70,t+.18);tg.gain.setValueAtTime(.0001,t);tg.gain.exponentialRampToValueAtTime(.16,t+.01);tg.gain.exponentialRampToValueAtTime(.0001,t+.25);th.connect(tg).connect(c.destination);th.start(t);th.stop(t+.3);
+  [[1318.5,.06],[1975.5,.16],[2637,.27]].forEach(([fr,d])=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=fr;g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(.07,t+d+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d+1.3);o.connect(g).connect(c.destination);o.start(t+d);o.stop(t+d+1.4)})}
+let wh=null;
+function whooshStart(){const c=sfxCtx();if(!c||wh)return;try{const b=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  const src=c.createBufferSource();src.buffer=b;src.loop=true;const f=c.createBiquadFilter();f.type='bandpass';f.Q.value=1.4;f.frequency.value=260;const g=c.createGain();g.gain.value=0;src.connect(f).connect(g).connect(c.destination);src.start();wh={src,f,g}}catch{}}
+function whooshSet(sp){if(!wh)return;const t=actx.currentTime;wh.g.gain.setTargetAtTime(Math.min(.11,sp*.11),t,.06);wh.f.frequency.setTargetAtTime(240+sp*1500,t,.06)}
+function whooshStop(){if(!wh)return;const w=wh;wh=null;try{w.g.gain.setTargetAtTime(0,actx.currentTime,.07);setTimeout(()=>{try{w.src.stop()}catch{}},450)}catch{}}
+function gSpinTo(lat,lon,label,feat){return new Promise(res=>{G.sel=null;G.pin=null;G.label='';const from=[...G.rot];let to0=-lon;while(to0<from[0]+380)to0+=360;const to1=Math.max(-55,Math.min(55,-lat*.85)),dur=playful()?4500:0,t0=performance.now();G.spinning=true;let pk=0,pe=0,tickA=from[0];if(dur)whooshStart();
+  const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;G.rot=[from[0]+(to0-from[0])*e,from[1]+(to1-from[1])*e,0];if(!playful())gDraw();if(dur){const sp=k>pk?Math.min(1,((e-pe)/(k-pk))/3):0;pk=k;pe=e;whooshSet(sp);if(G.rot[0]-tickA>=15){tickA+=15*Math.floor((G.rot[0]-tickA)/15);sfxTick(.35+sp*.65)}}
+    if(k<1)requestAnimationFrame(step);else{whooshStop();if(dur)sfxChime();G.rot[0]=((G.rot[0]%360)+540)%360-180;G.spinning=false;G.sel=feat||null;G.pin=[lon,lat];G.label=label;G.t0=performance.now();gDraw();res()}};requestAnimationFrame(step)})}
 async function globeSpin(){if(globeBusy)return;globeBusy=true;const out=$('#gres');gData();
   const per=PERS.find(p=>p[0]===S.gper)||PERS[0];let pool=ZONES.filter(z=>per[3](zHour(z[2])));if(!pool.length)pool=ZONES;
   if(out)out.innerHTML=`<div class="gwhere"><span class="gflag">🌍</span><div><b>Spinning…</b><span>Finding somewhere it’s ${per[0]==='any'?'anywhere':per[1].toLowerCase()} right now</span></div></div>`;
@@ -619,6 +631,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Late-night dim</label><select class="sel" id="s_ld">${[['auto','At night (8pm – 5am)'],['on','Always'],['off','Off']].map(([v,l])=>`<option value="${v}" ${S.ldim===v?'selected':''}>${l}</option>`).join('')}</select>
   <div style="margin-top:12px"><label class="tog"><input type="checkbox" id="s_sfx" ${S.staticfx?'checked':''}>Radio static while tuning</label>
+  <label class="tog"><input type="checkbox" id="s_fx" ${S.sfx?'checked':''}>Sound effects — globe whoosh, ticks and chime</label>
   <label class="tog"><input type="checkbox" id="s_nl" ${S.nightlight?'checked':''}>Night-light clock after 20 seconds untouched while playing</label>
   <label class="tog"><input type="checkbox" id="s_pl" ${playful()?'checked':''}>Playful touches — bouncy buttons and sparkles</label></div>
   <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button></div>
@@ -634,7 +647,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
   $('#s_nl').onchange=e=>{S.nightlight=e.target.checked;save('nightlight');poke()};
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
-  $('#s_bk').onclick=backup;$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
+  $('#s_bk').onclick=backup;$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
   const done=()=>{S.lastBackup=Date.now();save('lastBackup');toast('Backup saved')};if(NAT){NAT.saveFile(name,txt);return done()}
@@ -743,8 +756,10 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
-const RV=3;
+const RV=4;
 const NEWS=[
+  {v:4,i:'🔊',c:'var(--h-blue)',t:'Globe sounds',d:'Spin the globe to hear it whoosh, tick as it slows and chime when it lands. Turn off in Settings → Sound effects.'},
+  {v:4,i:'🎨',c:'var(--h-pink)',t:'Station artwork',d:'Stations without a logo now get their website icon, or colourful artwork with a genre badge.'},
   {app:102,i:'🔒',c:'var(--h-green)',t:'Extra safety',d:'The app’s phone features (alarm, files, links) now only respond to Nightjar Radio itself, and only secure links open.'},
   {app:5,i:'🧩',c:'var(--h-blue)',t:'Choose your widget',d:'Four widgets now: Presets, Mini radio (with the station logo and clock), Now playing (a slim bar) and Shortcuts (spin the globe, spin the dial, bedtime).'},
   {v:3,i:'📻',c:'var(--h-orange)',t:'Radio skins',d:'In the full player, switch the radio between Modern, Wooden, Boombox and Car stereo.'},
