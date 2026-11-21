@@ -971,7 +971,8 @@ const FAQ=[
   ['How do I move to a new phone?','Settings → “Back up now” saves a small file. On the new phone, open Settings → Restore and pick that file — your favourites, presets and settings come with you.']]]];
 function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px">‹ Settings</button><h3>Help &amp; FAQ</h3>
   ${FAQ.map(([g,qs])=>`<div class="mono faqg">${esc(g)}</div>${qs.map(([q,a])=>`<details class="faq"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}`).join('')}
-  <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.</p>`);
+  <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.<br><a href="#" id="faqpriv" style="color:var(--acc,#ffd08a)">Read the full privacy policy</a></p>`);
+  $('#faqpriv').onclick=e=>{e.preventDefault();const u=location.origin+location.pathname.replace(/[^/]*$/,'')+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#faqback').onclick=()=>settings();
   $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
 
@@ -1006,7 +1007,8 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <button class="pill" id="s_share" style="margin-top:14px">${ic('share')}Share the app</button>
   ${NAT?`<button class="pill" id="s_upd" style="margin-top:14px">${ic('dl')}Check for app updates</button>`:`<a class="pill" href="${APK}" style="margin-top:14px;text-decoration:none">${ic('dl')}Get the Android app</a>`}
   <input type="file" id="s_file" accept=".txt,.json,text/plain,application/json" hidden>
-  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono">${NAT?'App build '+NAT.version():'Web version'} · beta</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info</small></div>`);
+  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono">${NAT?'App build '+NAT.version():'Web version'} · beta</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a></small></div>`);
+  $('#s_priv').onclick=e=>{e.preventDefault();const u=location.origin+location.pathname.replace(/[^/]*$/,'')+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
