@@ -300,6 +300,25 @@ a.pill{color:inherit}
 .art .gx b{font:italic 600 34cqw/1 var(--serif);color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.35);letter-spacing:-.02em}
 .art .gx em{position:absolute;right:7%;bottom:5%;font-style:normal;font-size:24cqw;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
 .art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.sky{--t1:transparent;--t2:transparent}
+body[class*="th-"] .a2{--c:var(--t1)}body[class*="th-"] .a3{--c:var(--t2)}
+#thbadge{font-size:18px;margin-left:2px;line-height:1}
+.thchip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 14px;border-radius:999px;font-size:14px;background:color-mix(in srgb,var(--acc) 14%,transparent);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);color:var(--acc2)}
+.poppy{display:inline-block;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#111 0 22%,#2a7d2a 23% 30%,#d62f2f 31%);box-shadow:0 0 0 1px rgba(0,0,0,.3);vertical-align:-2px}
+#thfx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+#thfx i{position:absolute;top:-30px;font-style:normal;opacity:.75;animation:thfall var(--du) linear infinite;animation-delay:var(--de)}
+@keyframes thfall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(var(--sw),55vh) rotate(160deg)}100%{transform:translate(0,112vh) rotate(320deg)}}
+.fx-snow i{color:#fff;opacity:.55!important;text-shadow:0 0 6px rgba(255,255,255,.6)}
+.fx-float i{top:auto!important;bottom:-30px;animation-name:thrise!important}@keyframes thrise{0%{transform:translate(0,0)}50%{transform:translate(var(--sw),-55vh)}100%{transform:translate(0,-112vh)}}
+#thfx.fx-bats i{animation-name:thbat!important;opacity:.85}@keyframes thbat{0%{transform:translate(-20vw,0) scale(.8)}25%{transform:translate(20vw,8vh) scale(1)}50%{transform:translate(60vw,-4vh) scale(.8)}75%{transform:translate(90vw,10vh) scale(1)}100%{transform:translate(130vw,0) scale(.8)}}
+.fx-fireflies i{width:5px;height:5px;border-radius:50%;background:#ffd98a;box-shadow:0 0 10px 3px rgba(255,200,90,.6);top:auto!important;bottom:-10px;animation-name:thfly!important}
+@keyframes thfly{0%{transform:translate(0,0);opacity:0}20%{opacity:.9}50%{transform:translate(var(--sw),-40vh);opacity:.3}80%{opacity:.9}100%{transform:translate(0,-90vh);opacity:0}}
+.fx-fireworks i{width:4px;height:4px;border-radius:50%;opacity:1;animation:thboom 1.5s cubic-bezier(.2,.8,.3,1) forwards!important}
+@keyframes thboom{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 30px)) scale(.4);opacity:0}}
+#thlights{position:fixed;top:0;left:0;right:0;height:14px;z-index:21;display:flex;justify-content:space-around;pointer-events:none;padding-top:env(safe-area-inset-top)}
+#thlights i{width:7px;height:10px;border-radius:50% 50% 45% 45%;background:var(--c);box-shadow:0 0 8px var(--c);margin-top:3px;animation:twinkle 1.6s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes twinkle{50%{opacity:.35}}
+body.calm #thlights i{animation:none}
 /* late night dim */
 body.ldim::before{content:'';position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.42);pointer-events:none}
 body.ldim #toast{background:#17120d;color:#c08a45}
@@ -338,7 +357,7 @@ const P={home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1
  shuffle:'M3 7h3.5c4 0 6 10 10 10H21M18 14l3 3-3 3M3 17h3.5c1.6 0 2.8-1.6 3.8-3.6M14 8.6C15 7.6 15.8 7 16.5 7H21M18 4l3 3-3 3',vol:'M4 9.5h3.5L12 6v12l-4.5-3.5H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',plus:'M12 5v14M5 12h14',dl:'M12 4v11M7 10.5l5 5 5-5M5 20h14',ul:'M12 20V9M7 13.5l5-5 5 5M5 4h14',globe:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18'};
 const ic=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]}" ${['play','pause','star'].includes(n)&&n!=='star'?'fill="currentColor" stroke="none"':''}/></svg>`;
 const icf=n=>`<svg class="i" viewBox="0 0 24 24"><path d="${P[n]}" fill="currentColor"/></svg>`;
-const S={sfx:LS.get('sfx',true),skin:LS.get('skin','modern'),svol:LS.get('svol',{}),bedMin:LS.get('bedMin',30),presets:LS.get('presets',[null,null,null,null,null,null]),favs:LS.get('favs',[]),recent:LS.get('recent',[]),log:LS.get('log',[]),country:LS.get('country','GB'),
+const S={theme:LS.get('theme','auto'),sfx:LS.get('sfx',true),skin:LS.get('skin','modern'),svol:LS.get('svol',{}),bedMin:LS.get('bedMin',30),presets:LS.get('presets',[null,null,null,null,null,null]),favs:LS.get('favs',[]),recent:LS.get('recent',[]),log:LS.get('log',[]),country:LS.get('country','GB'),
   vol:LS.get('vol',.9),last:LS.get('last',null),ldim:LS.get('ldim','auto'),playful:LS.get('playful','auto'),nightlight:LS.get('nightlight',false),staticfx:LS.get('staticfx',true),lastBackup:LS.get('lastBackup',0)};
 S.geo=LS.get('geo',null);S.gper=LS.get('gper','night');
 const NAT=window.NJR||null;let natList=[],natLoaded=false,natErr='',song='';
@@ -510,7 +529,7 @@ function nearH(){return S.geo?`<div id="hnear">${skRows(4)}</div>`:`<div class="
 async function fillNear(tok){const el=$('#hnear');if(!el)return;try{const r=await nearList();if(tok!==renderTok||!$('#hnear'))return;$('#hnear').innerHTML=r.length?rows(r,'Near you',1):'<div class="empty"><b>Quiet round here</b>No stations listed near you — try Popular in your country below.</div>';mark()}catch{if(tok===renderTok&&$('#hnear'))$('#hnear').innerHTML=errBox()}}
 async function askNear(){const b=$('[data-act=near]');if(b)b.innerHTML=`${ic('globe')}Finding you…`;try{S.geo=await getPos();save('geo');render()}catch(e){if(b)b.innerHTML=`${ic('globe')}Find stations near me`;toast(e&&e.code===1?'Location is blocked — allow it in Chrome’s site settings':'Couldn’t get your location — try again outside or with GPS on')}}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,S.country])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`:''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   <div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>
   ${sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N())}
   <div class="chips" style="margin-top:18px">${MOODS.map(([l,t,c])=>`<button class="chip" style="--c:${c}" data-mood="${esc(t)}">${l}</button>`).join('')}</div>
@@ -628,6 +647,7 @@ function presetMenu(i){const p=S.presets[i];sheet(`<h3>Preset ${i+1}</h3><p clas
 function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/864e5):null;
   sheet(`<h3>Settings</h3>
   <label class="mono" style="display:block;margin:6px 0">Home country</label><select class="sel" id="s_cc">${COUNTRIES.map(([c,n])=>`<option value="${c}" ${c===S.country?'selected':''}>${flag(c)} ${n}</option>`).join('')}</select>
+  <label class="mono" style="display:block;margin:16px 0 6px">Seasonal themes</label><select class="sel" id="s_th"><option value="auto" ${S.theme==='auto'?'selected':''}>Automatic — UK calendar</option><option value="off" ${S.theme==='off'?'selected':''}>Off</option>${Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${S.theme===k?'selected':''}>Preview: ${t.name}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Late-night dim</label><select class="sel" id="s_ld">${[['auto','At night (8pm – 5am)'],['on','Always'],['off','Off']].map(([v,l])=>`<option value="${v}" ${S.ldim===v?'selected':''}>${l}</option>`).join('')}</select>
   <div style="margin-top:12px"><label class="tog"><input type="checkbox" id="s_sfx" ${S.staticfx?'checked':''}>Radio static while tuning</label>
@@ -647,7 +667,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
   $('#s_nl').onchange=e=>{S.nightlight=e.target.checked;save('nightlight');poke()};
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
-  $('#s_bk').onclick=backup;$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
+  $('#s_bk').onclick=backup;$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
   const done=()=>{S.lastBackup=Date.now();save('lastBackup');toast('Backup saved')};if(NAT){NAT.saveFile(name,txt);return done()}
@@ -678,6 +698,51 @@ $('#nl').addEventListener('click',()=>{const t=Date.now();if(t-nlTap<450)return 
 /* ---------- dim, playful ---------- */
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;const playful=()=>S.playful===true||(S.playful!==false&&!RM);
 function applyDim(){const h=new Date().getHours(),on=S.ldim==='on'||(S.ldim==='auto'&&(h>=20||h<5));document.body.classList.toggle('ldim',on)}
+/* ---------- seasonal themes (UK calendar) ---------- */
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
+const dayN=d=>Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);
+const nthSun=(y,m,n)=>{const d=new Date(y,m,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
+const THEMES={
+  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=new Date().getDate();return d===24?'Happy Christmas Eve':d===25?'Merry Christmas':d===26?'Happy Boxing Day':'Merry Christmas'},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
+  newyear:{name:'New Year',badge:'🎆',greet:()=>new Date().getMonth()===11?'Happy New Year’s Eve':'Happy New Year',fx:'fireworks',p:['✦','✧','★'],c:['#ffd166','#f3ecdf','#86b4ff']},
+  burns:{name:'Burns Night',badge:'🏴',greet:'Happy Burns Night',fx:'none',c:['#5b8def','#ffffff','#5b8def']},
+  valentine:{name:'Valentine’s',badge:'💗',greet:()=>new Date().getDate()===14?'Happy Valentine’s Day':'Love is in the air',fx:'float',p:['💗','💕','❤'],c:['#ff7aa8','#ffc2d6','#ff4f7b']},
+  pancake:{name:'Pancake Day',badge:'🥞',greet:'Happy Pancake Day',fx:'fall',p:['🥞','🍋'],c:['#ffc46b','#ffe2a8','#ff9f43']},
+  stdavid:{name:'St David’s Day',badge:'🌼',greet:'Happy St David’s Day',fx:'fall',p:['🌼'],c:['#ffd84d','#fff2a8','#3fbf7f']},
+  mothers:{name:'Mother’s Day',badge:'💐',greet:'Happy Mother’s Day',fx:'fall',p:['🌷','🌸','💐'],c:['#ff9ccc','#ffd1e6','#b8a2ff']},
+  stpatrick:{name:'St Patrick’s Day',badge:'☘️',greet:'Happy St Patrick’s Day',fx:'fall',p:['☘️','🍀'],c:['#3fbf7f','#b8f2c9','#ffd166']},
+  easter:{name:'Easter',badge:'🐣',greet:'Happy Easter',fx:'fall',p:['🥚','🐣','🌷','🐰'],c:['#ffd6a5','#cdeac0','#b8a2ff']},
+  stgeorge:{name:'St George’s Day',badge:'🌹',greet:'Happy St George’s Day',fx:'fall',p:['🌹'],c:['#ff4f5e','#ffffff','#ff4f5e']},
+  fathers:{name:'Father’s Day',badge:'👔',greet:'Happy Father’s Day',fx:'none',c:['#6fa8ff','#cfe0ff','#ffb347']},
+  halloween:{name:'Halloween',badge:'🎃',greet:()=>new Date().getDate()===31?'Happy Halloween':'Spooky season',fx:'bats',p:['🦇','🦇','🎃','👻'],c:['#ff8c1a','#ffc266','#9b5de5']},
+  bonfire:{name:'Bonfire Night',badge:'🎆',greet:'Remember, remember the 5th of November',fx:'fireworks',p:['✦','✧','✺'],c:['#ff6b4a','#ffd166','#ff9ccc']},
+  remembrance:{name:'Remembrance',badge:'<span class="poppy"></span>',greet:'We will remember them',fx:'none',c:['#d64545','#f3ecdf','#d64545']},
+  spring:{name:'Spring',badge:'🌸',greet:'',fx:'petals',p:['🌸','✿'],c:['#ff9ccc','#ffd1e6','#86d9a8']},
+  summer:{name:'Summer',badge:'☀️',greet:'',fx:'fireflies',p:[],c:['#ffb347','#ffd08a','#ff6b4a']},
+  autumn:{name:'Autumn',badge:'🍂',greet:'',fx:'fall',p:['🍂','🍁','🍂'],c:['#ff8c42','#ffc07a','#c9653b']},
+  winter:{name:'Winter',badge:'❄',greet:'',fx:'snow',p:['❄','❅','·'],c:['#9cc7ff','#e6f0ff','#86b4ff']}};
+function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getDate(),n=dayN(d),E=dayN(easter(y)),md=m*100+D;
+  if(md>=1231||md<=102)return'newyear';if(md>=1201&&md<=1230)return'christmas';
+  if(n>=E-2&&n<=E+1)return'easter';if(n===E-47)return'pancake';if(n===E-21||n===E-22)return'mothers';
+  if(md===125)return'burns';if(md>=207&&md<=214)return'valentine';if(md===301)return'stdavid';if(md===317)return'stpatrick';if(md===423)return'stgeorge';
+  if(n===dayN(nthSun(y,5,3)))return'fathers';if(md>=1025&&md<=1031)return'halloween';if(md>=1104&&md<=1106)return'bonfire';
+  const rs=dayN(nthSun(y,10,2));if(md===1111||n===rs||(n>=rs-2&&n<rs))return'remembrance';
+  if(md>=320&&md<=531)return'spring';if(md>=601&&md<=831)return'summer';if(md>=901)return md<=1111?'autumn':'winter';return'winter'}
+let TH=null,thFw=0;
+function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;
+  document.body.className=document.body.className.replace(/\bth-\S+/g,'').trim();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
+  if(!TH){['--acc','--acc2','--cor'].forEach(v=>document.documentElement.style.removeProperty(v));$('#thbadge')?.remove();return}
+  document.body.classList.add('th-'+id);const r=document.documentElement.style;
+  if(!['spring','summer','autumn','winter'].includes(id)){r.setProperty('--acc',TH.c[0]);r.setProperty('--acc2',TH.c[1]);r.setProperty('--cor',TH.c[2])}else['--acc','--acc2','--cor'].forEach(v=>r.removeProperty(v));
+  sky.style.setProperty('--t1',TH.c[0]);sky.style.setProperty('--t2',TH.c[2]);
+  let bd=$('#thbadge');if(!bd){bd=document.createElement('span');bd.id='thbadge';$('#brand').append(bd)}bd.innerHTML=TH.badge;bd.title=TH.name;
+  if(TH.lights){const l=document.createElement('div');l.id='thlights';l.innerHTML=Array.from({length:22},(_,i)=>`<i style="--c:${TH.c[i%3]};--d:${(i%4)*.4}s"></i>`).join('');document.body.append(l)}
+  if(!playful()||TH.fx==='none')return;const fx=document.createElement('div');fx.id='thfx';fx.className='fx-'+TH.fx;
+  if(TH.fx==='fireworks'){sky.append(fx);const boom=()=>{if(document.hidden||!$('#thfx'))return;const x=10+Math.random()*80,y=8+Math.random()*40,col=TH.c[Math.random()*3|0];for(let i=0;i<16;i++){const s=document.createElement('i');const a=Math.PI*2*i/16,rr=40+Math.random()*30;s.style.cssText=`left:${x}%;top:${y}%;--dx:${Math.cos(a)*rr}px;--dy:${Math.sin(a)*rr}px;background:${col};box-shadow:0 0 6px ${col}`;fx.append(s);setTimeout(()=>s.remove(),1600)}};boom();thFw=setInterval(boom,2600);return}
+  const N=TH.fx==='fireflies'?14:TH.fx==='snow'?18:12;
+  fx.innerHTML=Array.from({length:N},()=>{const l=Math.random()*100,du=(TH.fx==='fireflies'?6:12)+Math.random()*10,de=-Math.random()*20,sz=TH.fx==='snow'?(8+Math.random()*10):(14+Math.random()*10),g=TH.p[Math.random()*TH.p.length|0]||'';
+    return`<i style="${TH.fx==='bats'?`left:0;top:${(8+Math.random()*55)|0}vh`:`left:${l}%`};--du:${du}s;--de:${de}s;font-size:${sz}px;--sw:${(Math.random()*60-30)|0}px">${g}</i>`}).join('');sky.append(fx)}
+applyTheme();setInterval(()=>{if(S.theme==='auto'){const id=themeId();if(!TH||THEMES[id]!==TH){applyTheme();if(view==='home')render()}}},6e5);
 applyDim();setInterval(applyDim,60000);document.body.classList.toggle('calm',!playful());
 let px=innerWidth/2,py=innerHeight/2;addEventListener('pointerdown',e=>{px=e.clientX;py=e.clientY},{capture:true,passive:true});
 function burst(x,y,g,c,n=9){if(!playful())return;for(let i=0;i<n;i++){const d=document.createElement('span'),a=Math.PI*2*i/n,r=40+Math.random()*40;d.className='zap';d.textContent=g[i%g.length];d.style.cssText=`left:${x}px;top:${y}px;color:${c[i%c.length]};--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r-14}px;font-size:${12+Math.random()*8}px`;document.body.append(d);setTimeout(()=>d.remove(),1000)}}
@@ -756,8 +821,9 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
-const RV=4;
+const RV=5;
 const NEWS=[
+  {v:5,i:'🎄',c:'var(--h-red)',t:'Seasonal themes',d:'The app now dresses up for the UK calendar — snow at Christmas, fireworks for New Year and Bonfire Night, hearts, eggs, bats, poppies and more, plus gentle themes for each season. Settings → Seasonal themes to preview or turn off.'},
   {v:4,i:'🔊',c:'var(--h-blue)',t:'Globe sounds',d:'Spin the globe to hear it whoosh, tick as it slows and chime when it lands. Turn off in Settings → Sound effects.'},
   {v:4,i:'🎨',c:'var(--h-pink)',t:'Station artwork',d:'Stations without a logo now get their website icon, or colourful artwork with a genre badge.'},
   {app:102,i:'🔒',c:'var(--h-green)',t:'Extra safety',d:'The app’s phone features (alarm, files, links) now only respond to Nightjar Radio itself, and only secure links open.'},
