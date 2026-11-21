@@ -955,7 +955,7 @@ const FAQ=[
  ['Android app',[
   ['Does it keep playing with the screen off?','Yes, in the Android app. If it stops, your phone may be saving battery — allow Nightjar Radio to run in the background (the alarm screen has a shortcut for this).'],
   ['How does the wake-up alarm work?','Library → Wake-up radio. Pick a time, the days and a station; it fades in gently. If the station can’t be reached, a chime plays instead so you still wake up.'],
-  ['Does it work with Android Auto?','Yes. Your presets, favourites and recently played stations appear in Android Auto.'],
+  ['Does it work with Android Auto?','Yes. In Android Auto you’ll find your presets, favourites and recently played stations, plus Popular in your country, Sport and Moods (chill, jazz, 80s, rock and more). Tap the search button or just say “Hey Google, play Kerrang on Nightjar Radio”.'],
   ['Can I play it on my TV or speaker?','Yes — tap “Cast” in the full player to send the station to a Chromecast, Google/Nest speaker or Google TV on the same Wi-Fi. A few older stations that only use insecure (http) streams may not cast.'],
   ['What happens if my signal drops?','The app reconnects by itself — you’ll see “Reconnecting…” and it picks up again when the signal’s back.'],
   ['How do I add a widget?','Long-press an empty spot on your home screen → Widgets → Nightjar Radio. There are four: Presets, Mini radio, Now playing and Shortcuts.'],
@@ -1303,6 +1303,7 @@ let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=13;
 const NEWS=[
+  {app:110,i:'🚗',c:'var(--h-blue)',t:'Better Android Auto',d:'In the car you now get Popular in your country, Sport and a Moods grid — plus search. Try: “Hey Google, play Kerrang on Nightjar Radio”.'},
   {app:108,i:'📺',c:'var(--h-blue)',t:'Cast, reconnect & data saver',d:'Tap “Cast” in the player to send a station to your Chromecast, Google/Nest speaker or Google TV. If your signal drops, Nightjar Radio now reconnects by itself. And Settings has a new Data saver for mobile data, plus how much data you’ve used this month.'},
   {app:107,i:'🎂',c:'var(--h-pink)',t:'Your settings are safer',d:'Your birthday, presets, favourites and Home layout now have a backup copy inside the app, so they come back even if your phone clears its storage.'},
   {v:13,i:'✎',c:'#ffb36b',t:'Make Home yours',d:'Move Home’s sections into any order and hide the ones you don’t use — tap “Customise Home” at the bottom of Home, or in Settings.'},
