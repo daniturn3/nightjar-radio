@@ -34,7 +34,8 @@ object Store {
     fun find(c: Context, id: String): MediaItem? {
         val u = id.substringAfter('/')
         val prefix = if (id.contains('/')) id.substringBefore('/') + "/" else ""
-        for (k in listOf("queue", "presets", "favs", "recent")) {
+        val live = prefs(c).all.keys.filter { it.startsWith("live_") }
+        for (k in listOf("queue", "presets", "favs", "recent") + live) {
             val a = arr(c, k)
             for (i in 0 until a.length()) {
                 val o = a.optJSONObject(i) ?: continue

@@ -42,6 +42,8 @@ import androidx.media3.session.SessionResult
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.MoreExecutors
+import java.util.concurrent.Executors
 
 @UnstableApi
 class PlaybackService : MediaLibraryService() {
@@ -105,6 +107,7 @@ class PlaybackService : MediaLibraryService() {
     }
 
     // ---- Auto-reconnect: if a station that was playing drops (signal loss, Wi-Fi <-> mobile switch), keep trying quietly. ----
+    private val net = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(3))
     private var playedId: String? = null
     private var tries = 0
     private var retryRun: Runnable? = null
@@ -351,7 +354,12 @@ class PlaybackService : MediaLibraryService() {
         override fun onGetLibraryRoot(
             session: MediaLibrarySession, browser: MediaSession.ControllerInfo, params: LibraryParams?
         ): ListenableFuture<LibraryResult<MediaItem>> =
-            Futures.immediateFuture(LibraryResult.ofItem(Store.folder("root", "Nightjar Radio"), params))
+            Futures.immediateFuture(LibraryResult.ofItem(Store.folder("root", "Nightjar Radio"),
+                LibraryParams.Builder().setExtras(Bundle().apply {
+                    putBoolean("android.media.browse.SEARCH_SUPPORTED", true)
+                    putInt("android.media.browse.CONTENT_STYLE_BROWSABLE_HINT", Live.LIST)
+                    putInt("android.media.browse.CONTENT_STYLE_PLAYABLE_HINT", Live.LIST)
+                }).build()))
 
         override fun onGetItem(
             session: MediaLibrarySession, browser: MediaSession.ControllerInfo, mediaId: String
@@ -366,26 +374,75 @@ class PlaybackService : MediaLibraryService() {
             session: MediaLibrarySession, browser: MediaSession.ControllerInfo, parentId: String,
             page: Int, pageSize: Int, params: LibraryParams?
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
-            val list = when (parentId) {
-                "root" -> listOf(
-                    Store.folder("presets", "Presets"),
-                    Store.folder("favs", "Favourites"),
-                    Store.folder("recent", "Recently played")
-                )
-                else -> Store.items(this@PlaybackService, parentId)
+            val c = this@PlaybackService
+            if (parentId == "root") {
+                val cc = Live.country(c)
+                val list = mutableListOf<MediaItem>()
+                if (Store.items(c, "presets").isNotEmpty()) list += Live.folder("presets", "Presets", "Your six quick-tune stations", Live.GRID)
+                if (Store.items(c, "favs").isNotEmpty()) list += Live.folder("favs", "Favourites", "Stations you’ve starred")
+                if (Store.items(c, "recent").isNotEmpty()) list += Live.folder("recent", "Recently played")
+                list += Live.folder("live_popular", "Popular in ${Live.countryName(cc)}", "Top stations right now")
+                list += Live.folder("moods", "Moods", "Chill, jazz, 80s, rock and more", Live.GRID)
+                list += Live.folder("live_sport", "Sport", "Commentary and sports talk")
+                return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(list), params))
             }
-            return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(list), params))
+            if (parentId == "moods") {
+                val list = Live.MOODS.map { (id, title, _) -> Live.folder("live_mood_$id", title, "", Live.LIST) }
+                return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(list), params))
+            }
+            if (parentId.startsWith("live_") && parentId != "live_search") {
+                return net.submit<LibraryResult<ImmutableList<MediaItem>>> {
+                    LibraryResult.ofItemList(ImmutableList.copyOf(Live.load(c, parentId.removePrefix("live_"))), params)
+                }
+            }
+            return Futures.immediateFuture(LibraryResult.ofItemList(ImmutableList.copyOf(Store.items(c, parentId)), params))
+        }
+
+        // ---- Search: the car's search button and "Hey Google, play … on Nightjar Radio" ----
+        override fun onSearch(
+            session: MediaLibrarySession, browser: MediaSession.ControllerInfo, query: String, params: LibraryParams?
+        ): ListenableFuture<LibraryResult<Void>> {
+            val c = this@PlaybackService
+            net.submit { val n = Live.search(c, query).size; h.post { session.notifySearchResultChanged(browser, query, n, params) } }
+            return Futures.immediateFuture(LibraryResult.ofVoid())
+        }
+
+        override fun onGetSearchResult(
+            session: MediaLibrarySession, browser: MediaSession.ControllerInfo, query: String,
+            page: Int, pageSize: Int, params: LibraryParams?
+        ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+            val c = this@PlaybackService
+            return net.submit<LibraryResult<ImmutableList<MediaItem>>> {
+                var r = Store.items(c, "live_search")
+                if (r.isEmpty()) r = Live.search(c, query)
+                LibraryResult.ofItemList(ImmutableList.copyOf(r), params)
+            }
         }
 
         override fun onAddMediaItems(
             mediaSession: MediaSession, controller: MediaSession.ControllerInfo, mediaItems: MutableList<MediaItem>
-        ): ListenableFuture<MutableList<MediaItem>> =
-            Futures.immediateFuture(mediaItems.mapNotNull { Store.resolve(this@PlaybackService, it) }.toMutableList())
+        ): ListenableFuture<MutableList<MediaItem>> {
+            mediaItems.firstOrNull()?.requestMetadata?.searchQuery?.let { sq ->
+                val c = this@PlaybackService
+                return net.submit<MutableList<MediaItem>> { Live.search(c, sq).take(1).toMutableList() }
+            }
+            return Futures.immediateFuture(mediaItems.mapNotNull { Store.resolve(this@PlaybackService, it) }.toMutableList())
+        }
 
         override fun onSetMediaItems(
             mediaSession: MediaSession, controller: MediaSession.ControllerInfo, mediaItems: MutableList<MediaItem>,
             startIndex: Int, startPositionMs: Long
         ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+            // "Hey Google, play Kerrang on Nightjar Radio" arrives as a search query.
+            val sq = mediaItems.firstOrNull()?.requestMetadata?.searchQuery
+            if (sq != null) {
+                val c = this@PlaybackService
+                return net.submit<MediaSession.MediaItemsWithStartPosition> {
+                    var r = if (sq.isBlank()) Store.items(c, "presets").ifEmpty { Store.items(c, "recent") } else Live.search(c, sq)
+                    if (r.isEmpty()) r = Store.items(c, "recent")
+                    MediaSession.MediaItemsWithStartPosition(r, 0, C.TIME_UNSET)
+                }
+            }
             // Picked one station in a folder (e.g. on the car screen)? Load the whole folder so next/previous work.
             if (mediaItems.size == 1 && mediaItems[0].requestMetadata.mediaUri == null && mediaItems[0].localConfiguration == null) {
                 val id = mediaItems[0].mediaId
