@@ -327,6 +327,23 @@ class MainActivity : Activity() {
         }
 
         @JavascriptInterface fun openUrl(u: String) = ui { this@MainActivity.openUrl(u) }
+
+        /** Looks up what's playing on up to 30 stations; answers arrive one by one via window.njrPeek. */
+        @JavascriptInterface fun peek(json: String) {
+            if (!trusted || json.length > 50_000) return
+            val a = try { JSONArray(json) } catch (_: Exception) { return }
+            val urls = (0 until minOf(a.length(), 30)).map { a.optString(it) }
+                .filter { it.startsWith("http://") || it.startsWith("https://") }.distinct()
+            NowPlaying.peekAll(urls) { u, t ->
+                if (trusted) js("window.njrPeek&&window.njrPeek(" + JSONObject().put("u", u).put("t", t) + ")")
+            }
+        }
+
+        /** True on Wi-Fi or another connection that isn't metered. */
+        @JavascriptInterface fun unmetered(): Boolean {
+            val cm = getSystemService(android.net.ConnectivityManager::class.java) ?: return false
+            return !cm.isActiveNetworkMetered
+        }
     }
 
     private val OFFLINE = """<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
