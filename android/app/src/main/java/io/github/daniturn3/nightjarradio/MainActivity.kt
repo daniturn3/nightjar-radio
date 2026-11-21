@@ -339,6 +339,18 @@ class MainActivity : Activity() {
             }
         }
 
+        /** A safe second copy of small settings (birthday, presets, favourites, layout) kept by the app itself. */
+        @JavascriptInterface fun keep(key: String, value: String) {
+            if (!trusted || key.length > 40 || value.length > 60_000 || !key.matches(Regex("[A-Za-z0-9_]+"))) return
+            getSharedPreferences("njr_keep", MODE_PRIVATE).edit().putString(key, value).apply()
+        }
+        @JavascriptInterface fun kept(): String {
+            if (!trusted) return "{}"
+            val o = JSONObject()
+            getSharedPreferences("njr_keep", MODE_PRIVATE).all.forEach { (k, v) -> if (v is String) o.put(k, v) }
+            return o.toString()
+        }
+
         /** True on Wi-Fi or another connection that isn't metered. */
         @JavascriptInterface fun unmetered(): Boolean {
             val cm = getSystemService(android.net.ConnectivityManager::class.java) ?: return false
