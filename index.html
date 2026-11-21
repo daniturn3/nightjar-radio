@@ -145,7 +145,7 @@ body.calm .eq i{animation:none!important;transform:scaleY(.25)}
 .ctrls{display:flex;align-items:center;justify-content:center;gap:26px;margin:24px 0 16px}
 .ctrls .ib{width:56px;height:56px}.ctrls .ib .i{width:28px;height:28px}
 .bigplay{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--acc),var(--cor));color:#1a1210;box-shadow:0 18px 40px -16px var(--cor)}.bigplay .i{width:34px;height:34px}
-.npx{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.npx button{font-size:11.5px!important;padding:12px 2px!important}
+.npx{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.npx:has(>:nth-child(6)){grid-template-columns:repeat(3,1fr)}.npx button{font-size:11.5px!important;padding:12px 2px!important}
 .npx button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:12.5px}
 .npx button.on{color:var(--acc2);border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
 .vol{display:flex;align-items:center;gap:12px;margin:18px 4px 0;color:var(--mut)}
@@ -416,6 +416,8 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .hcard .alarm{background:rgba(0,0,0,.18);border-color:color-mix(in srgb,var(--a) 28%,transparent)}.hcard .recap{border-color:color-mix(in srgb,var(--a) 28%,transparent)}
 .lempty{padding:18px 10px 8px;text-align:center;color:var(--mut);font-size:13px;line-height:1.5}.lempty span{display:block;font-size:34px;margin-bottom:6px;filter:drop-shadow(0 4px 12px color-mix(in srgb,var(--a) 50%,transparent))}
 .lempty b{display:block;color:var(--cream);font:italic 500 19px var(--serif);margin-bottom:3px}
+.dbox{padding:12px 14px;border-radius:18px;background:rgba(134,217,168,.05);border:1px solid rgba(134,217,168,.25)}.drow{display:flex;align-items:center;gap:12px}.drow>div{flex:1}.drow b{display:block;font-weight:500;font-size:14.5px}.drow span{display:block;font-size:12px;color:var(--mut);margin-top:2px}
+.duse{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.duse div{padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.2)}.duse b{display:block;font:600 19px var(--mono);color:#86d9a8}.duse span{font-size:11.5px;color:var(--mut)}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -459,7 +461,7 @@ setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=loca
 const P={ball:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.4 2.5-1.3 4h-4.2l-1.3-4zM12 3v4.5M15.4 10l5-1.5M14.1 14l3 4M9.9 14l-3 4M8.6 10l-5-1.5',home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  play:'M8 5.5v13l10.5-6.5z',pause:'M7.5 5h3v14h-3zM13.5 5h3v14h-3z',prev:'M6 5v14M19 5.5v13L8.5 12z',next:'M18 5v14M5 5.5v13L15.5 12z',star:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  down:'M6 9l6 6 6-6',x:'M6 6l12 12M18 6 6 18',gear:'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM19.4 13.5l1.6 1.2-1.5 2.6-1.9-.6a7 7 0 0 1-1.9 1.1l-.4 2h-3l-.4-2a7 7 0 0 1-1.9-1.1l-1.9.6-1.5-2.6 1.6-1.2a7 7 0 0 1 0-2.2L3 10.1l1.5-2.6 1.9.6a7 7 0 0 1 1.9-1.1l.4-2h3l.4 2a7 7 0 0 1 1.9 1.1l1.9-.6 1.5 2.6-1.6 1.2a7 7 0 0 1 0 2.2z',
- moon:'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',car:'M5 16.5h14v-4.2l-1.8-4.6a1.5 1.5 0 0 0-1.4-1H8.2a1.5 1.5 0 0 0-1.4 1L5 12.3zM5 12.3h14M6.5 16.5V19M17.5 16.5V19',timer:'M12 8v5l3 2M12 4a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM10 2h4',share:'M18 8a3 3 0 1 0-2.8-4M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 3.9M15.4 6.6 8.6 10.5',
+ moon:'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',car:'M5 16.5h14v-4.2l-1.8-4.6a1.5 1.5 0 0 0-1.4-1H8.2a1.5 1.5 0 0 0-1.4 1L5 12.3zM5 12.3h14M6.5 16.5V19M17.5 16.5V19',timer:'M12 8v5l3 2M12 4a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM10 2h4',cast:'M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6M2 20h.01',share:'M18 8a3 3 0 1 0-2.8-4M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 3.9M15.4 6.6 8.6 10.5',
  shuffle:'M3 7h3.5c4 0 6 10 10 10H21M18 14l3 3-3 3M3 17h3.5c1.6 0 2.8-1.6 3.8-3.6M14 8.6C15 7.6 15.8 7 16.5 7H21M18 4l3 3-3 3',vol:'M4 9.5h3.5L12 6v12l-4.5-3.5H4zM16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11',plus:'M12 5v14M5 12h14',dl:'M12 4v11M7 10.5l5 5 5-5M5 20h14',ul:'M12 20V9M7 13.5l5-5 5 5M5 4h14',globe:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18'};
 const ic=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="${P[n]}" ${['play','pause','star'].includes(n)&&n!=='star'?'fill="currentColor" stroke="none"':''}/></svg>`;
 const icf=n=>`<svg class="i" viewBox="0 0 24 24"><path d="${P[n]}" fill="currentColor"/></svg>`;
@@ -515,25 +517,42 @@ const COUNTRIES=(()=>{const C='GB IE US CA AU NZ AD AE AF AL AM AO AR AT AZ BA B
 const au=$('#au');au.volume=S.vol;let cur=S.last,list=[],listName='',playing=false,buffering=false,sess=null;
 function setState(){document.body.classList.toggle('playing',playing);document.body.classList.toggle('buffering',buffering);renderMini();renderNPctl();carTick();
   if('mediaSession' in navigator)navigator.mediaSession.playbackState=playing?'playing':'paused'}
-function play(st,from){if(!st)return;if(miniHidden){miniHidden=false;LS.set('miniHidden',false)}if(cur?.u!==st.u)logEnd();cur=st;S.last=st;save('last');if(from){list=from.list||list;listName=from.name||listName}
+/* ---- Data saver: on mobile data, swap a heavy stream for a lighter copy of the same station when one exists ---- */
+const metered=()=>{try{if(NAT&&NAT.unmetered)return!NAT.unmetered();const c=navigator.connection;return!!(c&&(c.type==='cellular'||c.saveData))}catch{return false}};
+async function lighter(st){const base=st.n.replace(/\(?\b\d{2,3}\s?k(bps)?\b\)?/ig,'').replace(/\b(hq|hd|high quality|aac\+?|mp3|ogg|flac|opus)\b/ig,'').replace(/[\s()\[\]|·-]+$/,'').trim()||st.n;
+  const r=await Promise.race([stations({name:base},40,3600).catch(()=>[]),new Promise(z=>setTimeout(()=>z([]),2500))]),nb=sNorm(base);
+  const c=r.filter(x=>x.u!==st.u&&!x.hls&&x.br>=24&&x.br<=96&&x.br<(st.br||999)&&((st.home&&x.home===st.home)||sNorm(x.n).startsWith(nb))).sort((a,b)=>b.br-a.br)[0];
+  return c?{...st,url:c.url,br:c.br,lite:1}:null}
+function play(st,from){if(!st)return;if(LS.get('saver',false)&&!st.lite&&!(from&&from.sv)&&(st.br||0)>96&&metered()){
+    lighter(st).then(a=>{play0(a||st,{...(from||{}),sv:1});if(a)toast(`📉 Data saver: lighter ${a.br}k stream`)});return}play0(st,from)}
+function play0(st,from){if(!st)return;if(miniHidden){miniHidden=false;LS.set('miniHidden',false)}if(cur?.u!==st.u)logEnd();cur=st;S.last=st;save('last');if(from){list=from.list||list;listName=from.name||listName}
   S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');
-  buffering=true;playing=false;setState();staticOn();song='';applyVol(stVol(st));if(NAT){let L=(from?.list||(list.length?list:S.presets.filter(Boolean))).filter(Boolean),i=L.findIndex(x=>x.u===st.u);if(i<0){L=[st];i=0}natList=L;natLoaded=true;natErr='';NAT.playList(JSON.stringify(L.map(slim)),i)}else{au.src=st.url;au.play().catch(e=>{buffering=false;staticOff();setState();if(e.name==='NotAllowedError')toast('Tap play to start');else toast('That station isn’t answering — try another')})}
+  buffering=true;playing=false;setState();staticOn();song='';applyVol(stVol(st));wantPlay=true;reconnN=0;if(NAT&&cast.on){NAT.castPlay(JSON.stringify(slim(st)))}else if(NAT){let L=(from?.list||(list.length?list:S.presets.filter(Boolean))).filter(Boolean),i=L.findIndex(x=>x.u===st.u);if(i<0){L=[st];i=0}else if(st.lite){L=[...L];L[i]=st}natList=L;natLoaded=true;natErr='';NAT.playList(JSON.stringify(L.map(slim)),i)}else{au.src=st.url;au.play().catch(e=>{buffering=false;staticOff();setState();if(e.name==='NotAllowedError')toast('Tap play to start');else toast('That station isn’t answering — try another')})}
   click(st);meta();renderAll();firstFly()}
+let wantPlay=false,reconn=false,reconnN=0,reconnT=0,webPlayed=null,cast={on:false,dev:'',s:'off'};
+function webRetry(){if(!cur||!wantPlay||NAT)return;try{au.src=cur.url;au.load();au.play().catch(()=>{})}catch{}}
+addEventListener('online',()=>{if(reconn&&!NAT){clearTimeout(reconnT);setTimeout(webRetry,800)}});
+window.njrCast=e=>{const was=cast.on,wasPlay=cast.s==='playing';cast={on:!!e.on,dev:e.dev||'',s:e.s||'off'};
+  if(e.start){toast('📺 Casting to '+(cast.dev||'your device'));if(cur)NAT.castPlay(JSON.stringify(slim(cur)))}
+  if(e.end){toast('Stopped casting — tap play to listen here');playing=false;buffering=false}
+  if(cast.on){const wp=playing;playing=cast.s==='playing';buffering=cast.s==='buffering';if(playing&&!wp)logStart();if(!playing&&wp)logEnd()}
+  if(!buffering)staticOff();setState();if(npOpen)renderNP()};
 const stVol=st=>st&&S.svol[st.u]!=null?S.svol[st.u]:S.vol;
 function applyVol(v){au.volume=v;if(NAT)NAT.setVolume(v);const r=$('#volr');if(r)r.value=v}
-function toggle(){if(!cur)return;if(NAT){if(playing||buffering){NAT.pause()}else if(natLoaded){buffering=true;setState();staticOn();NAT.resume()}else play(cur);return}if(playing){au.pause()}else if(au.src&&au.src===cur.url&&au.readyState>1){au.play().catch(()=>play(cur))}else play(cur)}
+function toggle(){if(!cur)return;if(NAT&&cast.on){NAT.castToggle();return}wantPlay=!(playing||buffering);if(NAT){if(playing||buffering){NAT.pause()}else if(natLoaded){buffering=true;setState();staticOn();NAT.resume()}else play(cur);return}if(playing){au.pause()}else if(au.src&&au.src===cur.url&&au.readyState>1){au.play().catch(()=>play(cur))}else play(cur)}
 function step(d){if(!cur)return;let L=list.length?list:S.presets.filter(Boolean);if(!L.length)L=S.recent;let i=L.findIndex(x=>x.u===cur.u);i=(i+d+L.length)%L.length;play(L[i]);if(window.knobTurn)knobTurn(d)}
-window.njrNative=e=>{const was=playing;if(e.n>0)natLoaded=true;
+window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true;
   if(e.u&&e.u!==cur?.u){const st=[...natList,...S.presets.filter(Boolean),...S.favs,...S.recent].find(x=>x.u===e.u);if(st){logEnd();cur=st;S.last=st;save('last');S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');renderAll();if(carOn)carTick()}}
-  playing=e.s==='playing';buffering=e.s==='buffering';if(!buffering)staticOff();
+  const wasRc=reconn;reconn=e.s==='reconnecting';playing=e.s==='playing';buffering=e.s==='buffering'||reconn;if(!buffering)staticOff();
+  if(reconn&&!wasRc)toast('📶 Signal dropped — reconnecting…');if(wasRc&&playing)toast('✓ Back on air');
   if(e.err&&e.err!==natErr){buffering=false;toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
   if((e.song||'')!==song){song=e.song||'';showSong()}setState()};
 function showSong(){renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
-au.addEventListener('playing',()=>{playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
-au.addEventListener('pause',()=>{playing=false;buffering=false;staticOff();setState();logEnd()});
+au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
+au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
-au.addEventListener('error',()=>{if(!cur)return;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station')});
+au.addEventListener('error',()=>{if(!cur)return;if(webPlayed===cur.u&&wantPlay&&reconnN<10){if(!reconn)toast('📶 Signal dropped — reconnecting…');reconn=true;buffering=true;playing=false;setState();clearTimeout(reconnT);reconnT=setTimeout(webRetry,[2,3,5,8,12,15,20,30,30,30][reconnN++]*1e3);return}reconn=false;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station')});
 function meta(){if(NAT||!('mediaSession' in navigator)||!cur)return;try{navigator.mediaSession.metadata=new MediaMetadata({title:cur.n,artist:[flag(cur.cc),cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '),album:'Nightjar Radio',artwork:cur.fav?[{src:cur.fav,sizes:'256x256'}]:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}catch{}
   const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch{}};h('play',()=>toggle());h('pause',()=>au.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>au.pause())}
 /* static between stations */
@@ -543,7 +562,7 @@ let actx,noise,ng;function staticOn(){if(!S.staticfx)return;try{actx=actx||new (
   noise.connect(f).connect(ng).connect(actx.destination);noise.start();ng.gain.linearRampToValueAtTime(.05*S.vol,actx.currentTime+.15)}catch{}}
 function staticOff(){if(!noise)return;try{ng.gain.linearRampToValueAtTime(0,actx.currentTime+.4);const n=noise;setTimeout(()=>{try{n.stop()}catch{}},450)}catch{}noise=null}
 /* listening log */
-function logStart(){if(!cur)return;if(sess&&sess.u===cur.u)return;sess={u:cur.u,n:cur.n,tg:cur.tags[0]||'',cc:cur.cc||'',t:Date.now(),s:0};S.log.push(sess);if(S.log.length>4000)S.log=S.log.slice(-4000)}
+function logStart(){if(!cur)return;if(sess&&sess.u===cur.u)return;sess={u:cur.u,n:cur.n,tg:cur.tags[0]||'',cc:cur.cc||'',t:Date.now(),s:0,b:cur.br||0,m:metered()?1:0};S.log.push(sess);if(S.log.length>4000)S.log=S.log.slice(-4000)}
 function logEnd(){sess=null;save('log')}
 setInterval(()=>{if(playing&&sess){sess.s+=5;if(sess.s%60===0)save('log')}},5000);
 /* sleep timer */
@@ -874,7 +893,7 @@ function renderAll(){mark();$$('.presets').forEach(p=>p.outerHTML=presetsH());re
 /* ---------- players ---------- */
 let miniHidden=LS.get('miniHidden',false);
 function renderMini(){const m=$('#mini');if(!cur||(miniHidden&&!playing&&!buffering)){m.hidden=true;document.body.classList.remove('hasmini');return}miniHidden=false;m.hidden=false;document.body.classList.add('hasmini');
-  m.innerHTML=`${lgo(cur)}<div class="meta"><b>${esc(cur.n)}</b><span><i class="live">${buffering?'Tuning':'Live'}</i>${song?'♪ '+esc(song):flag(cur.cc)+' '+esc(cur.tags[0]||cur.c||'')}</span></div><button class="ib" data-act="favcur" aria-label="Favourite">${isFav(cur)?icf('star'):ic('star')}</button><button class="ib" data-act="toggle" aria-label="Play or pause">${playing||buffering?ic('pause'):ic('play')}</button>`}
+  m.innerHTML=`${lgo(cur)}<div class="meta"><b>${esc(cur.n)}</b><span><i class="live">${reconn?'Reconnecting':buffering?'Tuning':'Live'}</i>${cast.on?'📺 '+esc(cast.dev||'Casting'):song?'♪ '+esc(song):flag(cur.cc)+' '+esc(cur.tags[0]||cur.c||'')}</span></div><button class="ib" data-act="favcur" aria-label="Favourite">${isFav(cur)?icf('star'):ic('star')}</button><button class="ib" data-act="toggle" aria-label="Play or pause">${playing||buffering?ic('pause'):ic('play')}</button>`}
 let npOpen=false;
 const EQ=Array.from({length:22},(_,k)=>`<i style="--d:${(.5+((k*37)%9)/10).toFixed(2)}s;--dl:-${((k*53)%10)/10}s;--h:${(.45+((k*29)%11)/20).toFixed(2)}"></i>`).join('');
 const hueOf=n=>{let h=0;for(const c of n||'')h=(h*31+c.charCodeAt(0))%360;return h};
@@ -901,7 +920,7 @@ function renderNP(){if(!npOpen||!cur)return;const pi=S.presets.findIndex(p=>p&&p
   <div class="npt">${S.skin==='modern'?'':`<div class="npinfo"><h2>${esc(cur.n)}</h2><p>${flag(cur.cc)} ${esc([cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '))}</p><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div>`}
    <div class="skins">${SKINS.map(([k,l])=>`<button data-skin="${k}" class="${S.skin===k?'on':''}">${l}</button>`).join('')}</div></div>
   <div class="ctrls"><button class="ib" data-act="prev" aria-label="Previous station">${ic('prev')}</button><button class="bigplay" data-act="toggle" id="npbig" aria-label="Play or pause">${playing||buffering?icf('pause'):icf('play')}</button><button class="ib" data-act="next" aria-label="Next station">${ic('next')}</button></div>
-  <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button></div>
+  <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button>${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button data-act="cast" class="${cast.on?'on':''}">${ic('cast')}<span>${cast.on?'Casting':'Cast'}</span></button>`:''}</div>
   <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div>`;
   $('#volr').oninput=e=>{const v=+e.target.value;applyVol(v);S.vol=v;save('vol');if(cur){S.svol[cur.u]=v;const k=Object.keys(S.svol);if(k.length>300)delete S.svol[k[0]];LS.set('svol',S.svol);const n=$('#volnote');if(n){n.textContent='Volume remembered for '+cur.n;n.classList.add('on');clearTimeout(window.vnT);window.vnT=setTimeout(()=>n.classList.remove('on'),2200)}}};
   $$('[data-skin]').forEach(b=>b.onclick=()=>{S.skin=b.dataset.skin;LS.set('skin',S.skin);renderNP();burst(px,py,['✦'],['#ffd08a','#86b4ff'],7)})}
@@ -912,6 +931,11 @@ function openNP(){if(!cur)return;npOpen=true;renderNP();$('#np').classList.add('
 function closeNP(pop){if(!npOpen)return;npOpen=false;$('#np').classList.remove('on');if(!pop)history.back()}
 addEventListener('popstate',()=>{if(modalOpen)return closeModal(true);if(!$('#wrap').hidden)return wrapClose(true);if(carOn)return carExit(true);if(nlOn)return nlExit(true);if(sheetOpen)return closeSheet(true);if(npOpen)return closeNP(true)});
 
+/* Estimated data used this month, from each session's length × the station's stream quality. */
+function dataUse(){const m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);let all=0,mob=0;
+  S.log.filter(e=>e.t>=m0.getTime()).forEach(e=>{const mb=e.s*(e.b||128)/8/1024;all+=mb;if(e.m)mob+=mb});
+  const f=mb=>mb>=1024?(mb/1024).toFixed(mb>=10240?0:1)+' GB':Math.round(mb)+' MB';
+  return`<div class="duse"><div><b>${f(all)}</b><span>this month</span></div><div><b>${f(mob)}</b><span>on mobile data</span></div></div><p class="dim" style="font-size:11.5px;margin:8px 0 0">Estimated from each station’s stream quality. A typical station uses about 30–60 MB an hour.</p>`}
 /* ---------- Help & FAQ ---------- */
 const FAQ=[
  ['Getting started',[
@@ -925,13 +949,15 @@ const FAQ=[
   ['How do presets work?','Tap an empty preset while a station is playing to save it there. Long-press a preset to clear or replace it. You can also save from the player with the “Preset” button.'],
   ['Can I set a sleep timer?','Yes — tap “Sleep” in the full player. Or tap “Bedtime” for a calm station, a softer volume, a sleep timer and the night-light clock in one go.'],
   ['Why is one station much louder than another?','Stations broadcast at different levels. Set the volume in the player and Nightjar Radio remembers it for that station.'],
-  ['How much data does it use?','Most stations use roughly 30–60 MB an hour (higher-quality streams up to about 150 MB). On mobile data, Wi-Fi is your friend for long listens.'],
+  ['How much data does it use?','Most stations use roughly 30–60 MB an hour (higher-quality streams up to about 150 MB). Settings → Data shows roughly how much you’ve used this month, and Data saver switches to a lighter stream on mobile data when a station has one.'],
   ['Does it have RDS or recording?','It shows the song and artist when a station sends them — much like RDS in a car. Recording isn’t available yet.'],
   ['What do the seasonal themes do?','The app dresses up for special days — snow at Christmas, fireworks on New Year’s Eve, your birthday and more. Turn them off in Settings → Seasonal themes.']]],
  ['Android app',[
   ['Does it keep playing with the screen off?','Yes, in the Android app. If it stops, your phone may be saving battery — allow Nightjar Radio to run in the background (the alarm screen has a shortcut for this).'],
   ['How does the wake-up alarm work?','Library → Wake-up radio. Pick a time, the days and a station; it fades in gently. If the station can’t be reached, a chime plays instead so you still wake up.'],
   ['Does it work with Android Auto?','Yes. Your presets, favourites and recently played stations appear in Android Auto.'],
+  ['Can I play it on my TV or speaker?','Yes — tap “Cast” in the full player to send the station to a Chromecast, Google/Nest speaker or Google TV on the same Wi-Fi. A few older stations that only use insecure (http) streams may not cast.'],
+  ['What happens if my signal drops?','The app reconnects by itself — you’ll see “Reconnecting…” and it picks up again when the signal’s back.'],
   ['How do I add a widget?','Long-press an empty spot on your home screen → Widgets → Nightjar Radio. There are four: Presets, Mini radio, Now playing and Shortcuts.'],
   ['Why don’t some stations show a song title?','Talk and news stations, and some music stations, don’t send song titles. Titles in station lists can be set to Wi-Fi only, always, or off in Settings.'],
   ['How do I update the app?','Changes to screens and features arrive automatically. When a new Android version is needed, the app pops up “Update available” — tap it to download and install.'],
@@ -964,6 +990,9 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="mono" style="display:block;margin:16px 0 6px">Seasonal themes</label><select class="sel" id="s_th"><option value="auto" ${S.theme==='auto'?'selected':''}>Automatic — UK calendar</option><option value="off" ${S.theme==='off'?'selected':''}>Off</option>${Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${S.theme===k?'selected':''}>Preview: ${t.name}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Your birthday (optional)</label><div style="display:flex;gap:8px;align-items:center"><input type="date" class="sel" id="s_bday" style="flex:1;color-scheme:dark" value="${S.bday?'2000-'+S.bday:''}">${S.bday?'<button class="pill" id="s_bdx">Clear</button>':''}</div><p class="dim" style="font-size:12px;margin:6px 0 0">Get a little celebration on the day. Only the day and month are kept, on this phone.</p>
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
+  <label class="mono" style="display:block;margin:16px 0 6px">Data</label>
+  <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
+  ${dataUse()}</div>
   ${NAT&&NAT.peek?`<label class="mono" style="display:block;margin:16px 0 6px">Song titles in station lists</label><select class="sel" id="s_np">${[['wifi','On Wi-Fi only'],['always','Always (uses a little mobile data)'],['off','Off']].map(([v,l])=>`<option value="${v}" ${npMode()===v?'selected':''}>${l}</option>`).join('')}</select><p class="dim" style="font-size:12px;margin:6px 0 0">Shows what’s playing on your presets and favourites, and on any list when you tap “What’s on?”. Not every station sends song titles.</p>`:''}
   <label class="mono" style="display:block;margin:16px 0 6px">Late-night dim</label><select class="sel" id="s_ld">${[['auto','At night (8pm – 5am)'],['on','Always'],['off','Off']].map(([v,l])=>`<option value="${v}" ${S.ldim===v?'selected':''}>${l}</option>`).join('')}</select>
   <div style="margin-top:12px"><label class="tog"><input type="checkbox" id="s_sfx" ${S.staticfx?'checked':''}>Radio static while tuning</label>
@@ -984,6 +1013,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_nl').onchange=e=>{S.nightlight=e.target.checked;save('nightlight');poke()};
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
+  $('#s_saver').onchange=e=>{LS.set('saver',e.target.checked);toast(e.target.checked?'📉 Data saver on':'Data saver off')};
   $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;if(!v&&S.bday){e.target.value='2000-'+S.bday;return}S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
@@ -1190,7 +1220,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
-      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),
+      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
       share:async()=>{const u=cur.home||location.href;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
@@ -1271,6 +1301,7 @@ let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=13;
 const NEWS=[
+  {app:108,i:'📺',c:'var(--h-blue)',t:'Cast, reconnect & data saver',d:'Tap “Cast” in the player to send a station to your Chromecast, Google/Nest speaker or Google TV. If your signal drops, Nightjar Radio now reconnects by itself. And Settings has a new Data saver for mobile data, plus how much data you’ve used this month.'},
   {app:107,i:'🎂',c:'var(--h-pink)',t:'Your settings are safer',d:'Your birthday, presets, favourites and Home layout now have a backup copy inside the app, so they come back even if your phone clears its storage.'},
   {v:13,i:'✎',c:'#ffb36b',t:'Make Home yours',d:'Move Home’s sections into any order and hide the ones you don’t use — tap “Customise Home” at the bottom of Home, or in Settings.'},
   {v:12,until:VC_END,i:'🌴',c:'var(--h-pink)',t:'Vice City drive — until 18 Dec',d:'Celebrate GTA 6 launch month with real stations in the same styles — Miami & Florida, 80s, Southern hip-hop, reggaeton, metal, country, amapiano and pop. Find it on Home. Unofficial, and gone after 18 December.'},

@@ -42,6 +42,9 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:$m3")
     implementation("androidx.media3:media3-exoplayer-hls:$m3")
     implementation("androidx.media3:media3-session:$m3")
+    implementation("androidx.media3:media3-cast:$m3")
+    implementation("androidx.mediarouter:mediarouter:1.7.0")
+    implementation("com.google.android.gms:play-services-cast-framework:21.5.0")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("com.google.guava:guava:33.2.1-android")
 }

@@ -44,6 +44,7 @@ class MainActivity : Activity() {
 
     private lateinit var web: WebView
     private var ctl: MediaController? = null
+    private var caster: Caster? = null
     private var ctlFuture: ListenableFuture<MediaController>? = null
     private val pending = mutableListOf<(MediaController) -> Unit>()
     private var fileCb: ValueCallback<Array<Uri>>? = null
@@ -153,6 +154,7 @@ class MainActivity : Activity() {
 
     override fun onStart() {
         super.onStart()
+        if (caster == null) caster = Caster(this) { o -> js("window.njrCast&&window.njrCast($o)") }.also { it.start() }
         val f = MediaController.Builder(this, SessionToken(this, ComponentName(this, PlaybackService::class.java))).buildAsync()
         ctlFuture = f
         f.addListener({
@@ -176,7 +178,7 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
-        web.destroy(); super.onDestroy()
+        caster?.release(); web.destroy(); super.onDestroy()
     }
 
     @Deprecated("Deprecated in Java")
@@ -208,8 +210,10 @@ class MainActivity : Activity() {
 
     private fun push() {
         val c = ctl ?: return
+        val reconnecting = getSharedPreferences("njr", MODE_PRIVATE).getBoolean("reconnecting", false)
         val s = when {
             c.isPlaying -> "playing"
+            reconnecting && c.playWhenReady -> "reconnecting"
             c.playWhenReady && c.playerError == null && c.mediaItemCount > 0 &&
                 (c.playbackState == Player.STATE_BUFFERING || c.playbackState == Player.STATE_IDLE) -> "buffering"
             else -> "paused"
@@ -218,7 +222,7 @@ class MainActivity : Activity() {
             .put("s", s)
             .put("u", c.currentMediaItem?.mediaId?.substringAfter('/') ?: "")
             .put("song", c.mediaMetadata.extras?.getString("song") ?: "")
-            .put("err", c.playerError?.errorCodeName ?: "")
+            .put("err", if (reconnecting && c.playWhenReady) "" else (c.playerError?.errorCodeName ?: ""))
             .put("n", c.mediaItemCount)
         js("window.njrNative&&window.njrNative($o)")
     }
@@ -338,6 +342,18 @@ class MainActivity : Activity() {
                 if (trusted) js("window.njrPeek&&window.njrPeek(" + JSONObject().put("u", u).put("t", t) + ")")
             }
         }
+
+        // ---- Cast to Chromecast / Google speakers / Google TV ----
+        @JavascriptInterface fun castAvailable(): Boolean = trusted && caster?.available == true
+        @JavascriptInterface fun castConnected(): Boolean = trusted && caster?.connected == true
+        @JavascriptInterface fun castPick() = ui { caster?.pick() }
+        @JavascriptInterface fun castPlay(json: String) = ui {
+            if (json.length > 20_000) return@ui
+            withCtl { c -> c.pause() }
+            caster?.play(json)
+        }
+        @JavascriptInterface fun castToggle() = ui { caster?.toggle() }
+        @JavascriptInterface fun castStop() = ui { caster?.stop() }
 
         /** A safe second copy of small settings (birthday, presets, favourites, layout) kept by the app itself. */
         @JavascriptInterface fun keep(key: String, value: String) {

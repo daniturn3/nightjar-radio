@@ -87,10 +87,71 @@ class PlaybackService : MediaLibraryService() {
         addSession(session!!)
         exo.addListener(object : Player.Listener {
             override fun onEvents(player: Player, events: Player.Events) = saveWidget()
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) { playedId = exo.currentMediaItem?.mediaId; stopRetry(false) }
+            }
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                if (mediaItem?.mediaId != playedId) { playedId = null; stopRetry(false) }
+            }
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                if (!playWhenReady) stopRetry(false)
+            }
+            override fun onPlayerError(error: androidx.media3.common.PlaybackException) = maybeRetry(error)
         })
+        watchNetwork()
         song.addListener(object : Player.Listener {
             override fun onMediaMetadataChanged(mediaMetadata: androidx.media3.common.MediaMetadata) = saveWidget()
         })
+    }
+
+    // ---- Auto-reconnect: if a station that was playing drops (signal loss, Wi-Fi <-> mobile switch), keep trying quietly. ----
+    private var playedId: String? = null
+    private var tries = 0
+    private var retryRun: Runnable? = null
+    private val waits = longArrayOf(2_000, 3_000, 5_000, 8_000, 12_000, 15_000, 20_000, 30_000, 30_000, 30_000, 30_000, 30_000)
+    private var netCb: android.net.ConnectivityManager.NetworkCallback? = null
+
+    private fun setReconnecting(on: Boolean) =
+        getSharedPreferences("njr", Context.MODE_PRIVATE).edit().putBoolean("reconnecting", on).apply()
+
+    private fun maybeRetry(e: androidx.media3.common.PlaybackException) {
+        val item = exo.currentMediaItem ?: return
+        if (item.mediaId == "chime" || !exo.playWhenReady) return
+        val network = e.errorCode in 2000..2999 || e.errorCode == androidx.media3.common.PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW ||
+            e.errorCode == androidx.media3.common.PlaybackException.ERROR_CODE_TIMEOUT
+        // Only keep retrying a station that was actually playing — a dead station should fail fast.
+        if (!network || playedId != item.mediaId || tries >= waits.size) { stopRetry(false); return }
+        setReconnecting(true)
+        val r = Runnable { retryNow() }
+        retryRun?.let { h.removeCallbacks(it) }
+        retryRun = r
+        h.postDelayed(r, waits[tries++])
+    }
+
+    private fun retryNow() {
+        retryRun?.let { h.removeCallbacks(it) }; retryRun = null
+        if (exo.playerError == null || !exo.playWhenReady) return
+        exo.seekToDefaultPosition()
+        exo.prepare()
+    }
+
+    private fun stopRetry(keepFlag: Boolean) {
+        retryRun?.let { h.removeCallbacks(it) }; retryRun = null
+        tries = 0
+        if (!keepFlag) setReconnecting(false)
+    }
+
+    private fun watchNetwork() {
+        try {
+            val cm = getSystemService(android.net.ConnectivityManager::class.java) ?: return
+            val cb = object : android.net.ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: android.net.Network) {
+                    // Connection is back — retry straight away instead of waiting.
+                    h.post { if (retryRun != null) { h.postDelayed({ retryNow() }, 1200) } }
+                }
+            }
+            cm.registerDefaultNetworkCallback(cb); netCb = cb
+        } catch (_: Exception) { }
     }
 
     private var logoFor: String? = null
@@ -241,6 +302,8 @@ class PlaybackService : MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        try { netCb?.let { getSystemService(android.net.ConnectivityManager::class.java)?.unregisterNetworkCallback(it) } } catch (_: Exception) { }
+        retryRun?.let { h.removeCallbacks(it) }; setReconnecting(false)
         sleepRun?.let { h.removeCallbacks(it) }
         getSharedPreferences("njr", Context.MODE_PRIVATE).edit().putBoolean("w_playing", false).apply()
         RadioWidget.refresh(this)
