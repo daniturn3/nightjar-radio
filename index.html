@@ -104,7 +104,7 @@ body.buffering .live{color:var(--acc)}body.buffering .live::before{background:va
 #tabs button .i{width:24px;height:24px}
 #tabs button.on{color:var(--tc);background:color-mix(in srgb,var(--tc) 10%,transparent)}
 #tabs button.on::after{content:'';position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--tc);box-shadow:0 0 8px var(--tc)}
-#tabs [data-tab=home]{--tc:var(--h-orange)}#tabs [data-tab=dial]{--tc:var(--h-blue)}#tabs [data-tab=search]{--tc:var(--h-green)}#tabs [data-tab=library]{--tc:var(--h-pink)}
+#tabs [data-tab=home]{--tc:var(--h-orange)}#tabs [data-tab=dial]{--tc:var(--h-blue)}#tabs [data-tab=search]{--tc:var(--h-purple)}#tabs [data-tab=sport]{--tc:var(--h-green)}#tabs [data-tab=library]{--tc:var(--h-pink)}
 /* full player */
 #np{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 70% at 50% 0%,#1f2a52,transparent 60%),var(--bg);transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.2,1);overflow-y:auto;padding:0 20px calc(30px + env(safe-area-inset-bottom))}
 #np.on{transform:none}
@@ -357,7 +357,7 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem('njr_'+k,JSON.stringify(v))}catch{}}};
-const P={home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
+const P={ball:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.4 2.5-1.3 4h-4.2l-1.3-4zM12 3v4.5M15.4 10l5-1.5M14.1 14l3 4M9.9 14l-3 4M8.6 10l-5-1.5',home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  play:'M8 5.5v13l10.5-6.5z',pause:'M7.5 5h3v14h-3zM13.5 5h3v14h-3z',prev:'M6 5v14M19 5.5v13L8.5 12z',next:'M18 5v14M5 5.5v13L15.5 12z',star:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  down:'M6 9l6 6 6-6',x:'M6 6l12 12M18 6 6 18',gear:'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM19.4 13.5l1.6 1.2-1.5 2.6-1.9-.6a7 7 0 0 1-1.9 1.1l-.4 2h-3l-.4-2a7 7 0 0 1-1.9-1.1l-1.9.6-1.5-2.6 1.6-1.2a7 7 0 0 1 0-2.2L3 10.1l1.5-2.6 1.9.6a7 7 0 0 1 1.9-1.1l.4-2h3l.4 2a7 7 0 0 1 1.9 1.1l1.9-.6 1.5 2.6-1.6 1.2a7 7 0 0 1 0 2.2z',
  moon:'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z',car:'M5 16.5h14v-4.2l-1.8-4.6a1.5 1.5 0 0 0-1.4-1H8.2a1.5 1.5 0 0 0-1.4 1L5 12.3zM5 12.3h14M6.5 16.5V19M17.5 16.5V19',timer:'M12 8v5l3 2M12 4a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17zM10 2h4',share:'M18 8a3 3 0 1 0-2.8-4M6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 3.9M15.4 6.6 8.6 10.5',
@@ -441,7 +441,7 @@ setInterval(()=>{if(playing&&sess){sess.s+=5;if(sess.s%60===0)save('log')}},5000
 let sleepAt=0,sleepFade=false;setInterval(()=>{if(!sleepAt)return;const left=sleepAt-Date.now();if(left<=0){sleepAt=0;if(NAT){renderNPctl();return}let v=au.volume;sleepFade=true;const f=setInterval(()=>{v-=.05;if(v<=0){clearInterval(f);au.pause();au.volume=stVol(cur);sleepFade=false;toast('Sleep timer — goodnight 🌙')}else au.volume=v},300)}renderNPctl()},1000);
 
 /* ---------- views ---------- */
-const TABS=[['home','home'],['dial','dial'],['search','search'],['library','lib']];
+const TABS=[['home','home'],['dial','dial'],['sport','ball'],['search','search'],['library','lib']];
 let view='home',renderTok=0;const VIEWS={};
 $('#tabs').innerHTML=TABS.map(([t,i])=>`<button data-tab="${t}" aria-label="${t}">${ic(i)}</button>`).join('');
 function go(v){view=v;$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===v));window.scrollTo(0,0);render()}
@@ -599,7 +599,7 @@ function sportRowH(e){const t=THEMES[e.id],n0=dayN(new Date()),s0=dayN(e.st),on=
   const when=on?'<em class="on">On now</em>':`<em>${s0-n0===1?'Tomorrow':'in '+(s0-n0)+' days'}</em>`;
   return`<div class="sprow${on?' live':''}"><span class="spb">${t.badge}</span><div><b>${esc(t.name)}</b><span>${f(e.st)}${e.len>1?' – '+f(end):''}${yr}</span></div>${when}</div>`}
 VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];
-  el.innerHTML=`<div class="hero"><button class="mono" data-tab-go="home" style="color:var(--mut)">‹ Home</button><h1 style="margin-top:12px">Sport<b>.</b></h1></div>
+  el.innerHTML=`<div class="hero"><div class="mono">Sports radio</div><h1>Sport<b>.</b></h1></div>
   <div class="spnote">📻 Live commentary depends on each station’s broadcasting rights. Some stations play music instead of commentary online, or only stream it in their own country — so if a match isn’t on, try another station.</div>
   ${sec(`Sports radio in ${esc(cn)} ${flag(S.country)}`,'<div id="spcc">'+skRows(5)+'</div>','','01')}
   ${sec('Coming up','<div class="splist">'+upcomingSport().map(sportRowH).join('')+'</div>','Big events with radio commentary','02')}
