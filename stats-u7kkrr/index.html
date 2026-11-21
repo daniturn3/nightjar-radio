@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+<title>Nightjar Radio · stats</title><link rel="icon" href="../icon-192.png">
+<style>body{margin:0;min-height:100vh;background:radial-gradient(90% 60% at 80% -10%,rgba(63,111,224,.35),transparent 60%),#0c0e16;color:#f3ecdf;font:16px/1.5 system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:36px 20px}h1{font:italic 400 34px Georgia,serif;margin:0 0 4px}.mono{font:600 11px ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#86b4ff}
+.big{font:italic 400 72px/1 Georgia,serif;color:#ffd08a;margin:18px 0 4px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.c{padding:16px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(234,242,255,.1)}.c b{display:block;font:italic 400 30px Georgia,serif}.c span{font-size:13px;color:#a3a7b8}
+table{width:100%;border-collapse:collapse;margin-top:8px}td,th{padding:10px 6px;border-bottom:1px solid rgba(234,242,255,.08);text-align:left;font-size:14.5px}th{color:#a3a7b8;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+td:last-child,th:last-child{text-align:right}.bar{height:6px;border-radius:3px;background:linear-gradient(90deg,#ffb347,#ff6b4a);margin-top:4px}p.note{color:#a3a7b8;font-size:13px}button{margin-top:10px;border:1px solid rgba(234,242,255,.15);background:rgba(255,255,255,.05);color:inherit;border-radius:999px;padding:10px 18px;font:inherit}</style></head>
+<body><main><div class="mono">Private · Nightjar Radio</div><h1>Downloads</h1>
+<div class="big" id="total">…</div><div style="color:#a3a7b8">all-time Android app downloads</div>
+<div class="cards"><div class="c"><b id="cur">…</b><span id="curl">current version</span></div><div class="c"><b id="vers">…</b><span>versions released</span></div></div>
+<table><thead><tr><th>Version</th><th>Until</th><th>Downloads</th></tr></thead><tbody id="rows"></tbody></table>
+<button onclick="load()">↻ Refresh</button>
+<p class="note">Counts include repeat downloads and your own. Versions before build 105 weren't recorded. Browser users aren't counted. This page isn't linked anywhere, but it isn't password-protected either.</p></main>
+<script>
+async function load(){try{const[h,r]=await Promise.all([fetch('../stats/downloads.json?'+Date.now()).then(x=>x.json()).catch(()=>[]),fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-app',{cache:'no-store'}).then(x=>x.json())]);
+ const live=(r.assets||[]).find(a=>a.name==='nightjar-radio.apk')?.download_count||0,b=+(/(\d+)\s*$/.exec(r.name||'')||[0,0])[1];
+ const all=[...h.filter(x=>x.build!==b),{build:b,downloads:live,until:'now'}].sort((x,y)=>y.build-x.build),tot=all.reduce((s,x)=>s+x.downloads,0),mx=Math.max(1,...all.map(x=>x.downloads));
+ total.textContent=tot.toLocaleString('en-GB');cur.textContent=live.toLocaleString('en-GB');curl.textContent='build '+b+' (current)';vers.textContent=all.length;
+ rows.innerHTML=all.map(x=>`<tr><td>Build ${x.build}${x.until==='now'?' · current':''}<div class="bar" style="width:${Math.max(3,x.downloads/mx*100)}%"></div></td><td>${x.until==='now'?'—':new Date(x.until).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td>${x.downloads.toLocaleString('en-GB')}</td></tr>`).join('')}
+ catch(e){total.textContent='—';rows.innerHTML='<tr><td colspan=3>Couldn’t load the numbers — try again in a minute.</td></tr>'}}
+load();
+</script></body></html>

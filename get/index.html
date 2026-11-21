@@ -29,6 +29,7 @@ h1{font:600 clamp(40px,11vw,58px)/1 'Fraunces',serif;margin:20px 0 6px}h1 em{fon
 ol{margin:0;padding-left:22px}ol li{margin:8px 0}ol b{color:#fff}
 .feat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:34px}
 .feat div{padding:16px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line)}.feat b{display:block;margin:6px 0 2px}.feat span{font-size:13.5px;color:var(--mut)}.feat i{font-style:normal;font-size:24px}
+.dlcount{margin-top:14px;font:500 13px 'JetBrains Mono',monospace;letter-spacing:.06em;color:var(--mut);min-height:18px}
 .note{font-size:13.5px;color:var(--mut)}
 .gal{margin-top:40px}.gal h2{font:italic 400 28px 'Fraunces',serif;text-align:center;margin:0 0 16px}
 .strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:6px 20px 16px;scrollbar-width:none}.strip::-webkit-scrollbar{display:none}
@@ -52,6 +53,7 @@ footer{text-align:center;margin-top:44px;color:var(--mut);font-size:13px}footer 
       <a class="btn main" id="apk" href="https://github.com/daniturn3/nightjar-radio/releases/download/radio-app/nightjar-radio.apk">⬇ Download for Android <small id="build"></small></a>
       <a class="btn" href="../">📱 Open in browser <small>iPhone &amp; PC</small></a>
     </div>
+    <div class="dlcount" id="dlc"></div>
   </div>
 
   <div class="gal"><h2>Take a look</h2><div class="strip"><figure><div class="phone"><img src="shots/home.webp" alt="Home — presets & station of the day" loading="lazy"></div><figcaption>Home — presets & station of the day</figcaption></figure><figure><div class="phone"><img src="shots/player.webp" alt="The radio, with song titles" loading="lazy"></div><figcaption>The radio, with song titles</figcaption></figure><figure><div class="phone"><img src="shots/globe.webp" alt="Spin the globe" loading="lazy"></div><figcaption>Spin the globe</figcaption></figure><figure><div class="phone"><img src="shots/dial.webp" alt="Turn the dial" loading="lazy"></div><figcaption>Turn the dial</figcaption></figure><figure><div class="phone"><img src="shots/wooden.webp" alt="Wooden radio skin" loading="lazy"></div><figcaption>Wooden radio skin</figcaption></figure><figure><div class="phone"><img src="shots/carstereo.webp" alt="Car stereo skin" loading="lazy"></div><figcaption>Car stereo skin</figcaption></figure><figure><div class="phone"><img src="shots/alarm.webp" alt="Wake-up radio" loading="lazy"></div><figcaption>Wake-up radio</figcaption></figure><figure><div class="phone"><img src="shots/wrapped.webp" alt="Radio Wrapped" loading="lazy"></div><figcaption>Radio Wrapped</figcaption></figure></div><p class="note" style="text-align:center">Swipe to see more · station names are examples</p></div>
@@ -90,7 +92,8 @@ footer{text-align:center;margin-top:44px;color:var(--mut);font-size:13px}footer 
 <script>
 fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-app').then(r=>r.json()).then(d=>{
   const m=/build (\d+)/i.exec(d.name||'');const a=(d.assets||[]).find(x=>/\.apk$/.test(x.name));
-  if(m)document.getElementById('build').textContent='Build '+m[1]+(a?' · '+(a.size/1048576).toFixed(1)+' MB':'');}).catch(()=>{});
+  if(m)document.getElementById('build').textContent='Build '+m[1]+(a?' · '+(a.size/1048576).toFixed(1)+' MB':'');
+  fetch('../stats/downloads.json?'+Date.now()).then(x=>x.json()).catch(()=>[]).then(h=>{const b=m?+m[1]:0,t=h.filter(x=>x.build!==b).reduce((s,x)=>s+x.downloads,0)+(a?a.download_count:0);if(t>=10)document.getElementById('dlc').textContent='⬇ Downloaded '+t.toLocaleString('en-GB')+' times'})}).catch(()=>{});
 if(/iPhone|iPad/.test(navigator.userAgent)){const b=document.querySelector('.btns');b.prepend(b.children[1]);b.children[0].classList.add('main');b.children[1].classList.remove('main')}
 </script>
 </body>
