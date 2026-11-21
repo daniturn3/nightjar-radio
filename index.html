@@ -335,6 +335,8 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .pre .npl{font-size:10px;max-width:100%;margin-top:0;line-height:1.2}.card .npl{font-size:11.5px}
 .npbtn{font:inherit;font-size:12px;margin-left:auto;padding:5px 11px;border-radius:99px;border:1px solid rgba(134,217,168,.4);background:rgba(134,217,168,.08);color:#86d9a8;white-space:nowrap;flex:none}.npbtn[disabled]{opacity:.6}
 .sh:has(.npbtn){display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px}.sh:has(.npbtn)>p{flex-basis:100%;order:3}
+.faqg{margin:18px 0 6px;color:var(--acc,#ffd08a)}.faq{border-bottom:1px solid var(--line)}.faq summary{list-style:none;cursor:pointer;padding:12px 26px 12px 0;position:relative;font-weight:500;line-height:1.35}.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';position:absolute;right:2px;top:10px;font:400 20px var(--mono);color:var(--mut);transition:transform .2s}.faq[open] summary::after{transform:rotate(45deg)}.faq p{margin:0 0 14px;font-size:14px;line-height:1.55;color:var(--mut)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 .sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
@@ -752,6 +754,42 @@ function openNP(){if(!cur)return;npOpen=true;renderNP();$('#np').classList.add('
 function closeNP(pop){if(!npOpen)return;npOpen=false;$('#np').classList.remove('on');if(!pop)history.back()}
 addEventListener('popstate',()=>{if(modalOpen)return closeModal(true);if(!$('#wrap').hidden)return wrapClose(true);if(carOn)return carExit(true);if(nlOn)return nlExit(true);if(sheetOpen)return closeSheet(true);if(npOpen)return closeNP(true)});
 
+/* ---------- Help & FAQ ---------- */
+const FAQ=[
+ ['Getting started',[
+  ['Is Nightjar Radio free?','Yes — completely free, with no ads and no account. If you enjoy it, there’s an optional “Buy me a coffee” link at the bottom of Settings.'],
+  ['Where do the stations come from?','From radio-browser.info, a free community directory of over 40,000 stations worldwide. Nightjar Radio doesn’t run any stations itself — it tunes you in to the stations’ own streams.'],
+  ['A station is missing or the details are wrong','Stations are added and edited on radio-browser.info, so anyone can add a missing one or fix its details there. Changes show up in the app shortly after.'],
+  ['How do I change my home country?','Settings → Home country. It changes “Popular in…”, the Sport tab, football fixtures and seasonal themes.'],
+  ['Can I see the tour again?','Yes — Settings → Show the tour. “What’s new” shows the latest changes.']]],
+ ['Listening',[
+  ['Why won’t a station play?','Usually the station is offline, has moved its stream, or only allows listeners in its own country. Try again later, or pick another station.'],
+  ['How do presets work?','Tap an empty preset while a station is playing to save it there. Long-press a preset to clear or replace it. You can also save from the player with the “Preset” button.'],
+  ['Can I set a sleep timer?','Yes — tap “Sleep” in the full player. Or tap “Bedtime” for a calm station, a softer volume, a sleep timer and the night-light clock in one go.'],
+  ['Why is one station much louder than another?','Stations broadcast at different levels. Set the volume in the player and Nightjar Radio remembers it for that station.'],
+  ['How much data does it use?','Most stations use roughly 30–60 MB an hour (higher-quality streams up to about 150 MB). On mobile data, Wi-Fi is your friend for long listens.'],
+  ['Does it have RDS or recording?','It shows the song and artist when a station sends them — much like RDS in a car. Recording isn’t available yet.'],
+  ['What do the seasonal themes do?','The app dresses up for special days — snow at Christmas, fireworks on New Year’s Eve, your birthday and more. Turn them off in Settings → Seasonal themes.']]],
+ ['Android app',[
+  ['Does it keep playing with the screen off?','Yes, in the Android app. If it stops, your phone may be saving battery — allow Nightjar Radio to run in the background (the alarm screen has a shortcut for this).'],
+  ['How does the wake-up alarm work?','Library → Wake-up radio. Pick a time, the days and a station; it fades in gently. If the station can’t be reached, a chime plays instead so you still wake up.'],
+  ['Does it work with Android Auto?','Yes. Your presets, favourites and recently played stations appear in Android Auto.'],
+  ['How do I add a widget?','Long-press an empty spot on your home screen → Widgets → Nightjar Radio. There are four: Presets, Mini radio, Now playing and Shortcuts.'],
+  ['Why don’t some stations show a song title?','Talk and news stations, and some music stations, don’t send song titles. Titles in station lists can be set to Wi-Fi only, always, or off in Settings.'],
+  ['How do I update the app?','Changes to screens and features arrive automatically. When a new Android version is needed, the app pops up “Update available” — tap it to download and install.'],
+  ['Is there an iPhone version?','Not as an app, but the web version works in Safari — tap Share → Add to Home Screen. The alarm, widgets, Android Auto and song titles in lists are Android-only.']]],
+ ['Sport',[
+  ['Why isn’t the match commentary on?','Commentary depends on each station’s broadcasting rights. Some stations play music instead of commentary online, or only stream it in their own country — try another station.'],
+  ['Where do the football fixtures come from?','From ESPN’s public scores feed, shown in your own time zone for your home country’s leagues. It shows what’s on, but not which station has the commentary.']]],
+ ['Privacy & your data',[
+  ['What does Nightjar Radio know about me?','Nothing personal. There’s no account, no ads and no tracking. Your favourites, presets, settings and listening stats are kept only on your phone.'],
+  ['Who does the app talk to?','The station directory (radio-browser.info), the radio stations themselves when you listen, ESPN for football fixtures, and Google’s icon service for some station logos. “Near you” sends your approximate position to the station directory once, to find local stations — it isn’t stored by the app.'],
+  ['How do I move to a new phone?','Settings → “Back up now” saves a small file. On the new phone, open Settings → Restore and pick that file — your favourites, presets and settings come with you.']]]];
+function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px">‹ Settings</button><h3>Help &amp; FAQ</h3>
+  ${FAQ.map(([g,qs])=>`<div class="mono faqg">${esc(g)}</div>${qs.map(([q,a])=>`<details class="faq"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}`).join('')}
+  <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.</p>`);
+  $('#faqback').onclick=()=>settings();
+  $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
 function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop)history.back()}
@@ -773,7 +811,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="tog"><input type="checkbox" id="s_fx" ${S.sfx?'checked':''}>Sound effects — globe whoosh, ticks and chime</label>
   <label class="tog"><input type="checkbox" id="s_nl" ${S.nightlight?'checked':''}>Night-light clock after 20 seconds untouched while playing</label>
   <label class="tog"><input type="checkbox" id="s_pl" ${playful()?'checked':''}>Playful touches — bouncy buttons and sparkles</label></div>
-  <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button></div>
+  <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button><button class="pill" id="s_faq">? Help &amp; FAQ</button></div>
   ${S.geo?`<button class="pill" id="s_geo" style="margin-top:10px">${ic('x')}Forget my location</button>`:''}
   <div class="mono" style="margin:16px 0 6px">Backup</div><p class="dim" style="font-size:13px;margin:0 0 10px">Presets, favourites, history and settings in one file. ${ago==null?'Never backed up':ago<1?'Last backup today':'Last backup '+ago+' days ago'}</p>
   <div class="btnrow"><button class="pill amb" id="s_bk">${ic('dl')}Back up now</button><button class="pill" id="s_rs">${ic('ul')}Restore</button></div>
@@ -787,6 +825,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_nl').onchange=e=>{S.nightlight=e.target.checked;save('nightlight');poke()};
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
+  $('#s_faq').onclick=()=>faq();
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
@@ -1068,8 +1107,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=10;
+const RV=11;
 const NEWS=[
+  {v:11,i:'?',c:'var(--h-blue)',t:'Help & FAQ',d:'Got a question? Settings → Help & FAQ has quick answers on stations, presets, the alarm, Android Auto, widgets, sport, data use and privacy.'},
   {app:106,i:'♪',c:'var(--h-green)',t:'What’s playing now',d:'Your presets and favourites now show the song that’s on right now. On any other list, tap “♪ What’s on?”. Works on Wi-Fi by default — change it in Settings.'},
   {v:10,i:'⚽',c:'var(--h-green)',t:'Football today',d:'The Sport tab now has a fold-out list of today’s and tomorrow’s football for your home country — kick-off times in your time zone, plus live scores and full-times. Tap it to open.'},
   {v:9,i:'🌍',c:'var(--h-blue)',t:'Sport for your country',d:'Sport moments and the Coming up calendar now follow your home country — Super Bowl and the Kentucky Derby in the US, Melbourne Cup and AFL in Australia, All-Ireland finals in Ireland, IPL in India, and more.'},
