@@ -337,6 +337,10 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .sh:has(.npbtn){display:flex;align-items:flex-start;flex-wrap:wrap;gap:6px}.sh:has(.npbtn)>p{flex-basis:100%;order:3}
 .faqg{margin:18px 0 6px;color:var(--acc,#ffd08a)}.faq{border-bottom:1px solid var(--line)}.faq summary{list-style:none;cursor:pointer;padding:12px 26px 12px 0;position:relative;font-weight:500;line-height:1.35}.faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:'+';position:absolute;right:2px;top:10px;font:400 20px var(--mono);color:var(--mut);transition:transform .2s}.faq[open] summary::after{transform:rotate(45deg)}.faq p{margin:0 0 14px;font-size:14px;line-height:1.55;color:var(--mut)}
+.vc{margin:22px 0 4px;padding:16px 0 14px;border-radius:24px;background:linear-gradient(135deg,rgba(255,95,162,.20),rgba(255,166,92,.12) 45%,rgba(64,214,214,.16));border:1px solid rgba(255,120,180,.35);overflow:hidden}
+.vctop{padding:0 16px}.vctop b{display:block;font:italic 600 24px var(--serif,Georgia),serif;background:linear-gradient(90deg,#ff6fb5,#ffb36b,#5fe3e0);-webkit-background-clip:text;background-clip:text;color:transparent}.vctop span{font-size:12.5px;color:var(--mut)}
+.vcchips{padding:12px 16px 4px;margin:0}.vcchips .chip.on{background:rgba(255,111,181,.22);border-color:#ff6fb5;color:var(--cream)}.vc #vclist{padding:4px 0 0 16px}
+.vcfoot{display:flex;align-items:center;gap:12px;padding:10px 16px 0;font-size:11px;line-height:1.4;color:var(--mut)}.vcfoot .pill{flex:none;font-size:12.5px}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 .sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
@@ -565,11 +569,26 @@ async function nearList(){const{la,lo}=S.geo;let out=[];for(const dist of [60000
 function nearH(){return S.geo?`<div id="hnear">${skRows(4)}</div>`:`<div class="nearask"><div><b>What’s on the air near you?</b><span>Uses your phone’s location once to find local stations. It’s only kept on this phone.</span></div><button class="pill amb" data-act="near">${ic('globe')}Find stations near me</button></div>`}
 async function fillNear(tok){const el=$('#hnear');if(!el)return;try{const r=await nearList();if(tok!==renderTok||!$('#hnear'))return;$('#hnear').innerHTML=r.length?rows(r,'Near you',1):'<div class="empty"><b>Quiet round here</b>No stations listed near you — try Popular in your country below.</div>';mark()}catch{if(tok===renderTok&&$('#hnear'))$('#hnear').innerHTML=errBox()}}
 async function askNear(){const b=$('[data-act=near]');if(b)b.innerHTML=`${ic('globe')}Finding you…`;try{S.geo=await getPos();save('geo');render()}catch(e){if(b)b.innerHTML=`${ic('globe')}Find stations near me`;toast(e&&e.code===1?'Location is blocked — allow it in Chrome’s site settings':'Couldn’t get your location — try again outside or with GPS on')}}
+/* ---------- Vice City drive — limited-time, unofficial GTA 6 launch-month collection. Switches itself off at midnight on 19 Dec 2026 (local time). ---------- */
+const VC_END=new Date(2026,11,19,0,0,0).getTime(),vcOn=()=>Date.now()<VC_END;
+const VC=[['🌴','Miami & Florida',{state:'Florida',countrycode:'US'}],['📼','80s Vice',{tag:'80s'}],['✨','Pop',{tag:'pop',countrycode:'US'}],['🎤','Southern hip-hop',{tag:'hip hop',countrycode:'US'}],
+ ['💃','Reggaeton & Latin',{tag:'reggaeton'}],['🎸','Metal',{tag:'metal'}],['🤠','Country',{tag:'country',countrycode:'US'}],['🌍','Amapiano & Afro',{tag:'amapiano'},{tag:'afrobeats'}]];
+let vcSel=LS.get('vcSel',0);
+function vcH(){return`<div class="vc"><div class="vctop"><b>Vice City drive 🌴</b><span>Real stations with a Leonida feel, for GTA 6 launch month · until 18 Dec</span></div>
+  <div class="chips vcchips">${VC.map(([e,l],i)=>`<button class="chip${i===vcSel?' on':''}" data-vc="${i}">${e} ${l}</button>`).join('')}</div>
+  <div id="vclist">${skCards()}</div>
+  <div class="vcfoot"><button class="pill" id="vcalb">🎧 GTA VI: The Album</button><span>Unofficial — not affiliated with Rockstar Games. The in-game stations aren’t streamed anywhere, so these are real stations in the same styles.</span></div></div>`}
+async function vcFill(tok){const el=$('#vclist');if(!el)return;el.innerHTML=skCards();const [,l,q,q2]=VC[vcSel];
+  try{let r=await stations(q,16);if(r.length<4&&q2)r=r.concat(await stations(q2,16));if(tok!==renderTok||!$('#vclist'))return;$('#vclist').innerHTML=r.length?cards(r.slice(0,16),'Vice City drive · '+l):'<div class="empty">Nothing here right now.</div>';mark()}
+  catch{if($('#vclist'))$('#vclist').innerHTML=errBox()}}
+function vcWire(tok){if(!$('.vc'))return;$$('[data-vc]').forEach(b=>b.onclick=()=>{vcSel=+b.dataset.vc;LS.set('vcSel',vcSel);$$('[data-vc]').forEach(x=>x.classList.toggle('on',x===b));vcFill(tok)});
+  $('#vcalb').onclick=()=>{const u='https://open.spotify.com/search/Grand%20Theft%20Auto%20VI%20The%20Album';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};vcFill(tok)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
   el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   <div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>
   ${sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N())}
   <div class="chips" style="margin-top:18px">${MOODS.map(([l,t,c])=>`<button class="chip" style="--c:${c}" data-mood="${esc(t)}">${l}</button>`).join('')}</div>
+  ${vcOn()?vcH():''}
   ${sec('Near you',nearH(),S.geo?'Local stations, closest first':'',N())}
   ${sec('Around the world now',globeH(),'Spin the globe to land somewhere it’s night-time, morning — or anywhere — right now',N())}
   ${S.recent.length?sec('Tune back in',cards(S.recent.slice(0,12),'Recently played'),'',N()):''}
@@ -579,6 +598,7 @@ VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.cou
   const fill=(id,pr,f)=>pr.then(r=>{if(tok===renderTok&&$(id))$(id).innerHTML=r.length?f(r):'<div class="empty">Nothing here right now.</div>';mark()}).catch(()=>{if(tok===renderTok&&$(id))$(id).innerHTML=errBox()});
   sotd().then(st=>{if(tok===renderTok&&$('#hsotd'))$('#hsotd').innerHTML=st?sotdH(st):''}).catch(()=>{if($('#hsotd'))$('#hsotd').innerHTML=''});
   if(S.geo)fillNear(tok);
+  if(vcOn())vcWire(tok);
   gSetup();
   fill('#hcountry',stations({countrycode:S.country},16),r=>cards(r,'Popular in '+cn));
   fill('#hworld',rb('/json/stations/topclick/80').then(d=>d.filter(good).map(mk).slice(0,8)),r=>rows(r,'Most loved worldwide'));
@@ -1117,8 +1137,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=11;
+const RV=12;
 const NEWS=[
+  {v:12,until:VC_END,i:'🌴',c:'var(--h-pink)',t:'Vice City drive — until 18 Dec',d:'Celebrate GTA 6 launch month with real stations in the same styles — Miami & Florida, 80s, Southern hip-hop, reggaeton, metal, country, amapiano and pop. Find it on Home. Unofficial, and gone after 18 December.'},
   {v:11,i:'?',c:'var(--h-blue)',t:'Help & FAQ',d:'Got a question? Settings → Help & FAQ has quick answers on stations, presets, the alarm, Android Auto, widgets, sport, data use and privacy.'},
   {app:106,i:'♪',c:'var(--h-green)',t:'What’s playing now',d:'Your presets and favourites now show the song that’s on right now. On any other list, tap “♪ What’s on?”. Works on Wi-Fi by default — change it in Settings.'},
   {v:10,i:'⚽',c:'var(--h-green)',t:'Football today',d:'The Sport tab now has a fold-out list of today’s and tomorrow’s football for your home country — kick-off times in your time zone, plus live scores and full-times. Tap it to open.'},
@@ -1166,7 +1187,7 @@ function tour(){let k=0;const done=()=>{LS.set('seenTour',1);LS.set('seenRV',RV)
   draw();
   const m=$('#modal');let sx=null;m.ontouchstart=e=>{sx=e.touches[0].clientX};m.ontouchend=e=>{if(sx==null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>60){if(dx<0&&k<TOUR.length-1){k++;draw()}else if(dx>0&&k>0){k--;draw()}}}}
 function whatsNew(all){const seen=LS.get('seenRV',0),seenApp=LS.get('seenApp',0),av=NAT?NAT.version():0;
-  const items=all?NEWS.filter(n=>!n.app||NAT):NEWS.filter(n=>(n.v&&n.v>seen)||(n.app&&NAT&&n.app>seenApp&&n.app<=av));
+  const live=n=>!n.until||Date.now()<n.until,items=(all?NEWS.filter(n=>!n.app||NAT):NEWS.filter(n=>(n.v&&n.v>seen)||(n.app&&NAT&&n.app>seenApp&&n.app<=av))).filter(live);
   LS.set('seenRV',RV);if(NAT)LS.set('seenApp',av);if(!items.length){if(all)toast('Nothing new right now');return}
   queueModal(()=>modal(`<div class="mic" style="--mc:var(--h-purple)">✦</div><div class="mono" style="text-align:center">Just updated</div><h2>What’s new</h2><div class="news">${items.map(newsRow).join('')}</div>
    <div class="mbtns one"><button class="pill amb" data-m="ok">Lovely</button></div>`,{ok:()=>{}}))}
