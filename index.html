@@ -589,11 +589,7 @@ VIEWS.search=async(el,tok)=>{el.innerHTML=`<div class="hero"><div class="mono">F
   $('#scc').onchange=()=>{scc=$('#scc').value;LS.set('scc',scc);render()};
   if(!sq&&!scc)return;const q={};if(sq)q.name=sq;if(scc)q.countrycode=scc;
   try{const r=await stations(q,50);if(tok!==renderTok)return;$('#sres').innerHTML=r.length?rows(r,sq?`“${sq}”`:'Stations'):'<div class="empty"><b>No stations found</b>Try a shorter name.</div>';mark()}catch{if(tok===renderTok)$('#sres').innerHTML=errBox()}};
-function upcomingSport(){const now=new Date(),n0=dayN(now),y0=now.getFullYear(),out=[];
-  for(const[id,iso,len]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=new Date(a,b-1,c);if(dayN(st)+len>n0)out.push({id,st,len})}
-  for(let y=y0;y<=y0+1;y++){const w=new Date(firstMon(y,7));w.setDate(w.getDate()-35);if(dayN(w)+14>n0)out.push({id:'wimbledon',st:w,len:14});
-    const g=new Date(y,3,8);while(g.getDay()!==6)g.setDate(g.getDate()+1);if(dayN(g)+1>n0)out.push({id:'gn',st:g,len:1})}
-  return out.sort((a,b)=>a.st-b.st).slice(0,10)}
+function upcomingSport(){const n0=dayN(new Date()),y=new Date().getFullYear();return sportEvents(y,y+1).filter(e=>dayN(e.st)+e.len>n0).sort((a,b)=>a.st-b.st).slice(0,12)}
 function sportRowH(e){const t=THEMES[e.id],n0=dayN(new Date()),s0=dayN(e.st),on=n0>=s0&&n0<s0+e.len,end=new Date(e.st);end.setDate(end.getDate()+e.len-1);
   const f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),yr=e.st.getFullYear()!==new Date().getFullYear()?' '+e.st.getFullYear():'';
   const when=on?'<em class="on">On now</em>':`<em>${s0-n0===1?'Tomorrow':'in '+(s0-n0)+' days'}</em>`;
@@ -773,6 +769,21 @@ const THEMES={
   uclfinal:{name:'Champions League final',badge:'🏆',greet:'Champions League final night',fx:'none',c:['#5b8def','#dbe9ff','#ffd166'],sport:1},
   ascot:{name:'Royal Ascot',badge:'🏇',greet:'It’s Royal Ascot week',fx:'none',c:['#9b5de5','#e8dcff','#3fbf7f'],sport:1},
   worldcup:{name:'World Cup',badge:'⚽',greet:'The World Cup is on',fx:'none',c:['#3fbf7f','#d6f5e3','#ffd166'],sport:1},
+  ausopen:{name:'Australian Open',badge:'🎾',greet:'The Australian Open is on — overnight tennis on the radio',fx:'none',c:['#4a90e2','#dbe9ff','#5bc0eb'],sport:1},
+  rolandgarros:{name:'French Open',badge:'🎾',greet:'The French Open is on',fx:'none',c:['#e07a3f','#ffe0cc','#3fbf7f'],sport:1},
+  usopen:{name:'US Open',badge:'🎾',greet:'The US Open is on',fx:'none',c:['#4a90e2','#dbe9ff','#ffd166'],sport:1},
+  masters:{name:'The Masters',badge:'⛳',greet:'It’s Masters week',fx:'none',c:['#2a9d5c','#d6f5e3','#ffd166'],sport:1},
+  ipl:{name:'IPL',badge:'🏏',greet:'IPL season is on',fx:'none',c:['#4a90e2','#dbe9ff','#ff9f43'],sport:1},
+  hurling:{name:'All-Ireland hurling final',badge:'🏑',greet:'It’s All-Ireland hurling final day',fx:'none',c:['#3fbf7f','#d6f5e3','#ff9f43'],sport:1},
+  gaafootball:{name:'All-Ireland football final',badge:'🏆',greet:'It’s All-Ireland football final day',fx:'none',c:['#3fbf7f','#d6f5e3','#ff9f43'],sport:1},
+  superbowl:{name:'Super Bowl',badge:'🏈',greet:'It’s Super Bowl Sunday',fx:'none',c:['#4a90e2','#dbe9ff','#e63946'],sport:1},
+  kentucky:{name:'Kentucky Derby',badge:'🏇',greet:'It’s Kentucky Derby day',fx:'none',c:['#c0392b','#ffd1cc','#3fbf7f'],sport:1},
+  indy500:{name:'Indianapolis 500',badge:'🏁',greet:'It’s Indy 500 day',fx:'none',c:['#e63946','#ffd1cc','#ffd166'],sport:1},
+  nflthanks:{name:'Thanksgiving football',badge:'🏈',greet:'Happy Thanksgiving — football’s on',fx:'none',c:['#ff8c42','#ffd9b3','#9b5de5'],sport:1},
+  melbcup:{name:'Melbourne Cup',badge:'🏇',greet:'Melbourne Cup day — the race that stops a nation',fx:'none',c:['#ffd166','#fff1c2','#3fbf7f'],sport:1},
+  afl:{name:'AFL Grand Final',badge:'🏉',greet:'It’s AFL Grand Final day',fx:'none',c:['#e63946','#ffd1cc','#4a90e2'],sport:1},
+  nrl:{name:'NRL Grand Final',badge:'🏉',greet:'It’s NRL Grand Final day',fx:'none',c:['#3fbf7f','#d6f5e3','#4a90e2'],sport:1},
+  boxingtest:{name:'Boxing Day Test',badge:'🏏',greet:'It’s the Boxing Day Test',fx:'none',c:['#3fbf7f','#e8f5d0','#c8a165'],sport:1},
   wimbledon:{name:'Wimbledon',badge:'🎾',greet:'Wimbledon fortnight — strawberries and radio',fx:'none',c:['#3fbf7f','#d6f5e3','#9b5de5'],sport:1},
   sixnations:{name:'Six Nations',badge:'🏉',greet:'Six Nations weekend',fx:'none',c:['#4a90e2','#dbe9ff','#3fbf7f'],sport:1},
   gn:{name:'Grand National',badge:'🏇',greet:'It’s Grand National day',fx:'none',c:['#c0392b','#ffd1cc','#3fbf7f'],sport:1},
@@ -796,30 +807,48 @@ const FEST=[['lny','2026-02-17',3],['lny','2027-02-06',3],['lny','2028-01-26',3]
   ['eidadha','2026-05-27',2],['eidadha','2027-05-16',2],['eidadha','2028-05-05',2],['eidadha','2029-04-24',2],['eidadha','2030-04-14',2],
   ['hanukkah','2026-12-05',8],['hanukkah','2027-12-25',8],['hanukkah','2028-12-13',8],['hanukkah','2029-12-02',8],['hanukkah','2030-12-21',8],
   ['eurovision','2026-05-16',1],['eurovision','2027-05-15',1],['eurosemi','2027-05-11',1],['eurosemi','2027-05-13',1],['comicrelief','2026-03-20',1],['comicrelief','2027-03-19',1]];
-const SPORT=[['darts','2027-01-03',1],['cheltenham','2027-03-16',4],['boatrace','2027-04-11',1],['snooker','2027-04-17',17],['uclfinal','2027-06-05',1],['ascot','2027-06-15',5],['worldcup','2030-06-08',44],['sixnations','2027-02-05',37,'wknd'],['facup','2027-05-22',1],['wwc','2027-06-24',32],['ashes','2027-06-18',46],['tdf','2027-07-02',24],
-  ['ryder','2027-09-17',3],['rwc','2027-10-01',44],['cwc','2027-10-02',51],['euro','2028-06-09',31],['olympics','2028-07-14',17]];
-function sportOn(d){const y=d.getFullYear(),n=dayN(d),wd=d.getDay();
-  const wim=dayN(firstMon(y,7))-35;if(n>=wim&&n<wim+14)return'wimbledon';
-  if(d.getMonth()===3&&wd===6&&d.getDate()>=8&&d.getDate()<=14)return'gn';
-  for(const[id,iso,len,wk]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=dayN(new Date(a,b-1,c));if(n>=st&&n<st+len&&(!wk||wd===5||wd===6||wd===0))return id}return null}
+const UKI=['GB','IE','IM','JE','GG'],EUR=UKI.concat('FR DE ES IT NL BE PT AT CH DK SE NO FI PL CZ SK HU RO BG GR HR SI RS BA ME MK AL XK UA MD LT LV EE IS LU MT CY TR GE AM AZ AD MC SM VA LI GI FO'.split(' ')),
+  RUGBY=UKI.concat(['FR','IT','NZ','AU','ZA','AR','FJ','JP','WS','TO','GE','PT','UY','NA','RO','ES','CL','US','CA']),
+  CRICKET=['GB','IE','IM','JE','GG','AU','NZ','IN','PK','BD','LK','AF','ZA','ZW','NA','NL','JM','TT','BB','GY','LC','VC','DM','AG','KN','GD','AE','NP'];
+const SPORT=[['darts','2027-01-03',1,0,UKI.concat(['NL','BE','DE'])],['ausopen','2027-01-17',15],['sixnations','2027-02-05',37,'wknd',UKI.concat(['FR','IT'])],['ipl','2027-03-10',67,0,['IN']],
+  ['cheltenham','2027-03-16',4,0,UKI],['boatrace','2027-04-11',1,0,['GB']],['snooker','2027-04-17',17,0,UKI.concat(['CN','HK'])],['rolandgarros','2027-05-17',21],['facup','2027-05-22',1,0,UKI],
+  ['uclfinal','2027-06-05',1],['ascot','2027-06-15',5,0,UKI],['wwc','2027-06-24',32],['ashes','2027-06-18',46,0,['GB','AU','IM','JE','GG']],['tdf','2027-07-02',24],
+  ['hurling','2027-07-18',1,0,['IE']],['gaafootball','2027-07-25',1,0,['IE']],['usopen','2027-08-29',15],['ryder','2027-09-17',3],['rwc','2027-10-01',44,0,RUGBY],['cwc','2027-10-02',51,0,CRICKET],
+  ['boxingtest','2026-12-26',1,0,['AU']],['euro','2028-06-09',31,0,EUR],['olympics','2028-07-14',17],['worldcup','2030-06-08',44]];
+const nthDay=(y,m,wd,n)=>{const d=new Date(y,m,1);d.setDate(1+((wd-d.getDay()+7)%7)+7*(n-1));return d};
+const lastDay=(y,m,wd)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-((d.getDay()-wd+7)%7));return d};
+function sportRules(y){const add=(id,st,len,cc)=>({id,st,len,cc});const w=new Date(firstMon(y,7));w.setDate(w.getDate()-35);
+  const g=new Date(y,3,8);while(g.getDay()!==6)g.setDate(g.getDate()+1);const ms=nthDay(y,3,0,2);ms.setDate(ms.getDate()-3);const indy=lastMon(y,4);indy.setDate(indy.getDate()-1);
+  return[add('wimbledon',w,14),add('gn',g,1,UKI),add('masters',ms,4),add('superbowl',nthDay(y,1,0,2),1,['US','CA']),add('kentucky',nthDay(y,4,6,1),1,['US']),add('indy500',indy,1,['US']),
+    add('nflthanks',nthDay(y,10,4,4),1,['US']),add('melbcup',nthDay(y,10,2,1),1,['AU','NZ']),add('afl',lastDay(y,8,6),1,['AU']),add('nrl',nthDay(y,9,0,1),1,['AU','NZ','PG'])]}
+function sportEvents(y0,y1){const out=[];for(const[id,iso,len,wk,cc]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=new Date(a,b-1,c);if(a>=y0-1&&a<=y1)out.push({id,st,len,wk,cc})}
+  for(let y=y0;y<=y1;y++)out.push(...sportRules(y));return out.filter(e=>!e.cc||e.cc.includes(S.country))}
+function sportOn(d){const n=dayN(d),wd=d.getDay(),ev=sportEvents(d.getFullYear(),d.getFullYear());const order=['gn','boatrace','facup','hurling','gaafootball','superbowl','kentucky','indy500','nflthanks','melbcup','afl','nrl','uclfinal','darts','wimbledon'];
+  const on=ev.filter(e=>{const s=dayN(e.st);return n>=s&&n<s+e.len&&(!e.wk||wd===5||wd===6||wd===0)});on.sort((a,b)=>{const ia=order.indexOf(a.id),ib=order.indexOf(b.id);return(ia<0?99:ia)-(ib<0?99:ib)||a.len-b.len});return on[0]?.id||null}
 const ZOD=['Monkey','Rooster','Dog','Pig','Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat'];
 const lastSun=(y,m)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-d.getDay());return d};
 const firstMon=(y,m)=>{const d=new Date(y,m,1);d.setDate(1+((8-d.getDay())%7));return d};
 const lastMon=(y,m)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-((d.getDay()+6)%7));return d};
 function festOn(n){for(const[id,iso,len]of FEST){const[a,b,c]=iso.split('-').map(Number),st=dayN(new Date(a,b-1,c));if(n>=st&&n<st+len)return id}return null}
-function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getDate(),n=dayN(d),E=dayN(easter(y)),md=m*100+D,f=festOn(n);
+const SOUTH=['AU','NZ','ZA','AR','CL','UY','PY','BR','PE','BO','NA','BW','ZW','MZ','MG','FJ','WS','TO','PG','LS','SZ'];
+const MAYMUM=['US','CA','AU','NZ','IN','JP','DE','IT','CH','BE','NL','DK','FI','BR','CN','HK','SG','MY','PH','ZA','AT','TR','GR','CO','PE','CL','VE','EC','UY','IS','EE','CZ','SK','UA','JM','TT','BB','KE','GH','NG','ZW'];
+function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getDate(),n=dayN(d),E=dayN(easter(y)),md=m*100+D,cc=S.country,uk=UKI.includes(cc),gb=['GB','IM','JE','GG'].includes(cc),south=SOUTH.includes(cc);
+  let f=festOn(n);if(f==='comicrelief'&&!gb)f=null;if((f==='eurovision'||f==='eurosemi')&&!(EUR.includes(cc)||['AU','IL'].includes(cc)))f=null;
   if(S.bday&&S.bday===String(m).padStart(2,'0')+'-'+String(D).padStart(2,'0'))return'birthday';
   if(md>=1231||md<=102)return'newyear';if(md>=1224&&md<=1226)return'christmas';if(f==='hanukkah')return'hanukkah';if(md>=1201&&md<=1230)return'christmas';
-  if(f&&f!=='hanukkah'&&!(f==='diwali'&&n===dayN(nthSun(y,10,2))))return f;
+  if(f&&f!=='hanukkah'&&!(f==='diwali'&&uk&&n===dayN(nthSun(y,10,2))))return f;
   if(md===401)return'aprilfools';const sp=sportOn(d);
-  if(n>=E-2&&n<=E+1)return'easter';if(n===E-47)return'pancake';if(n===E-21||n===E-22)return'mothers';
-  const cf=dayN(lastSun(y,2)),cb=dayN(lastSun(y,9));if(n===cf||n===cf-1)return'clocksfwd';if(n===cb||n===cb-1)return'clocksback';
-  for(const bm of[firstMon(y,4),lastMon(y,4),lastMon(y,7)]){const b=dayN(bm);if(n>=b-2&&n<=b)return'bank'}
-  if(md===125)return'burns';if(md===213)return'worldradio';if(md>=207&&md<=214)return'valentine';if(md===301)return'stdavid';if(md===317)return'stpatrick';if(md===423)return'stgeorge';
-  if(n===dayN(nthSun(y,5,3)))return'fathers';if(md===621)return'solstice';if(md>=1025&&md<=1031)return'halloween';if(md>=1104&&md<=1106)return'bonfire';
-  const rs=dayN(nthSun(y,10,2));if(md===1111||n===rs||n===rs-1)return'remembrance';
-  if(m===11&&D>=12&&D<=18&&d.getDay()===5)return'cin';if(md===1130)return'standrew';
+  if(n>=E-2&&n<=E+1)return'easter';if(uk&&n===E-47)return'pancake';
+  if(uk?(n===E-21||n===E-22):(MAYMUM.includes(cc)&&n===dayN(nthDay(y,4,0,2))))return'mothers';
+  if(uk||EUR.includes(cc)){const cf=dayN(lastSun(y,2)),cb=dayN(lastSun(y,9));if(n===cf||n===cf-1)return'clocksfwd';if(n===cb||n===cb-1)return'clocksback'}
+  else if(cc==='US'||cc==='CA'){const cf=dayN(nthDay(y,2,0,2)),cb=dayN(nthDay(y,10,0,1));if(n===cf||n===cf-1)return'clocksfwd';if(n===cb||n===cb-1)return'clocksback'}
+  if(gb)for(const bm of[firstMon(y,4),lastMon(y,4),lastMon(y,7)]){const b=dayN(bm);if(n>=b-2&&n<=b)return'bank'}
+  if(gb&&md===125)return'burns';if(md===213)return'worldradio';if(md>=207&&md<=214)return'valentine';if(gb&&md===301)return'stdavid';if(md===317)return'stpatrick';if(gb&&md===423)return'stgeorge';
+  if(n===dayN(south&&['AU','NZ','FJ','PG'].includes(cc)?nthDay(y,8,0,1):nthSun(y,5,3)))return'fathers';if(!south&&md===621)return'solstice';if(md>=1025&&md<=1031)return'halloween';if(gb&&md>=1104&&md<=1106)return'bonfire';
+  const rs=dayN(nthSun(y,10,2));if((gb||['CA','AU','NZ','ZA','IN','JM','BB','TT','MT','CY','FJ'].includes(cc))&&(md===1111||(gb&&(n===rs||n===rs-1))))return'remembrance';
+  if(gb&&m===11&&D>=12&&D<=18&&d.getDay()===5)return'cin';if(gb&&md===1130)return'standrew';
   if(sp)return sp;if(m===6)return'pride';
+  if(south){if(m>=9&&m<=11)return'spring';if(m===12||m<=2)return'summer';if(m>=3&&m<=5)return'autumn';return'winter'}
   if(md>=320&&md<=531)return'spring';if(md>=601&&md<=831)return'summer';if(md>=901)return md<=1111?'autumn':'winter';return'winter'}
 let TH=null,thFw=0;
 function thOnce(id){const k='thOnce_'+id,today=new Date().toDateString();if(id==='aprilfools'&&LS.get(k,'')===today&&LS.get('foolUntil',0)>Date.now()+1500){LS.set(k,'');}if(LS.get(k,'')===today||S.theme!=='auto')return;
@@ -920,8 +949,9 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
-const RV=8;
+const RV=9;
 const NEWS=[
+  {v:9,i:'🌍',c:'var(--h-blue)',t:'Sport for your country',d:'Sport moments and the Coming up calendar now follow your home country — Super Bowl and the Kentucky Derby in the US, Melbourne Cup and AFL in Australia, All-Ireland finals in Ireland, IPL in India, and more.'},
   {v:8,i:'🏟️',c:'var(--h-green)',t:'Sport section',d:'Tap the Sport chip on Home for sports radio in your country, sports stations worldwide and a calendar of big events coming up.'},
   {v:7,i:'🏉',c:'var(--h-green)',t:'Sport',d:'A new Sport chip finds sports radio, and big events like Wimbledon, the Six Nations, the Grand National and World Cups now get their own greeting — tap it to find sport stations.'},
   {v:6,i:'🎂',c:'var(--h-pink)',t:'More special days',d:'Lunar New Year, Diwali, Eid, Hanukkah, Pride, World Radio Day, St Andrew’s, bank holidays, clock changes, Eurovision, Children in Need, Red Nose Day, April Fools’ — and your own birthday (add it in Settings).'},
