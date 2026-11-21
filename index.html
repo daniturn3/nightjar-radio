@@ -321,6 +321,7 @@ body[class*="th-"] .a2{--c:var(--t1)}body[class*="th-"] .a3{--c:var(--t2)}
 body.calm #thlights i{animation:none}
 body.th-rainbow .thchip{background:linear-gradient(90deg,rgba(255,80,80,.18),rgba(255,200,60,.18),rgba(80,200,120,.18),rgba(80,150,255,.18),rgba(180,110,255,.18));border-color:rgba(255,255,255,.25);color:#fff}
 body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5,1.6,.4,1)}#app{transition:transform .7s cubic-bezier(.5,1.6,.4,1)}
+#foolx{position:fixed;left:10px;bottom:calc(150px + env(safe-area-inset-bottom));z-index:97;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);font-size:16px;opacity:.55}
 /* late night dim */
 body.ldim::before{content:'';position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.42);pointer-events:none}
 body.ldim #toast{background:#17120d;color:#c08a45}
@@ -767,8 +768,10 @@ function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getD
   if(m===6)return'pride';
   if(md>=320&&md<=531)return'spring';if(md>=601&&md<=831)return'summer';if(md>=901)return md<=1111?'autumn':'winter';return'winter'}
 let TH=null,thFw=0;
-function thOnce(id){const k='thOnce_'+id,today=new Date().toDateString();if(LS.get(k,'')===today||S.theme!=='auto')return;
-  if(id==='aprilfools'){LS.set(k,today);setTimeout(()=>{document.body.classList.add('fool');setTimeout(()=>{document.body.classList.remove('fool');toast('🃏 April Fools! The radio’s the right way up again')},1900)},900)}
+function thOnce(id){const k='thOnce_'+id,today=new Date().toDateString();if(id==='aprilfools'&&LS.get(k,'')===today&&LS.get('foolUntil',0)>Date.now()+1500){LS.set(k,'');}if(LS.get(k,'')===today||S.theme!=='auto')return;
+  if(id==='aprilfools'){LS.set(k,today);const end=()=>{if(!document.body.classList.contains('fool'))return;document.body.classList.remove('fool');$('#foolx')?.remove();LS.set('foolUntil',0);toast('🃏 April Fools! The radio’s the right way up again')};
+    const start=()=>{document.body.classList.add('fool');const b=document.createElement('button');b.id='foolx';b.textContent='🃏';b.setAttribute('aria-label','Flip back');b.onclick=end;document.body.append(b);const ms=Math.max(1000,LS.get('foolUntil',0)-Date.now());setTimeout(end,ms)};
+    LS.set('foolUntil',Date.now()+5*60e3+900);setTimeout(start,900)}
   if(id==='birthday'){LS.set(k,today);setTimeout(()=>{for(let i=0;i<4;i++)setTimeout(()=>burst(innerWidth*(.2+Math.random()*.6),innerHeight*(.25+Math.random()*.4),['🎉','🎈','✨','🎂'],['#ff9ccc','#ffd166','#86b4ff'],12),i*350);toast('🎂 Happy birthday! Have a brilliant day')},900)}}
 function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;
   document.body.className=document.body.className.replace(/\bth-\S+/g,'').trim();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
