@@ -81,17 +81,17 @@ header .sp{flex:1}
 select.sel{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
 select.sel option{background:#171a28}
 /* dial */
-.dialwrap{position:relative;margin:18px calc(50% - 50vw) 8px;padding:16px 0 10px;background:linear-gradient(180deg,#1a1408,#110d06);border-top:1px solid #3a2c12;border-bottom:1px solid #3a2c12;box-shadow:inset 0 0 40px rgba(255,170,60,.12)}
+
 .dial{overflow-x:auto;scrollbar-width:none;scroll-snap-type:x mandatory}.dial::-webkit-scrollbar{display:none}
-.scale{display:flex;align-items:flex-end;height:74px;width:max-content;padding:0 calc(50vw - 30px)}
+
 .tk{flex:none;width:60px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;height:100%}
-.tk i{width:1.5px;height:14px;background:#ffcf8a;opacity:.45}.tk.has i{height:26px;opacity:.9}
-.tk span{font:500 10px var(--mono);color:#ffcf8a;opacity:.75}
-.needle{position:absolute;left:50%;top:6px;bottom:6px;width:2px;margin-left:-1px;background:var(--cor);box-shadow:0 0 12px var(--cor);pointer-events:none}
+
+
+
 .dialcard{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.035);margin-top:12px;min-height:84px}
 .dialcard .lg{width:56px;height:56px;border-radius:14px;flex:none;background:#20243a;overflow:hidden;display:grid;place-items:center;font:italic 600 22px var(--serif);color:var(--mut)}.dialcard .lg img{width:100%;height:100%;object-fit:cover}
 .dialcard b{display:block;font:italic 400 21px/1.15 var(--serif)}.dialcard span{font-size:13px;color:var(--mut)}
-.freq{font:600 40px/1 var(--mono);color:#ffcf8a;text-shadow:0 0 18px rgba(255,170,60,.5);text-align:center;margin:4px 0 2px}.freq small{font-size:14px;margin-left:6px;opacity:.7}
+
 /* mini player */
 #mini{position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom));z-index:30;max-width:736px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:20px;background:rgb(26,29,44);border:1px solid var(--line);box-shadow:0 18px 40px -16px #000;cursor:pointer}
 #mini .lg{width:46px;height:46px;border-radius:12px;background:#22263a;overflow:hidden;flex:none;display:grid;place-items:center;font:italic 600 18px var(--serif);color:var(--mut)}#mini .lg img{width:100%;height:100%;object-fit:cover}
@@ -357,6 +357,28 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .hico{width:34px;height:34px;flex:none;display:grid;place-items:center;font:normal 17px/1 system-ui,sans-serif;border-radius:11px;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 4px 12px color-mix(in srgb,var(--a) 40%,transparent)}
 .hcard .sh p{padding-left:44px;margin-top:-4px}.hcard .hs{margin:0 -14px;padding:2px 14px 8px}.hcard .row:active{background:color-mix(in srgb,var(--a) 12%,transparent)}
 .hcard .npbtn{border-color:color-mix(in srgb,var(--a) 50%,transparent);background:color-mix(in srgb,var(--a) 12%,transparent);color:var(--a)}
+.rset{position:relative;margin:16px 0 6px;padding:14px 14px 12px;border-radius:28px;background:
+ radial-gradient(120% 60% at 50% 0%,rgba(255,190,110,.10),transparent 60%),linear-gradient(160deg,#3a2614,#22160b 55%,#170f07);
+ border:1px solid #5a3d1e;box-shadow:inset 0 1px 0 rgba(255,220,170,.18),inset 0 -2px 0 rgba(0,0,0,.4),0 18px 40px -20px rgba(255,150,50,.45)}
+.rstop{display:flex;align-items:center;gap:10px;padding:0 4px 8px}.rsbrand{font:700 11px var(--mono);letter-spacing:.35em;color:#e9c48a;opacity:.85}
+.rsband{margin-left:auto;font:500 11px var(--mono);letter-spacing:.12em;color:#b89770}.rsband b{color:var(--mc);font-weight:600}
+.rsled{width:9px;height:9px;border-radius:50%;background:var(--mc);box-shadow:0 0 10px var(--mc),0 0 3px #fff inset;animation:led 2.4s ease-in-out infinite}@keyframes led{50%{opacity:.55}}
+.freq{font:600 42px/1 var(--mono);color:#ffcf8a;text-shadow:0 0 18px rgba(255,170,60,.6),0 0 2px #fff3;text-align:center;margin:2px 0 10px;letter-spacing:.02em}.freq small{font-size:13px;margin-left:6px;opacity:.65;letter-spacing:.1em}
+.dialwrap{position:relative;border-radius:16px;padding:12px 0 8px;overflow:hidden;background:linear-gradient(180deg,#2a1c08,#140d04 60%,#1d1407);border:1px solid #6b4a1f;
+ box-shadow:inset 0 0 30px rgba(255,170,60,.22),inset 0 2px 8px rgba(0,0,0,.6)}
+.dialwrap::after{content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,0) 45%),linear-gradient(90deg,#140d04,transparent 14%,transparent 86%,#140d04)}
+.scale{display:flex;align-items:flex-end;height:70px;width:max-content}
+.tk i{width:1.5px;height:12px;background:#ffcf8a;opacity:.4;border-radius:1px}.tk.has i{height:26px;width:2px;opacity:.95;box-shadow:0 0 6px rgba(255,190,110,.6)}
+.tk span{font:600 10.5px var(--mono);color:#ffcf8a;opacity:.85;text-shadow:0 0 6px rgba(255,170,60,.5)}
+.needle{position:absolute;left:50%;top:4px;bottom:4px;width:2px;margin-left:-1px;background:linear-gradient(#ff7a5c,#ff3b30);box-shadow:0 0 10px #ff4a3a,0 0 22px rgba(255,60,40,.5);pointer-events:none;z-index:2;border-radius:2px}
+.needle::before{content:'';position:absolute;left:50%;top:-4px;margin-left:-5px;border:5px solid transparent;border-top:7px solid #ff5a44}
+.rsbot{display:flex;align-items:center;gap:14px;margin-top:12px}.grille{flex:1;height:58px;border-radius:14px;background:radial-gradient(circle,#0d0804 1.6px,transparent 2px) 0 0/8px 8px,linear-gradient(180deg,#2b1d0e,#1a1108);border:1px solid #4a321a;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+.knob{position:relative;width:64px;height:64px;flex:none;border-radius:50%;border:0;padding:0;cursor:pointer;background:conic-gradient(from 0deg,#d9b27a,#8a6232,#e8c48e,#7a5428,#d9b27a,#8a6232,#e8c48e,#7a5428,#d9b27a);
+ box-shadow:0 6px 14px rgba(0,0,0,.55),inset 0 0 0 5px rgba(40,25,10,.55),inset 0 2px 2px rgba(255,240,210,.4);transition:transform .05s linear}
+.knob::before{content:'';position:absolute;inset:11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f2d6a4,#a87a43 55%,#6e4a22)}
+.knob i{position:absolute;left:50%;top:9px;width:4px;height:14px;margin-left:-2px;border-radius:2px;background:var(--mc);box-shadow:0 0 8px var(--mc);z-index:1}
+.knob:active{filter:brightness(1.15)}.rshint{text-align:center;font:500 10.5px var(--mono);letter-spacing:.08em;color:#a88a66;margin-top:9px;opacity:.8}
+.dialcard.lock{border-color:color-mix(in srgb,#ffb36b 45%,transparent);background:linear-gradient(120deg,rgba(255,179,107,.10),rgba(255,255,255,.03));box-shadow:0 8px 24px -14px rgba(255,160,70,.6)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 .sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
@@ -646,22 +668,27 @@ VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.cou
 let dialTag=LS.get('dialTag','chillout'),dialList=[];
 VIEWS.dial=async(el,tok)=>{window.dialSpin=null;el.innerHTML=`<div class="hero"><div class="mono">Turn the dial</div><h1>The dial<b>.</b></h1></div>
   <div class="chips">${MOODS.map(([l,t,c])=>`<button class="chip${t===dialTag?' on':''}" style="--c:${c}" data-dtag="${esc(t)}">${l}</button>`).join('')}</div>
-  <div class="freq" id="freq">--.-<small>MHz</small></div>
-  <div class="dialwrap"><div class="dial" id="dial"><div class="scale" id="scale"></div></div><div class="needle"></div></div>
+  ${(()=>{const md=MOODS.find(m=>m[1]===dialTag)||['Chill','',''+'#ffb36b'];return`<div class="rset" style="--mc:${md[2]||'#ffb36b'}">
+    <div class="rstop"><span class="rsbrand">NIGHTJAR</span><span class="rsband">FM · <b>${esc(md[0])}</b></span><span class="rsled"></span></div>
+    <div class="freq" id="freq">--.-<small>MHz</small></div>
+    <div class="dialwrap"><div class="dial" id="dial"><div class="scale" id="scale"></div></div><div class="needle"></div></div>
+    <div class="rsbot"><div class="grille"></div><button class="knob" id="knob" data-act="spin" aria-label="Spin the dial"><i></i></button><div class="grille"></div></div>
+    <div class="rshint">Swipe the dial to tune · tap the knob to spin</div></div>`})()}
   <div class="dialcard" id="dialcard"><div class="dim">Tuning…</div></div>
   <div class="btnrow" style="margin-top:14px;justify-content:center"><button class="pill amb" data-act="spin">${ic('shuffle')}Spin the dial</button></div>`;
   try{const[pop,rnd]=await Promise.all([stations({tag:dialTag},20).catch(()=>[]),stations({tag:dialTag,order:'random'},60,0).catch(()=>[])]);const m=new Map();[...pop.sort(()=>Math.random()-.5).slice(0,12),...rnd].forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});dialList=[...m.values()].sort(()=>Math.random()-.5).slice(0,48);if(!dialList.length)throw 0}catch{if(tok===renderTok)$('#dialcard').innerHTML=errBox();return}if(tok!==renderTok)return;
   if(!dialList.length){$('#dialcard').innerHTML='<div class="empty" style="padding:6px">No stations on this band — try another mood.</div>';return}
   const N=dialList.length,f=i=>(88+i*(20/Math.max(1,N-1))).toFixed(1);
   $('#scale').innerHTML=Array.from({length:N*2-1},(_,j)=>j%2?`<div class="tk"><i></i><span></span></div>`:`<div class="tk has" data-di="${j/2}"><i></i><span>${f(j/2)}</span></div>`).join('');
-  const d=$('#dial');let lastI=-1,settle;
+  const d=$('#dial');let lastI=-1,settle;const pad=()=>{$('#scale').style.padding='0 '+Math.max(0,d.clientWidth/2-30)+'px'};pad();addEventListener('resize',pad);
+  const knob=$('#knob'),turn=()=>{if(knob)knob.style.transform=`rotate(${d.scrollLeft*.75}deg)`};
   const at=()=>Math.max(0,Math.min(N*2-2,Math.round(d.scrollLeft/60)));
   const show=(j,live)=>{const i=j/2,onSt=Number.isInteger(i),st=onSt?dialList[i]:null;$('#freq').innerHTML=`${(88+(j/2)*(20/Math.max(1,N-1))).toFixed(1)}<small>MHz</small>`;
-    $('#dialcard').innerHTML=st?`${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc([st.c,...st.tags.slice(0,2)].filter(Boolean).join(' · '))}</span></div><button class="ib st${isFav(st)?' on':''}" data-dfav="${i}">${isFav(st)?icf('star'):ic('star')}</button>`:'<div class="dim">· · · static · · ·</div>';
+    $('#dialcard').classList.toggle('lock',!!st);$('#dialcard').innerHTML=st?`${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc([st.c,...st.tags.slice(0,2)].filter(Boolean).join(' · '))}</span></div><button class="ib st${isFav(st)?' on':''}" data-dfav="${i}">${isFav(st)?icf('star'):ic('star')}</button>`:'<div class="dim">· · · static · · ·</div>';
     if(onSt&&live&&i!==lastI){lastI=i;play(st,{list:dialList,name:'The dial · '+dialTag})}
     if(!onSt&&live&&S.staticfx&&playing){/* passing between stations */}};
   const startI=Math.max(0,dialList.findIndex(s=>s.u===cur?.u));d.scrollLeft=startI*2*60;lastI=cur&&dialList[startI]?.u===cur.u?startI:-1;show(startI*2,false);
-  d.addEventListener('scroll',()=>{const j=at();show(j,false);clearTimeout(settle);if(d.dataset.spin)return;settle=setTimeout(()=>show(at(),true),420)},{passive:true});
+  turn();d.addEventListener('scroll',()=>{turn();const j=at();show(j,false);clearTimeout(settle);if(d.dataset.spin)return;settle=setTimeout(()=>show(at(),true),420)},{passive:true});
   window.dialSpin=()=>{if(d.dataset.spin)return;const from=d.scrollLeft,cj=at();const heard=new Set(S.recent.slice(0,15).map(x=>x.u));let j,g=0;do{j=Math.floor(Math.random()*N)*2;g++}while(g<60&&N>4&&(Math.abs(j-cj)<8||heard.has(dialList[j/2].u)));
     const to=j*60,dur=playful()?6000:0,t0=performance.now();d.dataset.spin=1;d.style.scrollSnapType='none';staticOn();
     const f=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=1-Math.pow(1-k,4);d.scrollLeft=from+(to-from)*e;if(k<1)requestAnimationFrame(f);else{d.style.scrollSnapType='';delete d.dataset.spin;show(j,true);if(dialList[j/2]?.u===cur?.u&&!buffering)staticOff()}};requestAnimationFrame(f)}};
