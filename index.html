@@ -322,6 +322,15 @@ body.calm #thlights i{animation:none}
 body.th-rainbow .thchip{background:linear-gradient(90deg,rgba(255,80,80,.18),rgba(255,200,60,.18),rgba(80,200,120,.18),rgba(80,150,255,.18),rgba(180,110,255,.18));border-color:rgba(255,255,255,.25);color:#fff}
 body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5,1.6,.4,1)}#app{transition:transform .7s cubic-bezier(.5,1.6,.4,1)}
 #foolx{position:fixed;left:10px;bottom:calc(150px + env(safe-area-inset-bottom));z-index:97;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);font-size:16px;opacity:.55}
+.fx{margin:12px 0 6px;border-radius:18px;background:rgba(134,217,168,.06);border:1px solid rgba(134,217,168,.28);overflow:hidden}
+.fx summary{display:flex;align-items:center;gap:12px;padding:10px 12px;cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent}.fx summary::-webkit-details-marker{display:none}
+.fx summary>div{flex:1;min-width:0}.fx summary b{display:block;font-weight:500}.fx summary span#fxsub{font-size:12.5px;color:var(--mut)}.fxchev{font-style:normal;color:var(--mut);transition:transform .25s}.fx[open] .fxchev{transform:rotate(180deg)}
+.lvdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#86d9a8;margin:0 4px 1px 0;animation:lvp 1.4s infinite}@keyframes lvp{50%{opacity:.3}}
+.fxtabs{display:flex;gap:6px;padding:0 12px 8px}.fxtabs button{font:inherit;font-size:12.5px;padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:none;color:var(--mut)}.fxtabs button.on{background:rgba(134,217,168,.16);border-color:rgba(134,217,168,.5);color:var(--cream)}
+#fxbody{padding:0 12px;max-height:60vh;overflow-y:auto}.fxlg{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#86d9a8;margin:12px 0 6px}
+.fxm{display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--line)}.fxlg+.fxm{border-top:0}.fxm em{font:normal 600 12px var(--mono);color:var(--mut);width:44px;flex:none}.fxm em.lv{color:#86d9a8}
+.fxm div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px}.fxm div span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fxm b{font:600 14px var(--mono);text-align:right;line-height:1.35}.fxm.in b{color:#86d9a8}
+.fxnone{font-size:13px;color:var(--mut);padding:8px 0 4px}.fxfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 12px;font-size:11.5px;color:var(--mut)}.fxfoot button{font:inherit;font-size:12.5px;background:none;border:0;color:#86d9a8;padding:4px 0;white-space:nowrap}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
 .sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
@@ -604,12 +613,75 @@ async function sportStations(cc){const q=[['tag','sport'],['name','sport']];
   res.flat().forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});let r=[...m.values()];
   if(r.length<3){const t=await stations({countrycode:cc,tag:'talk'},15).catch(()=>[]);t.forEach(x=>{if(!m.has(x.u)){m.set(x.u,x);r.push(x)}})}
   return r.slice(0,20)}
+/* ---------- football fixtures (ESPN public scoreboard, TheSportsDB fallback) ---------- */
+const FXU='uefa.champions uefa.europa uefa.europa.conf uefa.nations fifa.worldq.uefa',FXI='fifa.friendly fifa.world';
+const FXL={GB:'eng.1 eng.2 eng.3 eng.4 eng.fa eng.league_cup sco.1 sco.2 sco.tennents sco.cis wal.1 nir.1 eng.w.1',IE:'irl.1 eng.1 sco.1',IM:'eng.1 eng.2',JE:'eng.1 eng.2',GG:'eng.1 eng.2',
+ ES:'esp.1 esp.2 esp.copa_del_rey',DE:'ger.1 ger.2 ger.dfb_pokal',AT:'aut.1 ger.1',CH:'sui.1 ger.1',IT:'ita.1 ita.2 ita.coppa_italia',SM:'ita.1',FR:'fra.1 fra.2 fra.coupe_de_france',MC:'fra.1',LU:'fra.1 bel.1',
+ NL:'ned.1 ned.2 ned.cup',BE:'bel.1 ned.1',PT:'por.1 por.taca.portugal',DK:'den.1',SE:'swe.1',NO:'nor.1',FI:'fin.1',PL:'pol.1',CZ:'cze.1',GR:'gre.1',TR:'tur.1',RU:'rus.1',UA:'ukr.1',RO:'rou.1',CY:'cyp.1',IL:'isr.1',
+ US:'usa.1 usa.nwsl usa.open concacaf.champions mex.1 eng.1',CA:'usa.1 can.1 concacaf.champions eng.1',MX:'mex.1 concacaf.champions usa.1',
+ BR:'bra.1 bra.2 bra.copa_do_brazil',AR:'arg.1 arg.copa',CO:'col.1',CL:'chi.1',PE:'per.1',UY:'uru.1',PY:'par.1',EC:'ecu.1',VE:'ven.1',BO:'bol.1',
+ AU:'aus.1 aus.w.1 eng.1',NZ:'aus.1 eng.1',JP:'jpn.1',KR:'kor.1',CN:'chn.1',SA:'ksa.1 eng.1',IN:'ind.1 eng.1',ZA:'rsa.1 eng.1',NG:'eng.1 esp.1',GH:'eng.1',KE:'eng.1'};
+const SAM='AR BR CO CL PE UY PY EC VE BO'.split(' '),CNC='US CA MX GT CR HN PA SV JM TT CU DO HT NI BZ BS BB'.split(' '),
+ AFC='JP KR CN SA AE QA IR IQ AU IN TH VN MY ID JO KW BH OM UZ SY LB PH SG HK'.split(' '),
+ CAF='ZA NG GH KE EG MA TN DZ SN CI CM ET UG TZ ZM ZW AO MZ NA BW ML BF GN BJ RW SD LY MG MU GA CD'.split(' ');
+function fxLeagues(cc){let l=(FXL[cc]||'').split(' ').filter(Boolean);
+  if(EUR.includes(cc))l=l.concat((l.length?'':'eng.1 ').split(' '),FXU.split(' '));
+  else if(SAM.includes(cc))l=l.concat('conmebol.libertadores conmebol.sudamericana fifa.worldq.conmebol'.split(' '));
+  else if(CNC.includes(cc))l=l.concat((l.length?'':'mex.1 usa.1 ').split(' '),'fifa.worldq.concacaf');
+  else if(AFC.includes(cc))l=l.concat('afc.champions fifa.worldq.afc'.split(' '));
+  else if(CAF.includes(cc))l=l.concat('caf.champions caf.confed fifa.worldq.caf'.split(' '));
+  if(l.length<2)l=l.concat('eng.1 esp.1 uefa.champions'.split(' '));
+  return[...new Set(l.concat(FXI.split(' ')).filter(Boolean))]}
+const ymd=(d,s='')=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join(s);
+const dOff=n=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+n);return d};
+const fxTidy=n=>String(n||'').replace(/^(English|Spanish|German|Italian|French|Dutch|Portuguese|Belgian|Turkish|Greek|Austrian|Swiss|Danish|Swedish|Norwegian|Australian|Japanese|Mexican|Brazilian|Argentine|Argentinian|Colombian|Chilean) (?=\S)/,'').replace(/^UEFA /,'');
+async function fxEspn(cc){const L0=fxLeagues(cc),rng=ymd(dOff(-1))+'-'+ymd(dOff(2));let ok=0;
+  const res=await Promise.all(L0.map(async(lg,li)=>{try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),9000);
+    const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${lg}/scoreboard?dates=${rng}&limit=200`,{signal:ctl.signal});clearTimeout(tm);
+    if(!r.ok)return[];const j=await r.json();ok++;const ln=fxTidy(j.leagues?.[0]?.abbreviation||j.leagues?.[0]?.name||lg);
+    return(j.events||[]).map(e=>{const c=e.competitions?.[0]||{},cs=c.competitors||[],h=cs.find(x=>x.homeAway==='home')||cs[0]||{},a=cs.find(x=>x.homeAway==='away')||cs[1]||{},st=e.status?.type||{};
+      return{id:e.id,t:Date.parse(e.date),h:h.team?.shortDisplayName||h.team?.displayName||'?',a:a.team?.shortDisplayName||a.team?.displayName||'?',hs:h.score??'',as:a.score??'',
+        s:/POSTPONED|CANCELED|CANCELLED|SUSPENDED/.test(st.name||'')?'off':st.state||'pre',clk:st.state==='in'?(/HALF/.test(st.name||'')?'HT':e.status?.displayClock||''):'',lg:ln,o:li}})}catch{return[]}}));
+  if(!ok)throw new Error('espn');return res.flat()}
+async function fxDb(cc){const cn=cName(cc),uk={GB:['England','Scotland','Wales','Northern Ireland']}[cc]||[cn];let all=[];
+  for(const n of[0,1]){const r=await fetch(`https://www.thesportsdb.com/api/v1/json/3/eventsday.php?d=${ymd(dOff(n),'-')}&s=Soccer`);if(!r.ok)throw new Error('tsdb');const j=await r.json();all=all.concat(j.events||[])}
+  const mine=all.filter(e=>uk.includes(e.strCountry)),use=mine.length?mine:all;
+  return use.map(e=>({id:e.idEvent,t:Date.parse((e.strTimestamp||e.dateEvent+'T'+(e.strTime||'00:00:00')).replace(/(\+00:00)?$/,'')+'Z'),h:e.strHomeTeam,a:e.strAwayTeam,hs:e.intHomeScore??'',as:e.intAwayScore??'',
+    s:/FT|AET|PEN|Match Finished/i.test(e.strStatus||'')?'post':/Postp|Cancel/i.test(e.strStatus||'')?'off':(e.intHomeScore!=null&&Date.parse(e.strTimestamp+'Z')<Date.now()?'in':'pre'),clk:'',lg:e.strLeague||'Football',o:0}))}
+let fxBusy=null,fxDay=0;
+async function fxLoad(force){const k=S.country+'|'+ymd(new Date()),c=LS.get('fx',null),live=c&&c.ev.some(e=>e.s==='in'),age=c?Date.now()-c.at:1e12;
+  if(c&&c.k===k&&!force&&age<(live?120e3:600e3))return c;if(fxBusy)return fxBusy;
+  fxBusy=(async()=>{let ev,src='ESPN';try{ev=await fxEspn(S.country)}catch{try{ev=await fxDb(S.country);src='TheSportsDB'}catch{ev=null}}
+    fxBusy=null;if(!ev)return c&&c.k===k?Object.assign({},c,{stale:1}):null;const seen=new Set();ev=ev.filter(e=>e.t&&!seen.has(e.id)&&seen.add(e.id));
+    const o={k,at:Date.now(),src,ev};LS.set('fx',o);return o})();return fxBusy}
+const fxOn=(e,n)=>ymd(new Date(e.t))===ymd(dOff(n));
+function fxRows(o,n){const ev=o.ev.filter(e=>fxOn(e,n)).sort((a,b)=>a.o-b.o||a.t-b.t);if(!ev.length)return`<div class="fxnone">No ${n?'matches tomorrow':'more matches today'} in the leagues we follow for ${esc(cName(S.country))}.</div>`;
+  let lg='',h='';ev.forEach(e=>{if(e.lg!==lg){lg=e.lg;h+=`<div class="fxlg">${esc(lg)}</div>`}
+    const tm=new Date(e.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),sc=e.s==='in'||e.s==='post';
+    const left=e.s==='in'?`<em class="lv">${esc(e.clk||'Live')}</em>`:e.s==='post'?'<em>FT</em>':e.s==='off'?'<em>P–P</em>':`<em>${tm}</em>`;
+    h+=`<div class="fxm${e.s==='in'?' in':''}">${left}<div><span>${esc(e.h)}</span><span>${esc(e.a)}</span></div>${sc?`<b>${esc(e.hs)}<br>${esc(e.as)}</b>`:''}</div>`});return h}
+function fxSub(o){if(!o)return'Fixtures unavailable right now';const t=o.ev.filter(e=>fxOn(e,0)),lv=t.filter(e=>e.s==='in').length,tm=o.ev.filter(e=>fxOn(e,1)).length;
+  return t.length?`${t.length} match${t.length>1?'es':''} today${lv?` · <i class="lvdot"></i>${lv} live`:''}`:tm?`No matches today · ${tm} tomorrow`:'No matches today or tomorrow'}
+function fxH(){return`<details class="fx" id="fx"${LS.get('fxOpen',false)?' open':''}><summary><span class="spb">⚽</span><div><b>Football · ${esc(cName(S.country))}</b><span id="fxsub">Checking today’s matches…</span></div><i class="fxchev">▾</i></summary>
+  <div class="fxtabs"><button data-fxd="0" class="${fxDay?'':'on'}">Today</button><button data-fxd="1" class="${fxDay?'on':''}">Tomorrow</button></div><div id="fxbody">${skRows(3)}</div>
+  <div class="fxfoot"><span id="fxupd"></span><button data-fxgo>Find sports radio ›</button></div></details>`}
+function fxPaint(o){const sub=$('#fxsub'),b=$('#fxbody');if(!sub)return;sub.innerHTML=fxSub(o);
+  if(!o){b.innerHTML='<div class="fxnone">Couldn’t reach the fixtures service. Check your connection, or try again in a bit.</div>';$('#fxupd').textContent='';return}
+  b.innerHTML=fxRows(o,fxDay);$('#fxupd').textContent=`Your local times · updated ${new Date(o.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${o.stale?' (offline)':''}`}
+function fxWire(tok){const d=$('#fx');if(!d)return;
+  d.addEventListener('toggle',()=>{LS.set('fxOpen',d.open);if(d.open)fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})});
+  d.querySelectorAll('[data-fxd]').forEach(b=>b.onclick=()=>{fxDay=+b.dataset.fxd;d.querySelectorAll('[data-fxd]').forEach(x=>x.classList.toggle('on',x===b));fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})});
+  d.querySelector('[data-fxgo]').onclick=()=>$('#spcc')?.scrollIntoView({behavior:'smooth',block:'start'});
+  fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)});
+  const iv=setInterval(()=>{if(tok!==renderTok||!document.body.contains(d))return clearInterval(iv);if(!document.hidden&&d.open)fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})},60e3)}
 VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];
   el.innerHTML=`<div class="hero"><div class="mono">Sports radio</div><h1>Sport<b>.</b></h1></div>
   <div class="spnote">📻 Live commentary depends on each station’s broadcasting rights. Some stations play music instead of commentary online, or only stream it in their own country — so if a match isn’t on, try another station.</div>
+  ${fxH()}
   ${sec(`Sports radio in ${esc(cn)} ${flag(S.country)}`,'<div id="spcc">'+skRows(5)+'</div>','','01')}
   ${sec(`Coming up ${flag(S.country)}`,'<div class="splist">'+upcomingSport().map(sportRowH).join('')+'</div>',`Big events for ${esc(cn)} and the world, with radio commentary`,'02')}
   ${sec('Sports radio worldwide','<div id="spww">'+skCards()+'</div>','','03')}`;
+  fxWire(tok);
   const uniq=a=>{const m=new Map();a.forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});return[...m.values()]};
   sportStations(S.country).then(r=>{if(tok!==renderTok||!$('#spcc'))return;$('#spcc').innerHTML=r.length?rows(r,'Sports radio · '+cn):'<div class="empty"><b>No sports stations listed for '+esc(cn)+'</b>The station directory doesn’t have any tagged for sport here yet — try the worldwide list below.</div>';mark()});
   stations({tag:'sports'},20).then(r=>{if(tok===renderTok&&$('#spww'))$('#spww').innerHTML=r.length?cards(r,'Sports radio worldwide'):'<div class="empty">Nothing here right now.</div>';mark()}).catch(()=>{if($('#spww'))$('#spww').innerHTML=errBox()})};
@@ -967,8 +1039,9 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
-const RV=9;
+const RV=10;
 const NEWS=[
+  {v:10,i:'⚽',c:'var(--h-green)',t:'Football today',d:'The Sport tab now has a fold-out list of today’s and tomorrow’s football for your home country — kick-off times in your time zone, plus live scores and full-times. Tap it to open.'},
   {v:9,i:'🌍',c:'var(--h-blue)',t:'Sport for your country',d:'Sport moments and the Coming up calendar now follow your home country — Super Bowl and the Kentucky Derby in the US, Melbourne Cup and AFL in Australia, All-Ireland finals in Ireland, IPL in India, and more.'},
   {v:8,i:'🏟️',c:'var(--h-green)',t:'Sport section',d:'Tap the Sport chip on Home for sports radio in your country, sports stations worldwide and a calendar of big events coming up.'},
   {v:7,i:'🏉',c:'var(--h-green)',t:'Sport',d:'A new Sport chip finds sports radio, and big events like Wimbledon, the Six Nations, the Grand National and World Cups now get their own greeting — tap it to find sport stations.'},
