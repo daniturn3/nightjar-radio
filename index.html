@@ -389,6 +389,14 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 @media (prefers-reduced-motion:reduce){.spem i{animation:none}}
 .hcard .sprow{background:rgba(0,0,0,.18);border-color:color-mix(in srgb,var(--a) 22%,transparent)}.hcard .spb{background:linear-gradient(135deg,color-mix(in srgb,var(--a) 35%,transparent),color-mix(in srgb,var(--b) 18%,transparent))}
 .hcard .sprow em{padding:4px 9px;border-radius:99px;background:color-mix(in srgb,var(--a) 14%,transparent);color:var(--a)}.hcard .sprow em.on{background:rgba(134,217,168,.18);color:#86d9a8}
+.oarow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.oadate{opacity:.8}
+.onair{position:relative;display:inline-flex;align-items:center;gap:8px;padding:6px 13px 6px 11px;border-radius:9px;font:700 11.5px var(--mono);letter-spacing:.22em;text-transform:uppercase;
+ color:#ff9b8f;background:linear-gradient(180deg,#3a1414,#240b0b);border:1px solid #6e2a26;box-shadow:inset 0 1px 0 rgba(255,200,190,.12),0 2px 8px rgba(0,0,0,.4);transition:all .5s}
+.onair i{width:8px;height:8px;border-radius:50%;background:#7a2a24;transition:all .5s}
+body.playing .onair{color:#fff;background:linear-gradient(180deg,#ff4d3d,#d4231a);border-color:#ff8a7a;text-shadow:0 0 8px rgba(255,255,255,.7);
+ box-shadow:0 0 0 1px rgba(255,80,60,.35),0 0 18px rgba(255,60,40,.65),0 0 40px rgba(255,60,40,.25),inset 0 1px 0 rgba(255,255,255,.45)}
+body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s ease-in-out infinite}@keyframes oap{50%{opacity:.35;transform:scale(.8)}}
+@media (prefers-reduced-motion:reduce){body.playing .onair i{animation:none}}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -654,7 +662,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -901,6 +909,7 @@ function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px
   <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.</p>`);
   $('#faqback').onclick=()=>settings();
   $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
+
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
 function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop)history.back()}
