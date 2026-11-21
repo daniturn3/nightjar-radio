@@ -322,6 +322,10 @@ body.calm #thlights i{animation:none}
 body.th-rainbow .thchip{background:linear-gradient(90deg,rgba(255,80,80,.18),rgba(255,200,60,.18),rgba(80,200,120,.18),rgba(80,150,255,.18),rgba(180,110,255,.18));border-color:rgba(255,255,255,.25);color:#fff}
 body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5,1.6,.4,1)}#app{transition:transform .7s cubic-bezier(.5,1.6,.4,1)}
 #foolx{position:fixed;left:10px;bottom:calc(150px + env(safe-area-inset-bottom));z-index:97;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);font-size:16px;opacity:.55}
+.spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
+.splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.sprow.live{border-color:rgba(134,217,168,.5);background:rgba(134,217,168,.08)}.spb{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(255,255,255,.05);flex:none}
+.sprow>div{flex:1;min-width:0}.sprow b{display:block;font-weight:500}.sprow div span{font-size:12.5px;color:var(--mut)}.sprow em{font:normal 600 11px var(--mono);color:var(--mut);white-space:nowrap}.sprow em.on{color:#86d9a8}
 /* late night dim */
 body.ldim::before{content:'';position:fixed;inset:0;z-index:94;background:rgba(0,0,0,.42);pointer-events:none}
 body.ldim #toast{background:#17120d;color:#c08a45}
@@ -375,7 +379,7 @@ const save=(...k)=>k.forEach(x=>{LS.set(x,S[x]);if(['presets','favs','recent'].i
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
 const flag=cc=>cc&&cc.length===2?String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0))):'🌐';
 const initials=n=>esc((n||'?').replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'♪');
-const GLYPH=[['jazz','🎷'],['blues','🎷'],['classic rock','🎸'],['rock','🎸'],['metal','🤘'],['classical','🎻'],['piano','🎹'],['opera','🎭'],['news','📰'],['talk','🎙️'],['sport','⚽'],['dance','🪩'],['house','🪩'],['techno','🎛️'],['electronic','🎛️'],['chill','🌙'],['lounge','🍸'],['ambient','✨'],['sleep','😴'],['lofi','☕'],['lo-fi','☕'],['country','🤠'],['folk','🪕'],['80s','📼'],['70s','🕺'],['60s','🌼'],['90s','💿'],['oldies','📻'],['hip hop','🎤'],['hiphop','🎤'],['rap','🎤'],['reggae','🌴'],['latin','💃'],['salsa','💃'],['soul','💜'],['r&b','💜'],['christian','🕊️'],['gospel','🕊️'],['kids','🧸'],['children','🧸'],['christmas','🎄'],['pop','⭐'],['indie','🎧'],['world','🌍']];
+const GLYPH=[['jazz','🎷'],['blues','🎷'],['classic rock','🎸'],['rock','🎸'],['metal','🤘'],['classical','🎻'],['piano','🎹'],['opera','🎭'],['sport','⚽'],['news','📰'],['talk','🎙️'],['dance','🪩'],['house','🪩'],['techno','🎛️'],['electronic','🎛️'],['chill','🌙'],['lounge','🍸'],['ambient','✨'],['sleep','😴'],['lofi','☕'],['lo-fi','☕'],['country','🤠'],['folk','🪕'],['80s','📼'],['70s','🕺'],['60s','🌼'],['90s','💿'],['oldies','📻'],['hip hop','🎤'],['hiphop','🎤'],['rap','🎤'],['reggae','🌴'],['latin','💃'],['salsa','💃'],['soul','💜'],['r&b','💜'],['christian','🕊️'],['gospel','🕊️'],['kids','🧸'],['children','🧸'],['christmas','🎄'],['pop','⭐'],['indie','🎧'],['world','🌍']];
 const glyph=st=>{const t=(st.tags||[]).join(' ').toLowerCase();return(GLYPH.find(([k])=>t.includes(k))||[0,'📻'])[1]};
 const artSrc=st=>{if(st.fav)return st.fav;try{const h=new URL(st.home).hostname;return h?`https://www.google.com/s2/favicons?sz=128&domain=${encodeURIComponent(h)}`:''}catch{return''}};
 const artImg=st=>{const u=artSrc(st);return u?`<img src="${esc(u)}" alt="" loading="lazy" referrerpolicy="no-referrer" onload="if(this.naturalWidth<48)this.remove()" onerror="this.remove()">`:''};
@@ -585,6 +589,25 @@ VIEWS.search=async(el,tok)=>{el.innerHTML=`<div class="hero"><div class="mono">F
   $('#scc').onchange=()=>{scc=$('#scc').value;LS.set('scc',scc);render()};
   if(!sq&&!scc)return;const q={};if(sq)q.name=sq;if(scc)q.countrycode=scc;
   try{const r=await stations(q,50);if(tok!==renderTok)return;$('#sres').innerHTML=r.length?rows(r,sq?`“${sq}”`:'Stations'):'<div class="empty"><b>No stations found</b>Try a shorter name.</div>';mark()}catch{if(tok===renderTok)$('#sres').innerHTML=errBox()}};
+function upcomingSport(){const now=new Date(),n0=dayN(now),y0=now.getFullYear(),out=[];
+  for(const[id,iso,len]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=new Date(a,b-1,c);if(dayN(st)+len>n0)out.push({id,st,len})}
+  for(let y=y0;y<=y0+1;y++){const w=new Date(firstMon(y,7));w.setDate(w.getDate()-35);if(dayN(w)+14>n0)out.push({id:'wimbledon',st:w,len:14});
+    const g=new Date(y,3,8);while(g.getDay()!==6)g.setDate(g.getDate()+1);if(dayN(g)+1>n0)out.push({id:'gn',st:g,len:1})}
+  return out.sort((a,b)=>a.st-b.st).slice(0,10)}
+function sportRowH(e){const t=THEMES[e.id],n0=dayN(new Date()),s0=dayN(e.st),on=n0>=s0&&n0<s0+e.len,end=new Date(e.st);end.setDate(end.getDate()+e.len-1);
+  const f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),yr=e.st.getFullYear()!==new Date().getFullYear()?' '+e.st.getFullYear():'';
+  const when=on?'<em class="on">On now</em>':`<em>${s0-n0===1?'Tomorrow':'in '+(s0-n0)+' days'}</em>`;
+  return`<div class="sprow${on?' live':''}"><span class="spb">${t.badge}</span><div><b>${esc(t.name)}</b><span>${f(e.st)}${e.len>1?' – '+f(end):''}${yr}</span></div>${when}</div>`}
+VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];
+  el.innerHTML=`<div class="hero"><button class="mono" data-tab-go="home" style="color:var(--mut)">‹ Home</button><h1 style="margin-top:12px">Sport<b>.</b></h1></div>
+  <div class="spnote">📻 Live commentary depends on each station’s broadcasting rights. Some stations play music instead of commentary online, or only stream it in their own country — so if a match isn’t on, try another station.</div>
+  ${sec(`Sports radio in ${esc(cn)} ${flag(S.country)}`,'<div id="spcc">'+skRows(5)+'</div>','','01')}
+  ${sec('Coming up','<div class="splist">'+upcomingSport().map(sportRowH).join('')+'</div>','Big events with radio commentary','02')}
+  ${sec('Sports radio worldwide','<div id="spww">'+skCards()+'</div>','','03')}`;
+  const uniq=a=>{const m=new Map();a.forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});return[...m.values()]};
+  Promise.all([stations({countrycode:S.country,tag:'sports'},20).catch(()=>[]),stations({countrycode:S.country,tag:'sport'},20).catch(()=>[])]).then(([a,b])=>{
+    if(tok!==renderTok||!$('#spcc'))return;const r=uniq([...a,...b]).slice(0,15);$('#spcc').innerHTML=r.length?rows(r,'Sports radio · '+cn):'<div class="empty"><b>No sports stations listed here</b>Try the worldwide list below.</div>';mark()});
+  stations({tag:'sports'},20).then(r=>{if(tok===renderTok&&$('#spww'))$('#spww').innerHTML=r.length?cards(r,'Sports radio worldwide'):'<div class="empty">Nothing here right now.</div>';mark()}).catch(()=>{if($('#spww'))$('#spww').innerHTML=errBox()})};
 VIEWS.library=(el)=>{setTimeout(alarmWire,0);el.innerHTML=`<div class="hero"><div class="mono">Your stations</div><h1>Library<b>.</b></h1></div>
   ${sec('Wake-up radio',alarmH(),NAT?'Wake up to a station, fading in gently':'','⏰')}
   ${recapH()}${recapH()?'':(wrapBtn()?sec('Radio Wrapped',wrapBtn(),'Your year on the radio so far','✦'):'')}
@@ -829,11 +852,12 @@ let flown=false;function firstFly(){}
 $('#setbtn').innerHTML=ic('gear');
 document.addEventListener('click',e=>{const t=e.target;
   const tb=t.closest('#tabs button');if(tb)return go(tb.dataset.tab);
+  const tg=t.closest('[data-tab-go]');if(tg)return go(tg.dataset.tabGo);
   const fv=t.closest('[data-fav]');if(fv){e.stopPropagation();const st=L[fv.dataset.fav]?.arr[fv.dataset.i];if(st)toggleFav(st,fv);return}
   const df=t.closest('[data-dfav]');if(df){toggleFav(dialList[df.dataset.dfav],df);return}
   const sr=t.closest('[data-st]');if(sr){const o=L[sr.dataset.st];if(!o)return;const st=o.arr[sr.dataset.i];if(cur?.u===st.u&&(playing||buffering))return openNP();play(st,{list:o.arr,name:o.name});return}
   const pr=t.closest('[data-pre]');if(pr){const i=+pr.dataset.pre,p=S.presets[i];if(p){if(cur?.u===p.u&&(playing||buffering))return openNP();play(p,{list:S.presets.filter(Boolean),name:'Presets'})}else if(cur){S.presets[i]={...cur};save('presets');toast(`Saved to preset ${i+1}`);burst(px,py,['✦','♪'],['#ffd08a','#86b4ff']);renderAll()}else presetMenu(i);return}
-  const md=t.closest('[data-mood]');if(md){dialTag=md.dataset.mood;LS.set('dialTag',dialTag);return go('dial')}
+  const md=t.closest('[data-mood]');if(md){if(md.dataset.mood==='sports')return go('sport');dialTag=md.dataset.mood;LS.set('dialTag',dialTag);return go('dial')}
   const gp=t.closest('[data-gper]');if(gp){S.gper=gp.dataset.gper;save('gper');$$('[data-gper]').forEach(b=>b.classList.toggle('on',b===gp));return}
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
@@ -896,8 +920,9 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
-const RV=7;
+const RV=8;
 const NEWS=[
+  {v:8,i:'🏟️',c:'var(--h-green)',t:'Sport section',d:'Tap the Sport chip on Home for sports radio in your country, sports stations worldwide and a calendar of big events coming up.'},
   {v:7,i:'🏉',c:'var(--h-green)',t:'Sport',d:'A new Sport chip finds sports radio, and big events like Wimbledon, the Six Nations, the Grand National and World Cups now get their own greeting — tap it to find sport stations.'},
   {v:6,i:'🎂',c:'var(--h-pink)',t:'More special days',d:'Lunar New Year, Diwali, Eid, Hanukkah, Pride, World Radio Day, St Andrew’s, bank holidays, clock changes, Eurovision, Children in Need, Red Nose Day, April Fools’ — and your own birthday (add it in Settings).'},
   {v:5,i:'🎄',c:'var(--h-red)',t:'Seasonal themes',d:'The app now dresses up for the UK calendar — snow at Christmas, fireworks for New Year and Bonfire Night, hearts, eggs, bats, poppies and more, plus gentle themes for each season. Settings → Seasonal themes to preview or turn off.'},
