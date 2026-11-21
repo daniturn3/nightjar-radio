@@ -397,6 +397,18 @@ body.playing .onair{color:#fff;background:linear-gradient(180deg,#ff4d3d,#d4231a
  box-shadow:0 0 0 1px rgba(255,80,60,.35),0 0 18px rgba(255,60,40,.65),0 0 40px rgba(255,60,40,.25),inset 0 1px 0 rgba(255,255,255,.45)}
 body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s ease-in-out infinite}@keyframes oap{50%{opacity:.35;transform:scale(.8)}}
 @media (prefers-reduced-motion:reduce){body.playing .onair i{animation:none}}
+.sbox{position:relative;margin:10px 0 8px;padding:14px 14px 12px;border-radius:26px;overflow:hidden;border:1px solid rgba(184,162,255,.35);
+ background:radial-gradient(120% 90% at 100% 0%,rgba(123,92,255,.28),transparent 60%),radial-gradient(90% 80% at 0% 100%,rgba(134,180,255,.16),transparent 60%),linear-gradient(180deg,#1b1838,#131327);box-shadow:0 16px 36px -20px rgba(123,92,255,.6)}
+.sglow{position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,156,204,.25),transparent 70%);pointer-events:none}
+.sbox .sbar{position:relative;margin:0 0 10px;background:rgba(10,10,25,.55);border:1px solid rgba(184,162,255,.35);border-radius:18px;box-shadow:inset 0 2px 6px rgba(0,0,0,.35);transition:border-color .2s,box-shadow .2s}
+.sbox .sbar:focus-within{border-color:#b8a2ff;box-shadow:0 0 0 3px rgba(184,162,255,.2),0 0 22px rgba(123,92,255,.35)}.sbox .sbar svg{color:#b8a2ff}
+.sx{border:0;background:rgba(255,255,255,.08);color:var(--cream);width:26px;height:26px;border-radius:50%;font-size:12px;flex:none}
+.sccw{position:relative;display:flex;align-items:center;gap:8px}.sccw span{position:absolute;left:14px;pointer-events:none;font-size:15px}.sccw .sel{padding-left:40px;margin:0;background-color:rgba(10,10,25,.45);border-color:rgba(184,162,255,.25)}
+.slab{position:relative;font:600 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#b8a2ff;margin:14px 2px 7px}
+.schips{position:relative;display:flex;gap:7px;flex-wrap:wrap}.schip{font:inherit;font-size:13px;padding:7px 12px;border-radius:99px;border:1px solid rgba(184,162,255,.3);background:rgba(184,162,255,.08);color:var(--cream)}
+.schip:active{background:rgba(184,162,255,.22)}.schip.rec{border-color:rgba(134,180,255,.35);background:rgba(134,180,255,.08);color:#cfe0ff}
+.sempty{margin:18px 0;padding:28px 20px;border-radius:24px;text-align:center;border:1px dashed rgba(184,162,255,.3);background:rgba(184,162,255,.04)}.semo{font-size:42px;margin-bottom:8px;filter:drop-shadow(0 6px 14px rgba(123,92,255,.5))}
+.sempty b{display:block;font:italic 500 22px var(--serif)}.sempty span{display:block;font-size:13px;color:var(--mut);margin-top:6px;line-height:1.5}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -716,14 +728,27 @@ VIEWS.dial=async(el,tok)=>{window.dialSpin=null;el.innerHTML=`<div class="hero">
     const to=j*60,dur=playful()?6000:0,t0=performance.now();d.dataset.spin=1;d.style.scrollSnapType='none';staticOn();
     const f=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=1-Math.pow(1-k,4);d.scrollLeft=from+(to-from)*e;if(k<1)requestAnimationFrame(f);else{d.style.scrollSnapType='';delete d.dataset.spin;show(j,true);if(dialList[j/2]?.u===cur?.u&&!buffering)staticOff()}};requestAnimationFrame(f)}};
 let sq=LS.get('sq',''),scc=LS.get('scc','');
-VIEWS.search=async(el,tok)=>{el.innerHTML=`<div class="hero"><div class="mono">Find a station</div><h1>Search<b>.</b></h1></div>
-  <form class="sbar" id="sform">${ic('search')}<input id="sq" placeholder="Station name, e.g. BBC Radio 6" value="${esc(sq)}" autocomplete="off" enterkeyhint="search"></form>
-  <select class="sel" id="scc"><option value="">Any country 🌐</option>${COUNTRIES.map(([c,n])=>`<option value="${c}" ${c===scc?'selected':''}>${flag(c)} ${n}</option>`).join('')}</select>
-  <div id="sres" style="margin-top:14px">${sq||scc?skRows(6):`<div class="empty"><b>Over 40,000 stations</b>Search by name, or pick a country to browse.</div>`}</div>`;
-  $('#sform').onsubmit=e=>{e.preventDefault();sq=$('#sq').value.trim();LS.set('sq',sq);$('#sq').blur();render()};
+const SSUG={GB:['BBC Radio 2','Kerrang!','Classic FM','Radio X','Heart','Jazz FM','Absolute 80s','talkSPORT','Capital','Smooth'],IE:['RTÉ Radio 1','Today FM','Newstalk','2FM','Classic Hits'],
+ US:['NPR','KEXP','Classic rock','Smooth jazz','Country hits','Hip hop'],AU:['triple j','ABC Classic','Smooth FM','KIIS'],_:['Jazz','Lo-fi','Classic rock','80s hits','Chillout','News','Classical','Reggae']};
+let shist=LS.get('shist',[]);
+const sDo=q=>{sq=q.trim();LS.set('sq',sq);if(sq){shist=[sq,...shist.filter(x=>x.toLowerCase()!==sq.toLowerCase())].slice(0,6);LS.set('shist',shist)}render()};
+VIEWS.search=async(el,tok)=>{const sug=SSUG[S.country]||SSUG._;el.innerHTML=`<div class="hero"><div class="mono">Find a station</div><h1>Search<b>.</b></h1></div>
+  <div class="sbox"><div class="sglow"></div>
+    <form class="sbar" id="sform">${ic('search')}<input id="sq" placeholder="Station name, e.g. BBC Radio 6" value="${esc(sq)}" autocomplete="off" enterkeyhint="search">${sq?'<button type="button" class="sx" id="sx" aria-label="Clear">✕</button>':''}</form>
+    <div class="sccw"><span>🌐</span><select class="sel" id="scc"><option value="">Any country</option>${COUNTRIES.map(([c,n])=>`<option value="${c}" ${c===scc?'selected':''}>${flag(c)} ${n}</option>`).join('')}</select></div>
+    ${shist.length?`<div class="slab">Recent</div><div class="schips">${shist.map(q=>`<button class="schip rec" data-sq="${esc(q)}">↺ ${esc(q)}</button>`).join('')}</div>`:''}
+    ${sq||scc?'':`<div class="slab">Try</div><div class="schips">${sug.map(q=>`<button class="schip" data-sq="${esc(q)}">${esc(q)}</button>`).join('')}</div>`}</div>
+  <div id="sres" style="margin-top:6px">${sq||scc?scard(sec(sq?`“${esc(sq)}”`:`${flag(scc)} ${esc(cName(scc))}`,skRows(6),'Searching…','01'),'🔎','#b8a2ff','#7b5cff'):`<div class="sempty"><div class="semo">📻</div><b>Over 40,000 stations</b><span>Type a name above, tap a suggestion, or pick a country to browse.</span></div>`}</div>`;
+  $('#sform').onsubmit=e=>{e.preventDefault();$('#sq').blur();sDo($('#sq').value)};
+  if($('#sx'))$('#sx').onclick=()=>{sq='';LS.set('sq','');render()};
+  $$('[data-sq]').forEach(b=>b.onclick=()=>sDo(b.dataset.sq));
   $('#scc').onchange=()=>{scc=$('#scc').value;LS.set('scc',scc);render()};
   if(!sq&&!scc)return;
-  try{const r=await smartSearch(sq,scc,50);if(tok!==renderTok)return;$('#sres').innerHTML=r.length?rows(r,sq?`“${sq}”`:'Stations'):'<div class="empty"><b>No stations found</b>Try a shorter name.</div>';mark()}catch{if(tok===renderTok)$('#sres').innerHTML=errBox()}};
+  const title=sq?`“${esc(sq)}”`:`${flag(scc)} ${esc(cName(scc))}`;
+  try{const r=await smartSearch(sq,scc,50);if(tok!==renderTok)return;
+    $('#sres').innerHTML=r.length?scard(sec(title,rows(r,sq?`“${sq}”`:'Stations'),`${r.length===50?'50+':r.length} station${r.length===1?'':'s'}${scc&&sq?' in '+esc(cName(scc)):''}`,'01'),'🔎','#b8a2ff','#7b5cff')
+      :`<div class="sempty"><div class="semo">🤔</div><b>No stations found</b><span>Try a shorter name, check the spelling, or set the country to “Any country”.</span></div>`;mark()}
+  catch{if(tok===renderTok)$('#sres').innerHTML=errBox()}};
 function upcomingSport(){const n0=dayN(new Date()),y=new Date().getFullYear(),seen=new Set();return sportEvents(y,y+1).filter(e=>dayN(e.st)+e.len>n0).sort((a,b)=>a.st-b.st).filter(e=>{if(seen.has(e.id))return false;seen.add(e.id);return true}).slice(0,12)}
 function sportRowH(e){const t=THEMES[e.id],n0=dayN(new Date()),s0=dayN(e.st),on=n0>=s0&&n0<s0+e.len,end=new Date(e.st);end.setDate(end.getDate()+e.len-1);
   const f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),yr=e.st.getFullYear()!==new Date().getFullYear()?' '+e.st.getFullYear():'';
