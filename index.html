@@ -395,7 +395,7 @@ const good=x=>(NAT?/^https?:/i:/^https:/i).test(x.url_resolved||'')&&x.lastcheck
 async function stations(q={},n=60,ttl){const p=new URLSearchParams({hidebroken:'true',...(NAT?{}:{is_https:'true'}),order:'clickcount',reverse:'true',limit:String(n*2),...q});
   const d=await rb('/json/stations/search?'+p,ttl);const seen=new Set();return d.filter(good).map(mk).filter(s=>{const k=s.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).slice(0,n)}
 function click(st){fetch(RB[rbOk]+'/json/url/'+st.u).catch(()=>{})}
-const MOODS=[['Chill','chillout','#86d9a8'],['Jazz','jazz','#ffad6b'],['80s','80s','#ff9ccc'],['70s','70s','#ffd166'],['90s','90s','#b8a2ff'],['Rock','rock','#ff8a8a'],['Lo-fi','lofi','#86b4ff'],['Classical','classical','#d9c7a7'],['Soul','soul','#ffad6b'],['Dance','dance','#ff9ccc'],['Indie','indie','#86d9a8'],['Country','country','#ffd166'],['Ambient','ambient','#86b4ff'],['News & talk','news','#a3a7b8'],['Reggae','reggae','#86d9a8'],['Blues','blues','#86b4ff'],['Folk','folk','#d9c7a7'],['Hip hop','hip hop','#b8a2ff'],['Metal','metal','#ff8a8a'],['Oldies','oldies','#ffd166']];
+const MOODS=[['Chill','chillout','#86d9a8'],['Jazz','jazz','#ffad6b'],['80s','80s','#ff9ccc'],['70s','70s','#ffd166'],['90s','90s','#b8a2ff'],['Rock','rock','#ff8a8a'],['Lo-fi','lofi','#86b4ff'],['Classical','classical','#d9c7a7'],['Soul','soul','#ffad6b'],['Dance','dance','#ff9ccc'],['Indie','indie','#86d9a8'],['Country','country','#ffd166'],['Ambient','ambient','#86b4ff'],['News & talk','news','#a3a7b8'],['Sport','sports','#86d9a8'],['Reggae','reggae','#86d9a8'],['Blues','blues','#86b4ff'],['Folk','folk','#d9c7a7'],['Hip hop','hip hop','#b8a2ff'],['Metal','metal','#ff8a8a'],['Oldies','oldies','#ffd166']];
 const COUNTRIES=[['GB','United Kingdom'],['IE','Ireland'],['US','United States'],['CA','Canada'],['AU','Australia'],['FR','France'],['DE','Germany'],['ES','Spain'],['IT','Italy'],['NL','Netherlands'],['JP','Japan'],['BR','Brazil'],['JM','Jamaica'],['IS','Iceland'],['GR','Greece'],['IN','India'],['MX','Mexico'],['NG','Nigeria'],['SE','Sweden'],['ZA','South Africa']];
 
 /* ---------- playback ---------- */
@@ -537,7 +537,7 @@ function nearH(){return S.geo?`<div id="hnear">${skRows(4)}</div>`:`<div class="
 async function fillNear(tok){const el=$('#hnear');if(!el)return;try{const r=await nearList();if(tok!==renderTok||!$('#hnear'))return;$('#hnear').innerHTML=r.length?rows(r,'Near you',1):'<div class="empty"><b>Quiet round here</b>No stations listed near you — try Popular in your country below.</div>';mark()}catch{if(tok===renderTok&&$('#hnear'))$('#hnear').innerHTML=errBox()}}
 async function askNear(){const b=$('[data-act=near]');if(b)b.innerHTML=`${ic('globe')}Finding you…`;try{S.geo=await getPos();save('geo');render()}catch(e){if(b)b.innerHTML=`${ic('globe')}Find stations near me`;toast(e&&e.code===1?'Location is blocked — allow it in Chrome’s site settings':'Couldn’t get your location — try again outside or with GPS on')}}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`:''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   <div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>
   ${sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N())}
   <div class="chips" style="margin-top:18px">${MOODS.map(([l,t,c])=>`<button class="chip" style="--c:${c}" data-mood="${esc(t)}">${l}</button>`).join('')}</div>
@@ -742,6 +742,18 @@ const THEMES={
   eidfitr:{name:'Eid al-Fitr',badge:'🌙',greet:'Eid Mubarak',fx:'float',p:['✨','⭐','🌙'],c:['#d4af37','#f3e5ab','#2a9d8f']},
   eidadha:{name:'Eid al-Adha',badge:'🌙',greet:'Eid Mubarak',fx:'float',p:['✨','⭐','🌙'],c:['#d4af37','#f3e5ab','#2a9d8f']},
   hanukkah:{name:'Hanukkah',badge:'🕎',greet:'Happy Hanukkah',fx:'float',p:['✨','⭐','✡'],c:['#4a7fd6','#dfe9ff','#c0c8d8']},
+  wimbledon:{name:'Wimbledon',badge:'🎾',greet:'Wimbledon fortnight — strawberries and radio',fx:'none',c:['#3fbf7f','#d6f5e3','#9b5de5'],sport:1},
+  sixnations:{name:'Six Nations',badge:'🏉',greet:'Six Nations weekend',fx:'none',c:['#4a90e2','#dbe9ff','#3fbf7f'],sport:1},
+  gn:{name:'Grand National',badge:'🏇',greet:'It’s Grand National day',fx:'none',c:['#c0392b','#ffd1cc','#3fbf7f'],sport:1},
+  facup:{name:'FA Cup Final',badge:'🏆',greet:'It’s FA Cup Final day',fx:'none',c:['#ffd166','#fff1c2','#e63946'],sport:1},
+  wwc:{name:'Women’s World Cup',badge:'⚽',greet:'The Women’s World Cup is on',fx:'none',c:['#3fbf7f','#d6f5e3','#ffd166'],sport:1},
+  ashes:{name:'The Ashes',badge:'🏏',greet:'The Ashes are on — perfect for radio commentary',fx:'none',c:['#3fbf7f','#e8f5d0','#c8a165'],sport:1},
+  tdf:{name:'Tour de France',badge:'🚴',greet:'The Tour de France is on',fx:'none',c:['#ffd400','#fff3a6','#3fbf7f'],sport:1},
+  ryder:{name:'Ryder Cup',badge:'⛳',greet:'Ryder Cup weekend',fx:'none',c:['#3fbf7f','#d6f5e3','#4a90e2'],sport:1},
+  rwc:{name:'Rugby World Cup',badge:'🏉',greet:'The Rugby World Cup is on',fx:'none',c:['#3fbf7f','#d6f5e3','#ffd166'],sport:1},
+  cwc:{name:'Cricket World Cup',badge:'🏏',greet:'The Cricket World Cup is on',fx:'none',c:['#4a90e2','#dbe9ff','#3fbf7f'],sport:1},
+  euro:{name:'Euro 2028',badge:'⚽',greet:'Euro 2028 — hosted in the UK & Ireland',fx:'none',c:['#4a90e2','#dbe9ff','#ff4f5e'],sport:1},
+  olympics:{name:'Olympics',badge:'🏅',greet:'The Olympics are on',fx:'none',c:['#ffd166','#fff1c2','#4a90e2'],sport:1},
   pride:{name:'Pride Month',badge:'🏳️‍🌈',greet:'Happy Pride Month',fx:'none',c:['#ff6b9d','#ffd166','#5bc0eb'],rainbow:1},
   spring:{name:'Spring',badge:'🌸',greet:'',fx:'petals',p:['🌸','✿'],c:['#ff9ccc','#ffd1e6','#86d9a8']},
   summer:{name:'Summer',badge:'☀️',greet:'',fx:'fireflies',p:[],c:['#ffb347','#ffd08a','#ff6b4a']},
@@ -753,6 +765,12 @@ const FEST=[['lny','2026-02-17',3],['lny','2027-02-06',3],['lny','2028-01-26',3]
   ['eidadha','2026-05-27',2],['eidadha','2027-05-16',2],['eidadha','2028-05-05',2],['eidadha','2029-04-24',2],['eidadha','2030-04-14',2],
   ['hanukkah','2026-12-05',8],['hanukkah','2027-12-25',8],['hanukkah','2028-12-13',8],['hanukkah','2029-12-02',8],['hanukkah','2030-12-21',8],
   ['eurovision','2026-05-16',1],['eurovision','2027-05-15',1],['comicrelief','2026-03-20',1],['comicrelief','2027-03-19',1]];
+const SPORT=[['sixnations','2027-02-05',37,'wknd'],['facup','2027-05-22',1],['wwc','2027-06-24',32],['ashes','2027-06-18',46],['tdf','2027-07-02',24],
+  ['ryder','2027-09-17',3],['rwc','2027-10-01',44],['cwc','2027-10-02',51],['euro','2028-06-09',31],['olympics','2028-07-14',17]];
+function sportOn(d){const y=d.getFullYear(),n=dayN(d),wd=d.getDay();
+  const wim=dayN(firstMon(y,7))-35;if(n>=wim&&n<wim+14)return'wimbledon';
+  if(d.getMonth()===3&&wd===6&&d.getDate()>=8&&d.getDate()<=14)return'gn';
+  for(const[id,iso,len,wk]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=dayN(new Date(a,b-1,c));if(n>=st&&n<st+len&&(!wk||wd===5||wd===6||wd===0))return id}return null}
 const ZOD=['Monkey','Rooster','Dog','Pig','Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat'];
 const lastSun=(y,m)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-d.getDay());return d};
 const firstMon=(y,m)=>{const d=new Date(y,m,1);d.setDate(1+((8-d.getDay())%7));return d};
@@ -762,7 +780,7 @@ function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getD
   if(S.bday&&S.bday===String(m).padStart(2,'0')+'-'+String(D).padStart(2,'0'))return'birthday';
   if(md>=1231||md<=102)return'newyear';if(md>=1224&&md<=1226)return'christmas';if(f==='hanukkah')return'hanukkah';if(md>=1201&&md<=1230)return'christmas';
   if(f&&f!=='hanukkah'&&!(f==='diwali'&&n===dayN(nthSun(y,10,2))))return f;
-  if(md===401)return'aprilfools';
+  if(md===401)return'aprilfools';const sp=sportOn(d);
   if(n>=E-2&&n<=E+1)return'easter';if(n===E-47)return'pancake';if(n===E-21||n===E-22)return'mothers';
   const cf=dayN(lastSun(y,2)),cb=dayN(lastSun(y,9));if(n===cf||n===cf-1)return'clocksfwd';if(n===cb||n===cb-1)return'clocksback';
   for(const bm of[firstMon(y,4),lastMon(y,4),lastMon(y,7)]){const b=dayN(bm);if(n>=b-2&&n<=b)return'bank'}
@@ -770,7 +788,7 @@ function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getD
   if(n===dayN(nthSun(y,5,3)))return'fathers';if(md===621)return'solstice';if(md>=1025&&md<=1031)return'halloween';if(md>=1104&&md<=1106)return'bonfire';
   const rs=dayN(nthSun(y,10,2));if(md===1111||n===rs||n===rs-1)return'remembrance';
   if(m===11&&D>=12&&D<=18&&d.getDay()===5)return'cin';if(md===1130)return'standrew';
-  if(m===6)return'pride';
+  if(sp)return sp;if(m===6)return'pride';
   if(md>=320&&md<=531)return'spring';if(md>=601&&md<=831)return'summer';if(md>=901)return md<=1111?'autumn':'winter';return'winter'}
 let TH=null,thFw=0;
 function thOnce(id){const k='thOnce_'+id,today=new Date().toDateString();if(id==='aprilfools'&&LS.get(k,'')===today&&LS.get('foolUntil',0)>Date.now()+1500){LS.set(k,'');}if(LS.get(k,'')===today||S.theme!=='auto')return;
@@ -870,8 +888,9 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
-const RV=6;
+const RV=7;
 const NEWS=[
+  {v:7,i:'🏉',c:'var(--h-green)',t:'Sport',d:'A new Sport chip finds sports radio, and big events like Wimbledon, the Six Nations, the Grand National and World Cups now get their own greeting — tap it to find sport stations.'},
   {v:6,i:'🎂',c:'var(--h-pink)',t:'More special days',d:'Lunar New Year, Diwali, Eid, Hanukkah, Pride, World Radio Day, St Andrew’s, bank holidays, clock changes, Eurovision, Children in Need, Red Nose Day, April Fools’ — and your own birthday (add it in Settings).'},
   {v:5,i:'🎄',c:'var(--h-red)',t:'Seasonal themes',d:'The app now dresses up for the UK calendar — snow at Christmas, fireworks for New Year and Bonfire Night, hearts, eggs, bats, poppies and more, plus gentle themes for each season. Settings → Seasonal themes to preview or turn off.'},
   {v:4,i:'🔊',c:'var(--h-blue)',t:'Globe sounds',d:'Spin the globe to hear it whoosh, tick as it slows and chime when it lands. Turn off in Settings → Sound effects.'},
