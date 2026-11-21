@@ -577,12 +577,12 @@ let vcSel=LS.get('vcSel',0);
 function vcH(){return`<div class="vc"><div class="vctop"><b>Vice City drive 🌴</b><span>Real stations with a Leonida feel, for GTA 6 launch month · until 18 Dec</span></div>
   <div class="chips vcchips">${VC.map(([e,l],i)=>`<button class="chip${i===vcSel?' on':''}" data-vc="${i}">${e} ${l}</button>`).join('')}</div>
   <div id="vclist">${skCards()}</div>
-  <div class="vcfoot"><button class="pill" id="vcalb">🎧 GTA VI: The Album</button><span>Unofficial — not affiliated with Rockstar Games. The in-game stations aren’t streamed anywhere, so these are real stations in the same styles.</span></div></div>`}
+  <div class="vcfoot"><button class="pill" id="vcalb">▶ GTA VI: The Album on YouTube</button><span>Unofficial — not affiliated with Rockstar Games. The in-game stations aren’t streamed anywhere, so these are real stations in the same styles.</span></div></div>`}
 async function vcFill(tok){const el=$('#vclist');if(!el)return;el.innerHTML=skCards();const [,l,q,q2]=VC[vcSel];
   try{let r=await stations(q,16);if(r.length<4&&q2)r=r.concat(await stations(q2,16));if(tok!==renderTok||!$('#vclist'))return;$('#vclist').innerHTML=r.length?cards(r.slice(0,16),'Vice City drive · '+l):'<div class="empty">Nothing here right now.</div>';mark()}
   catch{if($('#vclist'))$('#vclist').innerHTML=errBox()}}
 function vcWire(tok){if(!$('.vc'))return;$$('[data-vc]').forEach(b=>b.onclick=()=>{vcSel=+b.dataset.vc;LS.set('vcSel',vcSel);$$('[data-vc]').forEach(x=>x.classList.toggle('on',x===b));vcFill(tok)});
-  $('#vcalb').onclick=()=>{const u='https://open.spotify.com/search/Grand%20Theft%20Auto%20VI%20The%20Album';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};vcFill(tok)}
+  $('#vcalb').onclick=()=>{const u='https://www.youtube.com/results?search_query=Grand+Theft+Auto+VI+The+Album+official';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};vcFill(tok)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
   el.innerHTML=`<div class="hero"><div class="mono">${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} · On air</div><h1>${greet()}<b>.</b></h1>${TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):''}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   <div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>
