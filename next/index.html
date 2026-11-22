@@ -316,6 +316,9 @@ body[class*="th-"] .a2{--c:var(--t1)}body[class*="th-"] .a3{--c:var(--t2)}
 .bigev p{position:relative;margin:10px 0 0;font-size:14px;color:rgba(255,255,255,.8)}.bgbar{position:relative;height:6px;margin-top:12px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden}.bgbar i{position:absolute;inset:0 auto 0 0;border-radius:9px;background:linear-gradient(90deg,var(--ba),var(--bb))}
 .bgbt{position:relative;display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.bgbt button{flex:1;min-width:120px;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);color:var(--cream);font:600 14px var(--sans,inherit)}
 .chsel{margin-top:16px;text-align:left}.chsel .mono{display:block;margin-bottom:6px;font-size:11px;opacity:.7}.chseg{display:flex;gap:6px;padding:4px;border-radius:16px;background:rgba(255,255,255,.06)}.chseg button{flex:1;padding:9px;border:0;border-radius:12px;background:none;color:var(--cream);font:600 14px inherit;opacity:.7}.chseg button.on{background:rgba(134,217,168,.18);opacity:1;box-shadow:inset 0 0 0 1px rgba(134,217,168,.5)}.chsel p{margin:6px 2px 0;font-size:12.5px;opacity:.7}
+.fbseg{display:flex;gap:6px;padding:4px;margin:4px 0 10px;border-radius:16px;background:rgba(255,255,255,.06)}.fbseg button{flex:1;padding:9px;border:0;border-radius:12px;background:none;color:var(--cream);font-family:inherit;font-weight:600;font-size:14px;opacity:.7}.fbseg button.on{background:rgba(255,179,71,.18);opacity:1;box-shadow:inset 0 0 0 1px rgba(255,179,71,.5)}
+.fbta{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:15px;line-height:1.45;resize:vertical;margin-bottom:10px}
+.fbd{margin-top:10px;font-size:13px;opacity:.85}.fbd summary{cursor:pointer;opacity:.75}.fbd pre{white-space:pre-wrap;word-break:break-word;font:11.5px/1.45 var(--mono);background:rgba(0,0,0,.25);padding:10px 12px;border-radius:12px;margin:8px 0}.fbd p{margin:0;opacity:.7;font-size:12px}
 .thchip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 14px;border-radius:999px;font-size:14px;background:color-mix(in srgb,var(--acc) 14%,transparent);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);color:var(--acc2)}
 .poppy{display:inline-block;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#111 0 22%,#2a7d2a 23% 30%,#d62f2f 31%);box-shadow:0 0 0 1px rgba(0,0,0,.3);vertical-align:-2px}
 #thfx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -508,6 +511,9 @@ const NAT=window.NJR||null;let natList=[],natLoaded=false,natErr='',song='';
 const slim=x=>({u:x.u,n:x.n,url:x.url,fav:x.fav,cc:x.cc,c:x.c,tags:x.tags,hls:x.hls});
 const natSync=k=>{if(!NAT)return;try{const a=k==='presets'?S.presets.filter(Boolean):S[k];NAT.sync(k,JSON.stringify((a||[]).slice(0,40).map(slim)))}catch{}};
 const save=(...k)=>k.forEach(x=>{LS.set(x,S[x]);if(['presets','favs','recent'].includes(x))natSync(x)});
+/* Recent errors, only ever sent if the person sends a problem report themselves. */
+const ERRS=[];function logErr(m){try{ERRS.push(new Date().toTimeString().slice(0,5)+' '+String(m).slice(0,160));if(ERRS.length>8)ERRS.shift()}catch{}}
+addEventListener('error',e=>logErr((e.message||'error')+(e.lineno?' (line '+e.lineno+')':'')));addEventListener('unhandledrejection',e=>logErr('promise: '+(e.reason&&e.reason.message||e.reason)));
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
 const flag=cc=>cc&&cc.length===2?String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0))):'🌐';
 const initials=n=>esc((n||'?').replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'♪');
@@ -583,7 +589,7 @@ function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textConten
 au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
-au.addEventListener('error',()=>{if(!cur)return;if(webPlayed===cur.u&&wantPlay&&reconnN<10){if(!reconn)toast('📶 Signal dropped — reconnecting…');reconn=true;buffering=true;playing=false;setState();clearTimeout(reconnT);reconnT=setTimeout(webRetry,[2,3,5,8,12,15,20,30,30,30][reconnN++]*1e3);return}reconn=false;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station')});
+au.addEventListener('error',()=>{if(!cur)return;logErr('stream error: '+cur.n);if(webPlayed===cur.u&&wantPlay&&reconnN<10){if(!reconn)toast('📶 Signal dropped — reconnecting…');reconn=true;buffering=true;playing=false;setState();clearTimeout(reconnT);reconnT=setTimeout(webRetry,[2,3,5,8,12,15,20,30,30,30][reconnN++]*1e3);return}reconn=false;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station')});
 function meta(){if(NAT||!('mediaSession' in navigator)||!cur)return;try{navigator.mediaSession.metadata=new MediaMetadata({title:cur.n,artist:[flag(cur.cc),cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '),album:'Nightjar Radio',artwork:cur.fav?[{src:cur.fav,sizes:'256x256'}]:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}catch{}
   const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch{}};h('play',()=>toggle());h('pause',()=>au.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>au.pause())}
 /* static between stations */
@@ -1016,7 +1022,7 @@ function renderNP(){if(!npOpen||!cur)return;const pi=S.presets.findIndex(p=>p&&p
   <div class="npt">${S.skin==='modern'?'':`<div class="npinfo"><h2>${esc(cur.n)}</h2><p>${flag(cur.cc)} ${esc([cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '))}</p><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div>`}
    <div class="skins">${SKINS.map(([k,l])=>`<button data-skin="${k}" class="${S.skin===k?'on':''}">${l}</button>`).join('')}</div></div>
   <div class="ctrls"><button class="ib" data-act="prev" aria-label="Previous station">${ic('prev')}</button><button class="bigplay" data-act="toggle" id="npbig" aria-label="Play or pause">${playing||buffering?icf('pause'):icf('play')}</button><button class="ib" data-act="next" aria-label="Next station">${ic('next')}</button></div>
-  <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button>${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button data-act="cast" class="${cast.on?'on':''}">${ic('cast')}<span>${cast.on?'Casting':'Cast'}</span></button>`:''}</div>
+  <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button>${WEBCH!=='stable'||chan()==='beta'?`<button data-act="bug">🐞<span>Report</span></button>`:''}${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button data-act="cast" class="${cast.on?'on':''}">${ic('cast')}<span>${cast.on?'Casting':'Cast'}</span></button>`:''}</div>
   <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div>
   ${eqOK()?`<div style="text-align:center;margin-top:10px"><button class="eqpill" data-act="eq">🎚 Sound: <b>${esc(eqName())}</b></button></div>`:''}`;
   $('#volr').oninput=e=>{const v=+e.target.value;applyVol(v);S.vol=v;save('vol');if(cur){S.svol[cur.u]=v;const k=Object.keys(S.svol);if(k.length>300)delete S.svol[k[0]];LS.set('svol',S.svol);const n=$('#volnote');if(n){n.textContent='Volume remembered for '+cur.n;n.classList.add('on');clearTimeout(window.vnT);window.vnT=setTimeout(()=>n.classList.remove('on'),2200)}}};
@@ -1106,11 +1112,36 @@ const FAQ=[
   ['What does Nightjar Radio know about me?','Nothing personal. There’s no account, no ads and no tracking. Your favourites, presets, settings and listening stats are kept only on your phone.'],
   ['Who does the app talk to?','The station directory (radio-browser.info), the radio stations themselves when you listen, ESPN for football fixtures, and Google’s icon service for some station logos. “Near you” sends your approximate position to the station directory once, to find local stations — it isn’t stored by the app.'],
   ['How do I move to a new phone?','Settings → “Back up now” saves a small file. On the new phone, open Settings → Restore and pick that file — your favourites, presets and settings come with you.']]]];
+/* ---------- Problem reports & ideas → Google Form (only sent when the person taps Send) ---------- */
+const FBF={form:'',type:'',msg:'',contact:'',diag:''};   // filled in once Daniel's Google Form exists
+function fbDiag(){const ua=navigator.userAgent,an=(/Android ([\d.]+)/.exec(ua)||[])[1],md=(/Android [\d.]+; ([^;)]+)/.exec(ua)||[])[1];
+  return[`App: ${NAT?'build '+NAT.version():'browser'} · ${buildKind?buildKind():''} · updates: ${chan()} · site: ${WEBCH} · v${RV}`,
+    NAT?`Phone: ${(NAT.maker&&NAT.maker())||''} ${md&&md!=='K'?md:''} · Android ${an||'?'}`.replace(/\s+/g,' '):`Browser: ${ua.slice(0,140)}`,
+    `Country: ${S.country} · theme: ${S.theme} · data saver: ${LS.get('saver',false)?'on':'off'}`,
+    cur?`Playing: ${cur.n} (${cur.cc||'?'})${playing?'':' — stopped'}${cur.u?' · '+String(cur.u).slice(0,120):''}`:'Playing: nothing',
+    `Screen: ${view} · ${innerWidth}×${innerHeight}`,
+    ERRS.length?'Recent errors:\n'+ERRS.join('\n'):'Recent errors: none'].join('\n')}
+let fbLast=0;
+function fbSheet(kind='bug'){const d=fbDiag();
+  sheet(`<h3>${kind==='idea'?'💡 Suggest an idea':'🐞 Report a problem'}</h3>
+  <div class="fbseg"><button data-fbk="bug" class="${kind==='bug'?'on':''}">🐞 Problem</button><button data-fbk="idea" class="${kind==='idea'?'on':''}">💡 Idea</button></div>
+  <textarea id="fbmsg" class="fbta" rows="5" maxlength="2000" placeholder="${kind==='idea'?'What would you like Nightjar Radio to do?':'What happened? What were you doing when it went wrong?'}"></textarea>
+  <input id="fbwho" class="fbta" maxlength="80" placeholder="Your name or Reddit username (optional)">
+  <details class="fbd"><summary>Details sent with your report</summary><pre>${esc(d)}</pre><p>These help fix things faster. Nothing is sent until you tap Send, and nothing identifies you unless you add your name.</p></details>
+  <button class="pill amb" id="fbsend" style="width:100%;justify-content:center;margin-top:12px">${ic('share')}Send</button>`);
+  let k=kind;$$('[data-fbk]').forEach(b=>b.onclick=()=>{k=b.dataset.fbk;$$('[data-fbk]').forEach(x=>x.classList.toggle('on',x===b));$('#sheet h3').textContent=k==='idea'?'💡 Suggest an idea':'🐞 Report a problem';$('#fbmsg').placeholder=k==='idea'?'What would you like Nightjar Radio to do?':'What happened? What were you doing when it went wrong?'});
+  $('#fbsend').onclick=async()=>{const m=$('#fbmsg').value.trim();if(m.length<4){toast('Tell me a little about it first');$('#fbmsg').focus();return}
+    if(Date.now()-fbLast<60e3){toast('Thanks — you can send another in a minute');return}
+    if(!FBF.form){toast('Reports aren’t switched on yet — coming very soon');return}
+    const b=$('#fbsend');b.disabled=true;b.textContent='Sending…';
+    try{await fetch(`https://docs.google.com/forms/d/e/${FBF.form}/formResponse`,{method:'POST',mode:'no-cors',body:new URLSearchParams({[FBF.type]:k==='idea'?'Idea':'Problem',[FBF.msg]:m,[FBF.contact]:$('#fbwho').value.trim(),[FBF.diag]:fbDiag()})});
+      fbLast=Date.now();closeSheet();toast(k==='idea'?'💡 Thanks! Your idea has been sent':'🐞 Thanks! Your report has been sent')}
+    catch{b.disabled=false;b.innerHTML=ic('share')+'Send';toast('Couldn’t send — check your connection and try again')}}}
 function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px">‹ Settings</button><h3>Help &amp; FAQ</h3>
   ${FAQ.map(([g,qs])=>`<div class="mono faqg">${esc(g)}</div>${qs.map(([q,a])=>`<details class="faq"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}`).join('')}
-  <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.<br><a href="#" id="faqpriv" style="color:var(--acc,#ffd08a)">Read the full privacy policy</a></p>`);
+  <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.<br><a href="#" id="faqbug" style="color:var(--acc,#ffd08a)">🐞 Report a problem or suggest an idea</a><br><a href="#" id="faqpriv" style="color:var(--acc,#ffd08a)">Read the full privacy policy</a></p>`);
   $('#faqpriv').onclick=e=>{e.preventDefault();const u=ROOT+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
-  $('#faqback').onclick=()=>settings();
+  $('#faqback').onclick=()=>settings();$('#faqbug').onclick=e=>{e.preventDefault();fbSheet()};
   $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
 
 /* Favourites added/removed with the 👍 button in Android Auto (or the notification) while the app was closed. */
@@ -1142,7 +1173,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="tog"><input type="checkbox" id="s_fx" ${S.sfx?'checked':''}>Sound effects — globe whoosh, ticks and chime</label>
   <label class="tog"><input type="checkbox" id="s_nl" ${S.nightlight?'checked':''}>Night-light clock after 20 seconds untouched while playing</label>
   <label class="tog"><input type="checkbox" id="s_pl" ${playful()?'checked':''}>Playful touches — bouncy buttons and sparkles</label></div>
-  <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button><button class="pill" id="s_faq">? Help &amp; FAQ</button><button class="pill" id="s_home">✎ Customise Home</button>${eqOK()?'<button class="pill" id="s_eq">🎚 Sound / equaliser</button>':''}</div>
+  <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button><button class="pill" id="s_faq">? Help &amp; FAQ</button><button class="pill" id="s_bug">🐞 Report a problem</button><button class="pill" id="s_home">✎ Customise Home</button>${eqOK()?'<button class="pill" id="s_eq">🎚 Sound / equaliser</button>':''}</div>
   ${S.geo?`<button class="pill" id="s_geo" style="margin-top:10px">${ic('x')}Forget my location</button>`:''}
   <div class="mono" style="margin:16px 0 6px">Backup</div><p class="dim" style="font-size:13px;margin:0 0 10px">Presets, favourites, history and settings in one file. ${ago==null?'Never backed up':ago<1?'Last backup today':'Last backup '+ago+' days ago'}</p>
   <div class="btnrow"><button class="pill amb" id="s_bk">${ic('dl')}Back up now</button><button class="pill" id="s_rs">${ic('ul')}Restore</button></div>
@@ -1163,6 +1194,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();if($('#s_eq'))$('#s_eq').onclick=()=>eqSheet();
   $$('[data-chan]').forEach(b=>b.onclick=()=>{const c=b.dataset.chan;if(c===chan())return;LS.set('chan',c);LS.set('updChk',0);$$('[data-chan]').forEach(x=>x.classList.toggle('on',x===b));$('#chtxt').textContent=c==='beta'?'You get new versions as soon as they’re released. They may have the odd bug.':'Tried and tested: new versions arrive once they’ve been through beta.';$('#s_ver').textContent=verLabel();
     toast(c==='beta'?'⚡ Beta on — checking for the newest version…':'🛡️ Stable — you’ll move over when Stable reaches your version',3500);if(c==='beta')checkUpdate(true);setTimeout(njrRoute,1600)});
+  $('#s_bug').onclick=()=>fbSheet();
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;if(!v&&S.bday){e.target.value='2000-'+S.bday;return}S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
@@ -1378,7 +1410,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
-      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
+      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),bug:()=>fbSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
       share:async()=>{const u=cur.home||ROOT;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
@@ -1487,8 +1519,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=18;
+const RV=19;
 const NEWS=[
+  {v:19,i:'🐞',c:'var(--h-orange)',t:'Report a problem or suggest an idea',d:'Found a bug or have an idea? Tap “Report a problem” in Settings. Beta users also get a quick 🐞 button in the player. Every report is read.'},
   {v:18,i:'⚡',c:'var(--h-blue)',t:'Stable or Beta — you choose',d:'In Settings you can now pick how you get app updates. Stable is tried and tested, and gets new versions once they’ve been through beta. Beta gets them straight away, so you see new features first.'},
   {v:17,i:'🏆',c:'var(--h-orange)',t:'Big tournament specials',d:'During the men’s and women’s football, rugby, cricket and T20 World Cups, the Olympics, Winter Olympics and Paralympics, the app dresses up for the occasion — with a countdown card two weeks before, day-by-day progress, and quick links to live scores and radio coverage.'},
   {v:16,i:'🏏',c:'var(--h-green)',t:'Cricket scores',d:'Cricket is now in the Sport tab’s live scores — Tests, ODIs, T20s and the big leagues first, with live scores, overs and the match situation (“needs 40 runs”).'},
