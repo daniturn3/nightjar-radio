@@ -430,6 +430,7 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .alfix{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--cream);padding:11px 12px;margin-top:8px;border-radius:16px;border:1px solid rgba(255,179,107,.35);background:rgba(255,179,107,.08)}
 .alfix span{font-size:20px}.alfix div{flex:1}.alfix b{display:block;font-weight:600;font-size:14px}.alfix small{display:block;font-size:11.5px;color:var(--mut);line-height:1.35;margin-top:2px}.alfix i{font-style:normal;color:#ffb36b;font-size:20px}
 .alrep{margin-top:14px;padding:12px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:12.5px;line-height:1.45}.alrep>div:not(.mono){padding:3px 0;color:#cfe8d8}.alrep i{font-style:normal;font-family:var(--mono);color:var(--mut);margin-right:8px;font-size:11px}.alrep .bad{color:#ff9b8f}
+#brand small.btest{white-space:nowrap;letter-spacing:.06em;background:linear-gradient(90deg,#ff9ccc,#ffb36b);color:#1a0f05;border-color:transparent;font-weight:700}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -1032,7 +1033,7 @@ function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px
 function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.favEdits()||'[]');if(!e.length)return;let n=0;
   e.forEach(x=>{if(x.op==='add'&&x.st&&x.st.u&&!S.favs.some(f=>f.u===x.st.u)){S.favs.unshift({tags:[],...x.st});n++}else if(x.op==='del'){const i=S.favs.findIndex(f=>f.u===x.u);if(i>=0){S.favs.splice(i,1);n++}}});
   if(n){save('favs');if(view==='library'||view==='home')render();mark&&mark()}}catch{}}
-setTimeout(pullCarFavs,1500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullCarFavs()});setInterval(()=>{if(!document.hidden)pullCarFavs()},8000);
+setTimeout(pullCarFavs,1500);setTimeout(()=>{try{betaBadge()}catch{}},300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullCarFavs()});setInterval(()=>{if(!document.hidden)pullCarFavs()},8000);
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
 function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop)history.back()}
@@ -1064,7 +1065,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <button class="pill" id="s_share" style="margin-top:14px">${ic('share')}Share the app</button>
   ${NAT?`<button class="pill" id="s_upd" style="margin-top:14px">${ic('dl')}Check for app updates</button>`:`<a class="pill" href="${APK}" style="margin-top:14px;text-decoration:none">${ic('dl')}Get the Android app</a>`}
   <input type="file" id="s_file" accept=".txt,.json,text/plain,application/json" hidden>
-  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono" id="s_ver">${NAT?'App build '+NAT.version():'Web version'} · ${tester()?'🧪 tester':'beta'}</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a></small></div>`);
+  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono" id="s_ver">${verLabel()}</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a></small></div>`);
   $('#s_priv').onclick=e=>{e.preventDefault();const u=location.origin+location.pathname.replace(/[^/]*$/,'')+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
@@ -1074,7 +1075,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
   $('#s_saver').onchange=e=>{LS.set('saver',e.target.checked);toast(e.target.checked?'📉 Data saver on':'Data saver off')};
   {let n=0,t=0;$('#s_ver').onclick=()=>{if(Date.now()-t>1500)n=0;t=Date.now();if(++n<7){if(n>=4)toast(`${7-n} more…`,900);return}n=0;const on=!tester();LS.set('tester',on);LS.set('updChk',0);
-    toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);$('#s_ver').textContent=(NAT?'App build '+NAT.version():'Web version')+' · '+(on?'🧪 tester':'beta')}}
+    toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);$('#s_ver').textContent=verLabel()}}
   $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();if($('#s_eq'))$('#s_eq').onclick=()=>eqSheet();
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;if(!v&&S.bday){e.target.value='2000-'+S.bday;return}S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
@@ -1298,11 +1299,13 @@ function toggleFav(st,btn){const i=S.favs.findIndex(x=>x.u===st.u);if(i>=0){S.fa
 
 const APK='https://github.com/daniturn3/nightjar-radio/releases/download/radio-app/nightjar-radio.apk',APK_TEST='https://github.com/daniturn3/nightjar-radio/releases/download/radio-beta/nightjar-radio-beta.apk';
 /* Tester mode (tap the build number in Settings 7 times): get new app builds before everyone else. */
+const isTestBuild=()=>!!(NAT&&LS.get('updPub',0)&&NAT.version()>LS.get('updPub',0)),verLabel=()=>!NAT?'Web version · beta':isTestBuild()?`🧪 Beta test v${NAT.version()}`:`App build ${NAT.version()} · ${LS.get('tester',false)?'🧪 tester':'beta'}`;
+function betaBadge(){const b=$('#brand small');if(!b)return;const t=isTestBuild();b.textContent=t?'beta test v'+NAT.version():'beta';b.classList.toggle('btest',t)}
 const tester=()=>LS.get('tester',false),apkUrl=()=>tester()&&LS.get('updTest',false)?APK_TEST:APK;
 async function checkUpdate(manual){if(!NAT)return;const last=LS.get('updChk',0);if(!manual&&Date.now()-last<30*6e4){if(LS.get('updAvail',0)>NAT.version())updPopup();return}
   try{const get=async t=>{try{const r=await fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/'+t,{cache:'no-store'});if(!r.ok)return 0;const d=await r.json();const m=/build (\d+)/i.exec(d.name||'');return m?+m[1]:0}catch{return 0}};
     const pub=await get('radio-app'),tst=tester()?await get('radio-beta'):0;LS.set('updChk',Date.now());
-    const v=Math.max(pub,tst);if(!pub&&!tst)throw 0;LS.set('updTest',tst>pub);LS.set('updAvail',v);if(v>NAT.version()){if(manual)closeSheet();updPopup(manual)}else if(manual)toast('You’re on the latest version')}catch{if(manual)toast('Couldn’t check for updates')}}
+    const v=Math.max(pub,tst);if(!pub&&!tst)throw 0;if(pub)LS.set('updPub',pub);LS.set('updTest',tst>pub);LS.set('updAvail',v);betaBadge();if(v>NAT.version()){if(manual)closeSheet();updPopup(manual)}else if(manual)toast('You’re on the latest version')}catch{if(manual)toast('Couldn’t check for updates')}}
 let updShown=false;
 function updPopup(force){const v=LS.get('updAvail',0);if(!NAT||v<=NAT.version())return;if(updShown&&!force){updBanner();return}updShown=true;
   const items=NEWS.filter(n=>n.app&&n.app>NAT.version());
