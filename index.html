@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<base href="/nightjar-radio/">
+<script>/* Web channels: the app shows Stable (this folder's root), Beta (beta/) or Test (next/) — see CLAUDE.md */
+window.ROOT='https://daniturn3.github.io/nightjar-radio/';window.WEBCH=/\/nightjar-radio\/next\//.test(location.pathname)?'test':/\/nightjar-radio\/beta\//.test(location.pathname)?'beta':'stable';
+window.njrRoute=function(){try{if(!window.NJR)return;var L=localStorage,want=L.getItem('njr_tester')==='true'?'test':L.getItem('njr_chan')==='"beta"'?'beta':'stable';
+  if(want!==WEBCH)location.replace('/nightjar-radio/'+({test:'next/',beta:'beta/',stable:''})[want]+location.search+location.hash)}catch(e){}};njrRoute();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
@@ -481,7 +486,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* Keys also copied into the Android app's own storage, so they survive the phone clearing web data. */
 const KEEP=['tester','chan','songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
-try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])})}}catch{}
+try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])});njrRoute()}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
 const P={ball:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.4 2.5-1.3 4h-4.2l-1.3-4zM12 3v4.5M15.4 10l5-1.5M14.1 14l3 4M9.9 14l-3 4M8.6 10l-5-1.5',home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
@@ -1104,7 +1109,7 @@ const FAQ=[
 function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px">‹ Settings</button><h3>Help &amp; FAQ</h3>
   ${FAQ.map(([g,qs])=>`<div class="mono faqg">${esc(g)}</div>${qs.map(([q,a])=>`<details class="faq"><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('')}`).join('')}
   <p class="dim" style="font-size:12.5px;margin:18px 0 4px;text-align:center">Still stuck? Try the tour in Settings, or check “What’s new”.<br><a href="#" id="faqpriv" style="color:var(--acc,#ffd08a)">Read the full privacy policy</a></p>`);
-  $('#faqpriv').onclick=e=>{e.preventDefault();const u=location.origin+location.pathname.replace(/[^/]*$/,'')+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
+  $('#faqpriv').onclick=e=>{e.preventDefault();const u=ROOT+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#faqback').onclick=()=>settings();
   $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
 
@@ -1145,7 +1150,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   ${NAT?`<div class="chsel"><span class="mono">App updates</span><div class="chseg"><button data-chan="stable" class="${chan()==='stable'?'on':''}">🛡️ Stable</button><button data-chan="beta" class="${chan()==='beta'?'on':''}">⚡ Beta</button></div><p id="chtxt">${chan()==='beta'?'You get new versions as soon as they’re released. They may have the odd bug.':'Tried and tested: new versions arrive once they’ve been through beta.'}</p></div><button class="pill" id="s_upd" style="margin-top:10px">${ic('dl')}Check for app updates</button>`:`<a class="pill" href="${APK}" style="margin-top:14px;text-decoration:none">${ic('dl')}Get the Android app</a>`}
   <input type="file" id="s_file" accept=".txt,.json,text/plain,application/json" hidden>
   <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono" id="s_ver">${verLabel()}</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a></small></div>`);
-  $('#s_priv').onclick=e=>{e.preventDefault();const u=location.origin+location.pathname.replace(/[^/]*$/,'')+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
+  $('#s_priv').onclick=e=>{e.preventDefault();const u=ROOT+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
@@ -1154,10 +1159,10 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
   $('#s_saver').onchange=e=>{LS.set('saver',e.target.checked);toast(e.target.checked?'📉 Data saver on':'Data saver off')};
   {let n=0,t=0;$('#s_ver').onclick=()=>{if(Date.now()-t>1500)n=0;t=Date.now();if(++n<7){if(n>=4)toast(`${7-n} more…`,900);return}n=0;const on=!tester();LS.set('tester',on);LS.set('updChk',0);
-    toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);$('#s_ver').textContent=verLabel()}}
+    toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);$('#s_ver').textContent=verLabel();setTimeout(njrRoute,1600)}}
   $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();if($('#s_eq'))$('#s_eq').onclick=()=>eqSheet();
   $$('[data-chan]').forEach(b=>b.onclick=()=>{const c=b.dataset.chan;if(c===chan())return;LS.set('chan',c);LS.set('updChk',0);$$('[data-chan]').forEach(x=>x.classList.toggle('on',x===b));$('#chtxt').textContent=c==='beta'?'You get new versions as soon as they’re released. They may have the odd bug.':'Tried and tested: new versions arrive once they’ve been through beta.';$('#s_ver').textContent=verLabel();
-    toast(c==='beta'?'⚡ Beta on — checking for the newest version…':'🛡️ Stable — you’ll move over when Stable reaches your version',3500);if(c==='beta')checkUpdate(true)});
+    toast(c==='beta'?'⚡ Beta on — checking for the newest version…':'🛡️ Stable — you’ll move over when Stable reaches your version',3500);if(c==='beta')checkUpdate(true);setTimeout(njrRoute,1600)});
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;if(!v&&S.bday){e.target.value='2000-'+S.bday;return}S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
@@ -1374,7 +1379,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
       favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
-      share:async()=>{const u=cur.home||location.href;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
+      share:async()=>{const u=cur.home||ROOT;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
   if(t.closest('#mini'))return openNP()});
@@ -1392,7 +1397,7 @@ const APK='https://github.com/daniturn3/nightjar-radio/releases/download/radio-a
 /* Update channels: Stable (main) · Beta (new builds straight away, opt-in) · Test (developer only: tap the build number in Settings 7 times). */
 const tester=()=>LS.get('tester',false),chan=()=>LS.get('chan','stable');
 const buildKind=()=>{if(!NAT)return'web';const v=NAT.version(),pub=LS.get('updPub',0),bet=LS.get('updBeta',0);if(!pub)return'stable';if(v<=pub)return'stable';if(bet&&v<=bet)return'beta';return'test'};
-const isTestBuild=()=>buildKind()==='test',verLabel=()=>{const k=buildKind();return k==='web'?'Web version':k==='test'?`🧪 Beta test v${NAT.version()}`:k==='beta'?`Beta · build ${NAT.version()}${tester()?' · 🧪 tester':''}`:`Build ${NAT.version()} · ${chan()==='beta'?'beta channel':'stable'}${tester()?' · 🧪 tester':''}`};
+const isTestBuild=()=>buildKind()==='test',verLabel=()=>(WEBCH!=='stable'?(WEBCH==='test'?'🧪 Test site · ':'⚡ Beta site · '):'')+vLab0(),vLab0=()=>{const k=buildKind();return k==='web'?'Web version':k==='test'?`🧪 Beta test v${NAT.version()}`:k==='beta'?`Beta · build ${NAT.version()}${tester()?' · 🧪 tester':''}`:`Build ${NAT.version()} · ${chan()==='beta'?'beta channel':'stable'}${tester()?' · 🧪 tester':''}`};
 function betaBadge(){const b=$('#brand small');if(!b)return;const k=buildKind();b.textContent=k==='test'?'beta test v'+NAT.version():k==='beta'?'beta':k==='web'?'beta':'';b.style.display=b.textContent?'':'none';b.classList.toggle('btest',k==='test')}
 const apkUrl=()=>({test:APK_TEST,beta:APK_BETA}[LS.get('updSrc','stable')]||APK);
 async function checkUpdate(manual){if(!NAT)return;const last=LS.get('updChk',0);if(!manual&&Date.now()-last<30*6e4){if(LS.get('updAvail',0)>NAT.version())updPopup();return}
