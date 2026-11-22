@@ -528,6 +528,14 @@ const TRB=[];function trouble(kind){try{const now=Date.now();TRB.push({kind,t:no
   b.innerHTML=`<span>${kind==='app'?'🐞 Something went wrong':'📻 Having trouble tuning in?'}</span><b>Report it</b><i aria-label="Close">✕</i>`;document.getElementById('toast')?.classList.remove('on');b.classList.add('on');
   const hide=()=>b.classList.remove('on');clearTimeout(b._t);b._t=setTimeout(hide,10000);
   b.onclick=e=>{hide();if(e.target.tagName==='I')return;fbSheet('bug',{part:kind==='app'?'Something else':'Playing a station',often:'Sometimes'})}}catch{}}
+/* Tester mode is PIN-locked: only Daniel knows the code. (Turning it OFF needs no code.) */
+const TPIN={s:'954c68ba928f058b',h:'bd4d011c3d179f34b0830a916b07598995c40cf2b016aef42544820cd5712048',i:200000};let tpinTries=0;
+async function pinOK(p){try{const e=new TextEncoder(),k=await crypto.subtle.importKey('raw',e.encode(p),'PBKDF2',false,['deriveBits']),b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:e.encode(TPIN.s),iterations:TPIN.i,hash:'SHA-256'},k,256);return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')===TPIN.h}catch{return false}}
+function setTester(on){LS.set('tester',on);LS.set('updChk',0);toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);const v=$('#s_ver');if(v)v.textContent=verLabel();setTimeout(njrRoute,1600)}
+function testerPin(){if(tpinTries>=5)return toast('Too many tries — restart the app to try again');
+  sheet(`<h3>🧪 Tester code</h3><p class="dim" style="margin:0 0 10px">This is for testing new versions before release.</p><input id="tpin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:inherit;font-size:20px;letter-spacing:.3em;text-align:center"><button class="pill amb" id="tpgo" style="width:100%;justify-content:center;margin-top:12px">Unlock</button>`);
+  const go=async()=>{const v=$('#tpin').value.trim();if(!v)return;$('#tpgo').disabled=true;const ok=await pinOK(v);if(ok){closeSheet();setTester(true)}else{tpinTries++;$('#tpgo').disabled=false;$('#tpin').value='';toast('That code isn’t right')}};
+  $('#tpgo').onclick=go;$('#tpin').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#tpin')?.focus(),300)}
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
 const flag=cc=>cc&&cc.length===2?String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0))):'🌐';
 const initials=n=>esc((n||'?').replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'♪');
@@ -1219,8 +1227,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
   $('#s_saver').onchange=e=>{LS.set('saver',e.target.checked);toast(e.target.checked?'📉 Data saver on':'Data saver off')};
-  {let n=0,t=0;$('#s_ver').onclick=()=>{if(Date.now()-t>1500)n=0;t=Date.now();if(++n<7){if(n>=4)toast(`${7-n} more…`,900);return}n=0;const on=!tester();LS.set('tester',on);LS.set('updChk',0);
-    toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);$('#s_ver').textContent=verLabel();setTimeout(njrRoute,1600)}}
+  {let n=0,t=0;$('#s_ver').onclick=()=>{if(Date.now()-t>1500)n=0;t=Date.now();if(++n<7){if(n>=4)toast(`${7-n} more…`,900);return}n=0;tester()?setTester(false):testerPin()}}
   $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();if($('#s_eq'))$('#s_eq').onclick=()=>eqSheet();
   $$('[data-chan]').forEach(b=>b.onclick=()=>{const c=b.dataset.chan;if(c===chan())return;LS.set('chan',c);LS.set('updChk',0);$$('[data-chan]').forEach(x=>x.classList.toggle('on',x===b));$('#chtxt').textContent=c==='beta'?'You get new versions as soon as they’re released. They may have the odd bug.':'Tried and tested: new versions arrive once they’ve been through beta.';$('#s_ver').textContent=verLabel();
     toast(c==='beta'?'⚡ Beta on — checking for the newest version…':'🛡️ Stable — you’ll move over when Stable reaches your version',3500);if(c==='beta')checkUpdate(true);setTimeout(njrRoute,1600)});
