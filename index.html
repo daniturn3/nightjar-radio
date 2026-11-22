@@ -955,7 +955,7 @@ const FAQ=[
  ['Android app',[
   ['Does it keep playing with the screen off?','Yes, in the Android app. If it stops, your phone may be saving battery — allow Nightjar Radio to run in the background (the alarm screen has a shortcut for this).'],
   ['How does the wake-up alarm work?','Library → Wake-up radio. Pick a time, the days and a station; it fades in gently. If the station can’t be reached, a chime plays instead so you still wake up.'],
-  ['Does it work with Android Auto?','Yes. In Android Auto you’ll find your presets, favourites and recently played stations, plus Popular in your country, Sport and Moods (chill, jazz, 80s, rock and more). Tap the search button or just say “Hey Google, play Kerrang on Nightjar Radio”.'],
+  ['Does it work with Android Auto?','Yes. In Android Auto you’ll find your presets, favourites and recently played stations, plus Popular in your country, Sport and Moods (chill, jazz, 80s, rock and more). Tap the search button or just say “Hey Google, play Kerrang on Nightjar Radio”. Tap 👍 on the playing screen to add the station to your favourites.'],
   ['Can I play it on my TV or speaker?','Yes — tap “Cast” in the full player to send the station to a Chromecast, Google/Nest speaker or Google TV on the same Wi-Fi. A few older stations that only use insecure (http) streams may not cast.'],
   ['What happens if my signal drops?','The app reconnects by itself — you’ll see “Reconnecting…” and it picks up again when the signal’s back.'],
   ['How do I add a widget?','Long-press an empty spot on your home screen → Widgets → Nightjar Radio. There are four: Presets, Mini radio, Now playing and Shortcuts.'],
@@ -976,6 +976,11 @@ function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px
   $('#faqback').onclick=()=>settings();
   $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
 
+/* Favourites added/removed with the 👍 button in Android Auto (or the notification) while the app was closed. */
+function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.favEdits()||'[]');if(!e.length)return;let n=0;
+  e.forEach(x=>{if(x.op==='add'&&x.st&&x.st.u&&!S.favs.some(f=>f.u===x.st.u)){S.favs.unshift({tags:[],...x.st});n++}else if(x.op==='del'){const i=S.favs.findIndex(f=>f.u===x.u);if(i>=0){S.favs.splice(i,1);n++}}});
+  if(n){save('favs');if(view==='library'||view==='home')render();mark&&mark()}}catch{}}
+setTimeout(pullCarFavs,1500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullCarFavs()});setInterval(()=>{if(!document.hidden)pullCarFavs()},8000);
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
 function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop)history.back()}
@@ -1303,6 +1308,7 @@ let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=13;
 const NEWS=[
+  {app:112,i:'👍',c:'#ffd166',t:'Favourite from the car',d:'In Android Auto, tap the 👍 on the playing screen to add the station to your favourites (tap again to remove). It shows on your phone’s playback notification too.'},
   {app:110,i:'🚗',c:'var(--h-blue)',t:'Better Android Auto',d:'In the car you now get Popular in your country, Sport and a Moods grid — plus search. Try: “Hey Google, play Kerrang on Nightjar Radio”.'},
   {app:108,i:'📺',c:'var(--h-blue)',t:'Cast, reconnect & data saver',d:'Tap “Cast” in the player to send a station to your Chromecast, Google/Nest speaker or Google TV. If your signal drops, Nightjar Radio now reconnects by itself. And Settings has a new Data saver for mobile data, plus how much data you’ve used this month.'},
   {app:107,i:'🎂',c:'var(--h-pink)',t:'Your settings are safer',d:'Your birthday, presets, favourites and Home layout now have a backup copy inside the app, so they come back even if your phone clears its storage.'},
