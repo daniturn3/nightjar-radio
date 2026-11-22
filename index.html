@@ -427,6 +427,8 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .sgt{flex:1;min-width:0}.sgt b{display:block;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sgt span{display:block;font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sgb{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--cream)}.sgb.yt{color:#ff5a5a;border-color:rgba(255,90,90,.35)}.sgb.sp{color:#1ed760;border-color:rgba(30,215,96,.35);font-size:15px}
 .sgd{font:600 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#ff9ccc;margin:14px 0 4px}.lsong{cursor:pointer}
+.alfix{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--cream);padding:11px 12px;margin-top:8px;border-radius:16px;border:1px solid rgba(255,179,107,.35);background:rgba(255,179,107,.08)}
+.alfix span{font-size:20px}.alfix div{flex:1}.alfix b{display:block;font-weight:600;font-size:14px}.alfix small{display:block;font-size:11.5px;color:var(--mut);line-height:1.35;margin-top:2px}.alfix i{font-style:normal;color:#ffb36b;font-size:20px}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -1002,7 +1004,8 @@ const FAQ=[
   ['What do the seasonal themes do?','The app dresses up for special days — snow at Christmas, fireworks on New Year’s Eve, your birthday and more. Turn them off in Settings → Seasonal themes.']]],
  ['Android app',[
   ['Does it keep playing with the screen off?','Yes, in the Android app. If it stops, your phone may be saving battery — allow Nightjar Radio to run in the background (the alarm screen has a shortcut for this).'],
-  ['How does the wake-up alarm work?','Library → Wake-up radio. Pick a time, the days and a station; it fades in gently. If the station can’t be reached, a chime plays instead so you still wake up.'],
+  ['How does the wake-up alarm work?','Library → Wake-up radio. Pick a time, the days and a station. When it goes off your phone lights up with a wake-up screen (Stop, Snooze 9 min or Keep listening) and the station fades in. If the station can’t be reached, a chime plays instead. Use “Test it” to check it rings with the screen off.'],
+  ['The alarm didn’t ring with the screen off','Open Library → Wake-up radio and fix anything under “Make sure it rings” — especially Autostart on Xiaomi, Redmi and POCO phones, and background running. Then use “Test it”.'],
   ['Does it work with Android Auto?','Yes. In Android Auto you’ll find your presets, favourites and recently played stations, plus Popular in your country, Sport and Moods (chill, jazz, 80s, rock and more). Tap the search button or just say “Hey Google, play Kerrang on Nightjar Radio”. Tap 👍 on the playing screen to add the station to your favourites.'],
   ['Can I play it on my TV or speaker?','Yes — tap “Cast” in the full player to send the station to a Chromecast, Google/Nest speaker or Google TV on the same Wi-Fi. A few older stations that only use insecure (http) streams may not cast.'],
   ['What happens if my signal drops?','The app reconnects by itself — you’ll see “Reconnecting…” and it picks up again when the signal’s back.'],
@@ -1316,7 +1319,15 @@ function alarmH(){if(!NAT)return`<div class="nearask"><div><b>Wake up to the rad
   <label class="mono" style="display:block;margin:12px 0 6px">Station</label>${ch.length?`<select class="sel" id="al_st">${ch.map(x=>`<option value="${esc(x.u)}" ${a.st?.u===x.u?'selected':''}>${esc(x.n)}</option>`).join('')}</select>`:'<p class="dim" style="margin:0">Play or favourite a station first, then choose it here.</p>'}
   <div class="vol" style="margin-top:14px">${ic('vol')}<input type="range" min="0.1" max="1" step="0.05" value="${a.vol}" id="al_v"></div>
   <p class="dim" style="font-size:12.5px;margin:10px 0 0">Fades in over a minute. If the station can’t be reached, a gentle chime plays instead.</p>
-  ${NAT.batteryOk()?'':`<button class="pill" id="al_bat" style="margin-top:12px">${ic('gear')}Make sure it rings — allow running in the background</button>`}</div>`}
+  ${alarmChecks()}</div>`}
+/* Phone settings that can stop the alarm ringing with the screen off — each shown only when it needs fixing. */
+function alarmChecks(){const q=(f,d)=>{try{return f()}catch{return d}};const mk=q(()=>NAT.maker(),''),rows=[];
+  if(NAT.notifOk&&!q(()=>NAT.notifOk(),true))rows.push(['al_ntf','🔔','Allow notifications','Needed to show the wake-up screen']);
+  if(NAT.fullScreenOk&&!q(()=>NAT.fullScreenOk(),true))rows.push(['al_fs','📱','Allow the wake-up screen','Lets the alarm light up your phone, even when locked']);
+  if(!q(()=>NAT.batteryOk(),true))rows.push(['al_bat','🔋','Allow running in the background','So your phone doesn’t put the alarm to sleep']);
+  if(NAT.openAutostart&&/xiaomi|redmi|poco|oppo|realme|oneplus|vivo|huawei|honor/.test(mk))rows.push(['al_auto','🚀','Turn on Autostart',`${/xiaomi|redmi|poco/.test(mk)?'Xiaomi, Redmi and POCO phones':'Your phone'} block alarms from waking apps unless Autostart is on for Nightjar Radio`]);
+  return`<div class="alchk">${rows.length?`<div class="mono" style="margin:16px 0 8px;color:#ffb36b">Make sure it rings</div>${rows.map(([id,e,t,d])=>`<button class="alfix" id="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div><i>›</i></button>`).join('')}`:''}
+  ${NAT.testAlarm?`<button class="pill" id="al_test" style="margin-top:12px">⏰ Test it — rings in 1 minute</button><p class="dim" style="font-size:12px;margin:6px 0 0">Tap test, lock your phone and wait. It should light up and start playing.</p>`:''}</div>`}
 function alarmText(t){const el=$('#al_next');if(!el)return;if(!t||!S.alarm.on){el.textContent=S.alarm.on?'Pick at least one day':'Alarm off';return}
   const d=new Date(t),mins=Math.round((t-Date.now())/6e4),hh=Math.floor(mins/60),mm=mins%60,today=new Date().toDateString()===d.toDateString(),tom=new Date(Date.now()+864e5).toDateString()===d.toDateString();
   el.textContent=`Rings ${today?'today':tom?'tomorrow':d.toLocaleDateString('en-GB',{weekday:'long'})} at ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · in ${hh?hh+'h ':''}${mm}m`}
@@ -1331,7 +1342,12 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   $$('[data-aldays]').forEach(b=>b.onclick=()=>{a.days=b.dataset.aldays?b.dataset.aldays.split(',').map(Number):[];$$('[data-ald]').forEach(x=>x.classList.toggle('on',a.days.includes(+x.dataset.ald)));alarmSave(true)});
   if($('#al_st'))$('#al_st').onchange=e=>{a.st=alarmChoices().find(x=>x.u===e.target.value)||a.st;alarmSave(true)};
   $('#al_v').onchange=e=>{a.vol=+e.target.value;alarmSave(true)};
-  if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();setTimeout(()=>{if(view==='library')render()},4000)}}
+  const back=()=>setTimeout(()=>{if(view==='library')render()},4000);
+  if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();back()};
+  if($('#al_ntf'))$('#al_ntf').onclick=()=>{NAT.askNotif();back()};
+  if($('#al_fs'))$('#al_fs').onclick=()=>{NAT.askFullScreen();back()};
+  if($('#al_auto'))$('#al_auto').onclick=()=>{NAT.openAutostart();toast('Find Nightjar Radio and switch Autostart on',4000)};
+  if($('#al_test'))$('#al_test').onclick=()=>{if(!S.alarm.st){toast('Choose a station first');return}NAT.testAlarm();toast('⏰ Test alarm in 1 minute — lock your phone now',4500)}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
 /* ---------- now playing in lists (Android app: peeks at each stream's song title) ---------- */
 const NPC={},NPU={},npMode=()=>LS.get('npMode','wifi'),NPFRESH=90e3;
@@ -1356,6 +1372,7 @@ let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=14;
 const NEWS=[
+  {app:114,i:'⏰',c:'#ffb36b',t:'A proper wake-up alarm',d:'Your radio alarm now lights up the phone with a full wake-up screen — Stop, Snooze or Keep listening — and starts playing even with the screen off. Open Library → Wake-up radio to check your phone’s settings and test it.'},
   {v:14,i:'🎵',c:'#ff9ccc',t:'What was that song?',d:'Library now keeps a list of songs you’ve heard, with one-tap ▶ YouTube and ● Spotify buttons. Tap the song name in the player to find it too.'},
   {app:113,i:'🎚',c:'#ffb36b',t:'Sound styles',d:'New equaliser: Bass boost, Voice (great for talk and sport), Night, Rock, Pop, Dance, Jazz and more. Tap “🎚 Sound” under the volume in the player, or find it in Settings.'},
   {app:112,i:'👍',c:'#ffd166',t:'Favourite from the car',d:'In Android Auto, tap the 👍 on the playing screen to add the station to your favourites (tap again to remove). It shows on your phone’s playback notification too.'},
