@@ -431,6 +431,7 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .alfix span{font-size:20px}.alfix div{flex:1}.alfix b{display:block;font-weight:600;font-size:14px}.alfix small{display:block;font-size:11.5px;color:var(--mut);line-height:1.35;margin-top:2px}.alfix i{font-style:normal;color:#ffb36b;font-size:20px}
 .alrep{margin-top:14px;padding:12px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:12.5px;line-height:1.45}.alrep>div:not(.mono){padding:3px 0;color:#cfe8d8}.alrep i{font-style:normal;font-family:var(--mono);color:var(--mut);margin-right:8px;font-size:11px}.alrep .bad{color:#ff9b8f}
 #brand small.btest{white-space:nowrap;letter-spacing:.06em;background:linear-gradient(90deg,#ff9ccc,#ffb36b);color:#1a0f05;border-color:transparent;font-weight:700}
+.hios{padding-left:20px;line-height:1.55}.hios li{margin:0 0 12px;color:#dcd6ca}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -1336,6 +1337,7 @@ function alarmChecks(){const q=(f,d)=>{try{return f()}catch{return d}};const mk=
   if(!q(()=>NAT.batteryOk(),true))rows.push(['al_bat','🔋','Allow running in the background','So your phone doesn’t put the alarm to sleep']);
   if(NAT.openMiuiBattery&&/xiaomi|redmi|poco/.test(mk))rows.push(['al_miui','🔋','Battery saver → “No restrictions”','Xiaomi holds back alarms while the screen is off unless Nightjar Radio has no battery restrictions']);
   if(NAT.openAutostart&&/xiaomi|redmi|poco|oppo|realme|oneplus|vivo|huawei|honor/.test(mk))rows.push(['al_auto','🚀','Turn on Autostart',`${/xiaomi|redmi|poco/.test(mk)?'Xiaomi, Redmi and POCO phones':'Your phone'} block alarms from waking apps unless Autostart is on for Nightjar Radio`]);
+  if(/tecno|infinix|itel/.test(mk))rows.push(['al_hios','📱','Tecno / Infinix: 3 quick settings','Battery Lab power saving, Phone Master auto-start, and lock the app in recents']);
   return`<div class="alchk">${rows.length?`<div class="mono" style="margin:16px 0 8px;color:#ffb36b">Make sure it rings</div>${rows.map(([id,e,t,d])=>`<button class="alfix" id="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div><i>›</i></button>`).join('')}`:''}
   ${NAT.testAlarm?`<button class="pill" id="al_test" style="margin-top:12px">⏰ Test it — rings in 1 minute</button><p class="dim" style="font-size:12px;margin:6px 0 0">Tap test, lock your phone and wait. It should light up and start playing.</p>`:''}${NAT.alarmLog?'<div id="alrep"></div>':''}</div>`}
 function alarmRep(){const el=$('#alrep');if(!el||!NAT.alarmLog)return;let a=[];try{a=JSON.parse(NAT.alarmLog()||'[]')}catch{}if(!a.length){el.innerHTML='';return}
@@ -1360,6 +1362,7 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   if($('#al_ntf'))$('#al_ntf').onclick=()=>{NAT.askNotif();back()};
   if($('#al_fs'))$('#al_fs').onclick=()=>{NAT.askFullScreen();back()};
   if($('#al_miui'))$('#al_miui').onclick=()=>{NAT.openMiuiBattery();toast('Choose “No restrictions”',4000)};
+  if($('#al_hios'))$('#al_hios').onclick=()=>sheet(`<h3>Make the alarm ring on Tecno / Infinix</h3><ol class="hios"><li><b>Settings → Battery Lab → Battery Saving Settings</b> (or App Power Saving Management) → find <b>Nightjar Radio</b> and switch power saving <b>off</b> for it.</li><li>Open the <b>Phone Master</b> app → <b>Toolbox / Application Manager → Auto-start Management</b> → switch <b>Nightjar Radio on</b> (all options).</li><li>Open your recent apps, then pull down on (or long-press) Nightjar Radio and tap the <b>🔒 lock</b>, so it isn’t cleared.</li><li>Also check <b>Settings → Apps → Nightjar Radio → Battery</b> → <b>Unrestricted</b>.</li></ol><p class="dim" style="font-size:13px">Then try <b>⏰ Test it</b> again with the screen off.</p>`);
   if($('#al_auto'))$('#al_auto').onclick=()=>{NAT.openAutostart();toast('Find Nightjar Radio and switch Autostart on',4000)};
   if($('#al_test'))$('#al_test').onclick=()=>{if(!S.alarm.st){toast('Choose a station first');return}NAT.testAlarm();alarmRep();toast('⏰ Test alarm in 1 minute — lock your phone now',4500)};
   alarmRep();clearInterval(window.__alrT);window.__alrT=setInterval(()=>{if(view!=='library')return clearInterval(window.__alrT);alarmRep()},5000)}
