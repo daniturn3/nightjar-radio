@@ -318,6 +318,9 @@ body[class*="th-"] .a2{--c:var(--t1)}body[class*="th-"] .a3{--c:var(--t2)}
 .chsel{margin-top:16px;text-align:left}.chsel .mono{display:block;margin-bottom:6px;font-size:11px;opacity:.7}.chseg{display:flex;gap:6px;padding:4px;border-radius:16px;background:rgba(255,255,255,.06)}.chseg button{flex:1;padding:9px;border:0;border-radius:12px;background:none;color:var(--cream);font:600 14px inherit;opacity:.7}.chseg button.on{background:rgba(134,217,168,.18);opacity:1;box-shadow:inset 0 0 0 1px rgba(134,217,168,.5)}.chsel p{margin:6px 2px 0;font-size:12.5px;opacity:.7}
 .fbseg{display:flex;gap:6px;padding:4px;margin:4px 0 10px;border-radius:16px;background:rgba(255,255,255,.06)}.fbseg button{flex:1;padding:9px;border:0;border-radius:12px;background:none;color:var(--cream);font-family:inherit;font-weight:600;font-size:14px;opacity:.7}.fbseg button.on{background:rgba(255,179,71,.18);opacity:1;box-shadow:inset 0 0 0 1px rgba(255,179,71,.5)}
 .fbta{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:15px;line-height:1.45;resize:vertical;margin-bottom:10px}
+.footbug{display:inline-block;margin-top:8px;padding:4px 8px;border:0;background:none;font-family:inherit;font-size:12.5px;color:inherit;opacity:.6}
+#trbl{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));z-index:95;transform:translate(-50%,30px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-radius:999px;border:1px solid rgba(255,179,71,.5);background:#1d1a22;color:var(--cream);font-family:inherit;font-size:14px;box-shadow:0 12px 30px -10px #000;transition:.3s;white-space:nowrap}
+#trbl.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}#trbl b{padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,var(--acc,#ffb347),var(--cor,#ff6b4a));color:#1a1210;font-size:13px}#trbl i{font-style:normal;opacity:.5;padding:0 4px}
 .fbql{font-size:12.5px;opacity:.7;margin:2px 2px 6px}.fbch{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.fbch button{padding:7px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13.5px}.fbch button.on{background:rgba(255,179,71,.2);border-color:rgba(255,179,71,.6)}
 .fbd{margin-top:10px;font-size:13px;opacity:.85}.fbd summary{cursor:pointer;opacity:.75}.fbd pre{white-space:pre-wrap;word-break:break-word;font:11.5px/1.45 var(--mono);background:rgba(0,0,0,.25);padding:10px 12px;border-radius:12px;margin:8px 0}.fbd p{margin:0;opacity:.7;font-size:12px}
 .thchip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 14px;border-radius:999px;font-size:14px;background:color-mix(in srgb,var(--acc) 14%,transparent);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);color:var(--acc2)}
@@ -472,7 +475,7 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 <div id="app">
   <header><div class="brand" id="brand"><img src="icon-192.png" alt=""><span>Nightjar <em>Radio</em></span><small>beta</small></div><div class="sp"></div><button class="ib" data-act="settings" aria-label="Settings" id="setbtn"></button></header>
   <main id="view"></main>
-  <footer class="foot"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span>live radio after dark</span><br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a></footer>
+  <footer class="foot"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span>live radio after dark</span><br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><br><button class="footbug" data-act="bug">🐞 Report a problem</button></footer>
 </div>
 <div id="mini" hidden></div>
 <nav id="tabs"></nav>
@@ -514,7 +517,14 @@ const natSync=k=>{if(!NAT)return;try{const a=k==='presets'?S.presets.filter(Bool
 const save=(...k)=>k.forEach(x=>{LS.set(x,S[x]);if(['presets','favs','recent'].includes(x))natSync(x)});
 /* Recent errors, only ever sent if the person sends a problem report themselves. */
 const ERRS=[];function logErr(m){try{ERRS.push(new Date().toTimeString().slice(0,5)+' '+String(m).slice(0,160));if(ERRS.length>8)ERRS.shift()}catch{}}
-addEventListener('error',e=>logErr((e.message||'error')+(e.lineno?' (line '+e.lineno+')':'')));addEventListener('unhandledrejection',e=>logErr('promise: '+(e.reason&&e.reason.message||e.reason)));
+addEventListener('error',e=>{logErr((e.message||'error')+(e.lineno?' (line '+e.lineno+')':''));trouble('app')});addEventListener('unhandledrejection',e=>logErr('promise: '+(e.reason&&e.reason.message||e.reason)));
+/* "Having trouble?" — offered when things keep going wrong (3 failed stations in 10 min, or 2 app errors), at most once an hour. */
+const TRB=[];function trouble(kind){try{const now=Date.now();TRB.push({kind,t:now});while(TRB.length&&now-TRB[0].t>6e5)TRB.shift();
+  const n=TRB.filter(x=>x.kind===kind).length;if(n<(kind==='app'?2:3)||now-(+localStorage.getItem('njr_trblAt')||0)<36e5||sheetOpen)return;
+  localStorage.setItem('njr_trblAt',now);let b=document.getElementById('trbl');if(!b){b=document.createElement('button');b.id='trbl';document.body.append(b)}
+  b.innerHTML=`<span>${kind==='app'?'🐞 Something went wrong':'📻 Having trouble tuning in?'}</span><b>Report it</b><i aria-label="Close">✕</i>`;document.getElementById('toast')?.classList.remove('on');b.classList.add('on');
+  const hide=()=>b.classList.remove('on');clearTimeout(b._t);b._t=setTimeout(hide,10000);
+  b.onclick=e=>{hide();if(e.target.tagName==='I')return;fbSheet('bug',{part:kind==='app'?'Something else':'Playing a station',often:'Sometimes'})}}catch{}}
 let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
 const flag=cc=>cc&&cc.length===2?String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0))):'🌐';
 const initials=n=>esc((n||'?').replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'♪');
@@ -583,14 +593,14 @@ window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true
   if(e.u&&e.u!==cur?.u){const st=[...natList,...S.presets.filter(Boolean),...S.favs,...S.recent].find(x=>x.u===e.u);if(st){logEnd();cur=st;S.last=st;save('last');S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');renderAll();if(carOn)carTick()}}
   const wasRc=reconn;reconn=e.s==='reconnecting';playing=e.s==='playing';buffering=e.s==='buffering'||reconn;if(!buffering)staticOff();
   if(reconn&&!wasRc)toast('📶 Signal dropped — reconnecting…');if(wasRc&&playing)toast('✓ Back on air');
-  if(e.err&&e.err!==natErr){buffering=false;toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station')}natErr=e.err||'';
+  if(e.err&&e.err!==natErr){buffering=false;logErr('player: '+e.err+' · '+(cur?.n||''));toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station');trouble('play')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
   if((e.song||'')!==song){song=e.song||'';showSong()}setState()};
 function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
 au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
-au.addEventListener('error',()=>{if(!cur)return;logErr('stream error: '+cur.n);if(webPlayed===cur.u&&wantPlay&&reconnN<10){if(!reconn)toast('📶 Signal dropped — reconnecting…');reconn=true;buffering=true;playing=false;setState();clearTimeout(reconnT);reconnT=setTimeout(webRetry,[2,3,5,8,12,15,20,30,30,30][reconnN++]*1e3);return}reconn=false;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station')});
+au.addEventListener('error',()=>{if(!cur)return;logErr('stream error: '+cur.n);if(webPlayed===cur.u&&wantPlay&&reconnN<10){if(!reconn)toast('📶 Signal dropped — reconnecting…');reconn=true;buffering=true;playing=false;setState();clearTimeout(reconnT);reconnT=setTimeout(webRetry,[2,3,5,8,12,15,20,30,30,30][reconnN++]*1e3);return}reconn=false;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station');trouble('play')});
 function meta(){if(NAT||!('mediaSession' in navigator)||!cur)return;try{navigator.mediaSession.metadata=new MediaMetadata({title:cur.n,artist:[flag(cur.cc),cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '),album:'Nightjar Radio',artwork:cur.fav?[{src:cur.fav,sizes:'256x256'}]:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}catch{}
   const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch{}};h('play',()=>toggle());h('pause',()=>au.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>au.pause())}
 /* static between stations */
@@ -1123,7 +1133,7 @@ function fbDiag(){const ua=navigator.userAgent,an=(/Android ([\d.]+)/.exec(ua)||
     `Screen: ${view} · ${innerWidth}×${innerHeight}`,
     ERRS.length?'Recent errors:\n'+ERRS.join('\n'):'Recent errors: none'].join('\n')}
 let fbLast=0;
-function fbSheet(kind='bug'){const d=fbDiag();
+function fbSheet(kind='bug',pre={}){const d=fbDiag();
   sheet(`<h3>${kind==='idea'?'💡 Suggest an idea':'🐞 Report a problem'}</h3>
   <div class="fbseg"><button data-fbk="bug" class="${kind==='bug'?'on':''}">🐞 Problem</button><button data-fbk="idea" class="${kind==='idea'?'on':''}">💡 Idea</button></div>
   <div id="fbq"><div class="fbql">How often?</div><div class="fbch" data-q="often">${['Just once','Sometimes','Every time'].map(x=>`<button>${x}</button>`).join('')}</div>
@@ -1133,6 +1143,7 @@ function fbSheet(kind='bug'){const d=fbDiag();
   <details class="fbd"><summary>Details sent with your report</summary><pre>${esc(d)}</pre><p>These help fix things faster. Nothing is sent until you tap Send, and nothing identifies you unless you add your name.</p></details>
   <button class="pill amb" id="fbsend" style="width:100%;justify-content:center;margin-top:12px">${ic('share')}Send</button>`);
   let k=kind;const qa={};const qv=()=>{$('#fbq').hidden=k==='idea'};qv();
+  [['often',pre.often],['part',pre.part]].forEach(([q,v])=>{if(!v)return;const b=[...$$(`.fbch[data-q=${q}] button`)].find(x=>x.textContent===v);if(b){b.classList.add('on');qa[q]=v}});
   $$('.fbch').forEach(g=>g.querySelectorAll('button').forEach(b=>b.onclick=()=>{const on=!b.classList.contains('on');g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.toggle('on',on);qa[g.dataset.q]=on?b.textContent:''}));
   $$('[data-fbk]').forEach(b=>b.onclick=()=>{k=b.dataset.fbk;qv();$$('[data-fbk]').forEach(x=>x.classList.toggle('on',x===b));$('#sheet h3').textContent=k==='idea'?'💡 Suggest an idea':'🐞 Report a problem';$('#fbmsg').placeholder=k==='idea'?'What would you like Nightjar Radio to do?':'What happened? What were you doing when it went wrong?'});
   $('#fbsend').onclick=async()=>{const m=$('#fbmsg').value.trim();if(m.length<4){toast('Tell me a little about it first');$('#fbmsg').focus();return}
