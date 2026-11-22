@@ -1,5 +1,5 @@
 name: Nightjar Radio Android app
-# The Android code lives in the PRIVATE repo daniturn3/nightjar-radio-sic. This workflow fetches it with the
+# The Android code lives in the PRIVATE repo daniturn3/nightjar-radio-src. This workflow fetches it with the
 # read-only SRC_TOKEN secret, builds and signs it here (signing secrets stay in this repo), and publishes the
 # TEST build to this repo's releases. Run it by hand (Actions → Run workflow) after changing the Android code.
 on:
@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { repository: daniturn3/nightjar-radio-sic, token: '${{ secrets.SRC_TOKEN }}', ref: main }
+        with: { repository: daniturn3/nightjar-radio-src, token: '${{ secrets.SRC_TOKEN }}', ref: main }
+      - uses: actions/checkout@v4
+        with: { path: pub, sparse-checkout: release-notes.md, sparse-checkout-cone-mode: false }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a  # v4.4.3, pinned (job has the signing secret)
@@ -37,5 +39,5 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk nightjar-radio-beta.apk
           gh release view radio-beta >/dev/null 2>&1 || gh release create radio-beta --title "Nightjar Radio test build" --notes "Test builds for the developer. Not for general use." --prerelease --latest=false
           gh release upload radio-beta nightjar-radio-beta.apk --clobber
-          { cat android/RELEASE_NOTES.md; echo; echo "_Test build $((${{ github.run_number }} + 100))_"; } > notes.md
+          { cat pub/release-notes.md; echo; echo "_Test build $((${{ github.run_number }} + 100))_"; } > notes.md
           gh release edit radio-beta --title "Nightjar Radio build $((${{ github.run_number }} + 100)) (test)" --notes-file notes.md --prerelease

@@ -57,7 +57,7 @@ def save(d, msg):
         raise SystemExit("could not push stats")
 
 def notes(n, label):
-    body = pathlib.Path("android/RELEASE_NOTES.md").read_text() if pathlib.Path("android/RELEASE_NOTES.md").exists() else ""
+    body = pathlib.Path("release-notes.md").read_text() if pathlib.Path("release-notes.md").exists() else ""
     pathlib.Path("notes.md").write_text(f"{body}\n\n_{label} build {n}_\n")
 
 def now(): return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
