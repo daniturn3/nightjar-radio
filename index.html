@@ -807,7 +807,7 @@ function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0)
     <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div><p>${esc(t.tag||t.greet)}</p>
     ${b.pre?'':`<div class="bgbar"><i style="width:${Math.round(b.day/b.len*100)}%"></i></div>`}
     <div class="bgbt">${t.fxs?`<button data-bigfx="${t.fxs}">📊 Live scores</button>`:''}<button data-sgo="${esc(t.q||'sport')}">📻 Find coverage</button></div></div>`}
-function upcomingSport(){const n0=dayN(new Date()),y=new Date().getFullYear(),seen=new Set();return sportEvents(y,y+1).filter(e=>dayN(e.st)+e.len>n0).sort((a,b)=>a.st-b.st).filter(e=>{if(seen.has(e.id))return false;seen.add(e.id);return true}).slice(0,12)}
+function upcomingSport(){const n0=dayN(new Date()),y=new Date().getFullYear(),seen=new Set();return sportEvents(y,y+1).filter(e=>dayN(e.st)+e.len>n0).sort((a,b)=>a.st-b.st).filter(e=>{if(seen.has(e.id))return false;seen.add(e.id);return true}).slice(0,16)}
 function sportRowH(e){const t=THEMES[e.id],n0=dayN(new Date()),s0=dayN(e.st),on=n0>=s0&&n0<s0+e.len,end=new Date(e.st);end.setDate(end.getDate()+e.len-1);
   const f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),yr=e.st.getFullYear()!==new Date().getFullYear()?' '+e.st.getFullYear():'';
   const when=on?'<em class="on">On now</em>':`<em>${s0-n0===1?'Tomorrow':'in '+(s0-n0)+' days'}</em>`;
@@ -823,7 +823,7 @@ async function sportStations(cc){const q=[['tag','sport'],['name','sport']];
   if(r.length<3){const t=await stations({countrycode:cc,tag:'talk'},15).catch(()=>[]);t.forEach(x=>{if(!m.has(x.u)){m.set(x.u,x);r.push(x)}})}
   return r.slice(0,20)}
 /* ---------- football fixtures (ESPN public scoreboard, TheSportsDB fallback) ---------- */
-const FXU='uefa.champions uefa.europa uefa.europa.conf uefa.nations fifa.worldq.uefa',FXI='fifa.world fifa.friendly fifa.cwc fifa.wwc uefa.champions uefa.euro conmebol.america caf.nations afc.asian.cup concacaf.gold';
+const FXU='uefa.champions uefa.europa uefa.europa.conf uefa.nations fifa.worldq.uefa uefa.wchampions uefa.weuro',FXI='fifa.world fifa.friendly fifa.cwc fifa.wwc uefa.champions uefa.euro conmebol.america caf.nations afc.asian.cup concacaf.gold';
 const FXL={GB:'eng.1 eng.2 eng.3 eng.4 eng.fa eng.league_cup sco.1 sco.2 sco.tennents sco.cis wal.1 nir.1 eng.w.1',IE:'irl.1 eng.1 sco.1',IM:'eng.1 eng.2',JE:'eng.1 eng.2',GG:'eng.1 eng.2',
  ES:'esp.1 esp.2 esp.copa_del_rey',DE:'ger.1 ger.2 ger.dfb_pokal',AT:'aut.1 ger.1',CH:'sui.1 ger.1',IT:'ita.1 ita.2 ita.coppa_italia',SM:'ita.1',FR:'fra.1 fra.2 fra.coupe_de_france',MC:'fra.1',LU:'fra.1 bel.1',
  NL:'ned.1 ned.2 ned.cup',BE:'bel.1 ned.1',PT:'por.1 por.taca.portugal',DK:'den.1',SE:'swe.1',NO:'nor.1',FI:'fin.1',PL:'pol.1',CZ:'cze.1',GR:'gre.1',TR:'tur.1',RU:'rus.1',UA:'ukr.1',RO:'rou.1',CY:'cyp.1',IL:'isr.1',
@@ -1261,6 +1261,9 @@ const THEMES={
   ryder:{name:'Ryder Cup',badge:'⛳',greet:'Ryder Cup weekend',fx:'none',c:['#3fbf7f','#d6f5e3','#4a90e2'],sport:1},
   rwc:{name:'Rugby World Cup',badge:'🏉',greet:'The Rugby World Cup is on',fx:'float',p:['🏉','🏆','✨'],c:['#3fbf7f','#d6f5e3','#ffd166'],sport:1,big:1,fxs:'rugby',q:'rugby',tag:'The world’s best rugby nations chasing the Webb Ellis Cup'},
   cwc:{name:'Cricket World Cup',badge:'🏏',greet:'The Cricket World Cup is on',fx:'float',p:['🏏','🏆','✨'],c:['#4a90e2','#dbe9ff','#3fbf7f'],sport:1,big:1,fxs:'cricket',q:'cricket',tag:'Fifty overs, fourteen nations, one trophy'},
+  wt20wc:{name:'Women’s T20 World Cup',badge:'🏏',greet:'The Women’s T20 World Cup is on',fx:'float',p:['🏏','💥','🏆','✨'],c:['#ff6b9d','#ffd1e6','#3fbf7f'],sport:1,big:1,fxs:'cricket',q:'cricket',tag:'The world’s best in the short format, every ball on the radio'},
+  w6n:{name:'Women’s Six Nations',badge:'🏉',greet:'Women’s Six Nations weekend',fx:'none',c:['#ff6b9d','#ffd1e6','#4a90e2'],sport:1},
+  wfacup:{name:'Women’s FA Cup Final',badge:'🏆',greet:'It’s Women’s FA Cup Final day at Wembley',fx:'none',c:['#ffd166','#fff1c2','#ff6b9d'],sport:1},
   t20wc:{name:'T20 World Cup',badge:'🏏',greet:'The T20 World Cup is on',fx:'float',p:['🏏','💥','🏆','✨'],c:['#9b5de5','#e8dcff','#3fbf7f'],sport:1,big:1,fxs:'cricket',q:'cricket',tag:'Sixes, super overs and late nights'},
   paralympics:{name:'Paralympics',badge:'🏅',greet:'The Paralympics are on',fx:'float',p:['🥇','🥈','🥉','✨','⭐'],c:['#e2001a','#ffd1d6','#0081c8'],sport:1,big:1,q:'sport',tag:'Incredible athletes, unforgettable moments'},
   winterolympics:{name:'Winter Olympics',badge:'⛷️',greet:'The Winter Olympics are on',fx:'snow',p:['❄','⛷️','🏂','⛸️','🥇'],c:['#7cc4ff','#e6f4ff','#f4c300'],sport:1,big:1,q:'sport',tag:'Snow, ice and gold in the mountains'},
@@ -1282,10 +1285,10 @@ const UKI=['GB','IE','IM','JE','GG'],EUR=UKI.concat('FR DE ES IT NL BE PT AT CH 
   RUGBY=UKI.concat(['FR','IT','NZ','AU','ZA','AR','FJ','JP','WS','TO','GE','PT','UY','NA','RO','ES','CL','US','CA']),
   CRICKET=['GB','IE','IM','JE','GG','AU','NZ','IN','PK','BD','LK','AF','ZA','ZW','NA','NL','JM','TT','BB','GY','LC','VC','DM','AG','KN','GD','AE','NP'];
 const SPORT=[['darts','2027-01-03',1,0,UKI.concat(['NL','BE','DE'])],['ausopen','2027-01-17',15],['sixnations','2027-02-05',37,'wknd',UKI.concat(['FR','IT'])],['ipl','2027-03-10',67,0,['IN']],
-  ['cheltenham','2027-03-16',4,0,UKI],['boatrace','2027-04-11',1,0,['GB']],['snooker','2027-04-17',17,0,UKI.concat(['CN','HK'])],['rolandgarros','2027-05-17',21],['facup','2027-05-22',1,0,UKI],
+  ['cheltenham','2027-03-16',4,0,UKI],['boatrace','2027-04-11',1,0,['GB']],['snooker','2027-04-17',17,0,UKI.concat(['CN','HK'])],['rolandgarros','2027-05-17',21],['facup','2027-05-22',1,0,UKI],['wfacup','2027-05-15',1,0,UKI],['w6n','2027-04-10',36,'wknd',UKI.concat(['FR','IT'])],
   ['uclfinal','2027-06-05',1],['ascot','2027-06-15',5,0,UKI],['wwc','2027-06-24',32],['ashes','2027-06-18',46,0,['GB','AU','IM','JE','GG']],['tdf','2027-07-02',24],
   ['hurling','2027-07-18',1,0,['IE']],['gaafootball','2027-07-25',1,0,['IE']],['usopen','2027-08-29',15],['ryder','2027-09-17',3],['rwc','2027-10-01',44,0,RUGBY],['cwc','2027-10-02',51,0,CRICKET],
-  ['boxingtest','2026-12-26',1,0,['AU']],['euro','2028-06-09',31,0,EUR],['olympics','2028-07-14',17],['giro','2027-05-08',23,0,['IT','SM','VA','CH']],['asiancup','2027-12-23',30,0,'SA AE QA KW BH OM YE IQ IR JO SY LB PS JP KR CN AU IN ID TH VN MY UZ KG TJ TM KZ PH SG HK TW KP BD LK NP AF'.split(' ')],['worldcup','2030-06-08',44],['t20wc','2028-10-12',32,0,CRICKET],['paralympics','2028-08-15',13],['winterolympics','2030-02-01',17],['winterparalympics','2030-03-01',10],
+  ['boxingtest','2026-12-26',1,0,['AU']],['euro','2028-06-09',31,0,EUR],['olympics','2028-07-14',17],['giro','2027-05-08',23,0,['IT','SM','VA','CH']],['asiancup','2027-12-23',30,0,'SA AE QA KW BH OM YE IQ IR JO SY LB PS JP KR CN AU IN ID TH VN MY UZ KG TJ TM KZ PH SG HK TW KP BD LK NP AF'.split(' ')],['worldcup','2030-06-08',44],['t20wc','2028-10-12',32,0,CRICKET],['wt20wc','2028-09-07',25,0,CRICKET],['paralympics','2028-08-15',13],['winterolympics','2030-02-01',17],['winterparalympics','2030-03-01',10],
   ['olympics','2032-07-23',17],['paralympics','2032-08-24',13],['winterolympics','2034-02-10',17]];
 const nthDay=(y,m,wd,n)=>{const d=new Date(y,m,1);d.setDate(1+((wd-d.getDay()+7)%7)+7*(n-1));return d};
 const lastDay=(y,m,wd)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-((d.getDay()-wd+7)%7));return d};
@@ -1297,7 +1300,7 @@ function sportRules(y){const add=(id,st,len,cc)=>({id,st,len,cc});const w=new Da
     add('nflthanks',nthDay(y,10,4,4),1,['US']),add('melbcup',nthDay(y,10,2,1),1,['AU','NZ']),add('afl',lastDay(y,8,6),1,['AU']),add('nrl',nthDay(y,9,0,1),1,['AU','NZ','PG'])]}
 function sportEvents(y0,y1){const out=[];for(const[id,iso,len,wk,cc]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=new Date(a,b-1,c);if(a>=y0-1&&a<=y1)out.push({id,st,len,wk,cc})}
   for(let y=y0;y<=y1;y++)out.push(...sportRules(y));return out.filter(e=>!e.cc||e.cc.includes(S.country))}
-function sportOn(d){const n=dayN(d),wd=d.getDay(),ev=sportEvents(d.getFullYear(),d.getFullYear());const order=['gn','boatrace','facup','hurling','gaafootball','superbowl','kentucky','indy500','nflthanks','melbcup','afl','nrl','uclfinal','darts','wimbledon'];
+function sportOn(d){const n=dayN(d),wd=d.getDay(),ev=sportEvents(d.getFullYear(),d.getFullYear());const order=['gn','boatrace','facup','wfacup','hurling','gaafootball','superbowl','kentucky','indy500','nflthanks','melbcup','afl','nrl','uclfinal','darts','wimbledon'];
   const on=ev.filter(e=>{const s=dayN(e.st);return n>=s&&n<s+e.len&&(!e.wk||wd===5||wd===6||wd===0)});on.sort((a,b)=>{const ia=order.indexOf(a.id),ib=order.indexOf(b.id);return(ia<0?99:ia)-(ib<0?99:ib)||a.len-b.len});return on[0]?.id||null}
 const ZOD=['Monkey','Rooster','Dog','Pig','Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat'];
 const lastSun=(y,m)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-d.getDay());return d};
@@ -1474,7 +1477,7 @@ let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=17;
 const NEWS=[
-  {v:17,i:'🏆',c:'var(--h-orange)',t:'Big tournament specials',d:'During the football, rugby, cricket and T20 World Cups, the Olympics, Winter Olympics and Paralympics, the app dresses up for the occasion — with a countdown card two weeks before, day-by-day progress, and quick links to live scores and radio coverage.'},
+  {v:17,i:'🏆',c:'var(--h-orange)',t:'Big tournament specials',d:'During the men’s and women’s football, rugby, cricket and T20 World Cups, the Olympics, Winter Olympics and Paralympics, the app dresses up for the occasion — with a countdown card two weeks before, day-by-day progress, and quick links to live scores and radio coverage.'},
   {v:16,i:'🏏',c:'var(--h-green)',t:'Cricket scores',d:'Cricket is now in the Sport tab’s live scores — Tests, ODIs, T20s and the big leagues first, with live scores, overs and the match situation (“needs 40 runs”).'},
   {v:15,i:'🏆',c:'var(--h-green)',t:'Live scores for more sports',d:'The Sport tab’s fold-out now covers Football, Rugby, F1, Golf, Tennis, UFC, NFL, NBA, NHL and MLB — tap a sport to see today’s and tomorrow’s scores, live as they happen.'},
   {app:114,i:'⏰',c:'#ffb36b',t:'A proper wake-up alarm',d:'Your radio alarm now lights up the phone with a full wake-up screen — Stop, Snooze or Keep listening — and starts playing even with the screen off. Open Library → Wake-up radio to check your phone’s settings and test it.'},
