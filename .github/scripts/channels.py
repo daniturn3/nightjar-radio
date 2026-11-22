@@ -3,7 +3,8 @@
 
   test   -> release tag radio-beta     (developer only, every CI build)
   beta   -> release tag radio-pubbeta  (public beta, gets each published build straight away)
-  stable -> release tag radio-app      (main download, gets a beta build once it has been out 10 days)
+  stable -> release tag radio-app      (main download: once a beta build has been out 10 days,
+                                       stable updates to whatever beta has at that moment)
 
 Every build published to beta is also kept in release radio-builds as nightjar-radio-<build>.apk,
 so stable can later take exactly that build even if beta has moved on.
@@ -110,8 +111,10 @@ def main():
             waiting = [x for x in d["beta"] if x["build"] > cur]
             print("Nothing ready for stable." + (f" Next: build {waiting[0]['build']} on {(datetime.datetime.fromisoformat(waiting[0]['at'])+datetime.timedelta(days=DAYS)).date()}" if waiting else ""))
             return
-        n = max(x["build"] for x in ready)
-        if to_stable(d, n, f"{DAYS} days in beta"): save(d, f"Build {n} promoted to stable")
+        # Stable is due (a beta build has waited DAYS days) -> it gets whatever beta has NOW,
+        # so anything added and then removed again in beta never reaches stable.
+        n = max(x["build"] for x in d["beta"])
+        if to_stable(d, n, "stable update due"): save(d, f"Build {n} promoted to stable")
     else:
         raise SystemExit(__doc__)
 
