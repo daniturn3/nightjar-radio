@@ -466,7 +466,7 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* Keys also copied into the Android app's own storage, so they survive the phone clearing web data. */
-const KEEP=['songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
+const KEEP=['tester','songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
 try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])})}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
@@ -1064,7 +1064,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <button class="pill" id="s_share" style="margin-top:14px">${ic('share')}Share the app</button>
   ${NAT?`<button class="pill" id="s_upd" style="margin-top:14px">${ic('dl')}Check for app updates</button>`:`<a class="pill" href="${APK}" style="margin-top:14px;text-decoration:none">${ic('dl')}Get the Android app</a>`}
   <input type="file" id="s_file" accept=".txt,.json,text/plain,application/json" hidden>
-  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono">${NAT?'App build '+NAT.version():'Web version'} · beta</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a></small></div>`);
+  <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono" id="s_ver">${NAT?'App build '+NAT.version():'Web version'} · ${tester()?'🧪 tester':'beta'}</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a></small></div>`);
   $('#s_priv').onclick=e=>{e.preventDefault();const u=location.origin+location.pathname.replace(/[^/]*$/,'')+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
@@ -1073,6 +1073,8 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
   $('#s_saver').onchange=e=>{LS.set('saver',e.target.checked);toast(e.target.checked?'📉 Data saver on':'Data saver off')};
+  {let n=0,t=0;$('#s_ver').onclick=()=>{if(Date.now()-t>1500)n=0;t=Date.now();if(++n<7){if(n>=4)toast(`${7-n} more…`,900);return}n=0;const on=!tester();LS.set('tester',on);LS.set('updChk',0);
+    toast(on?'🧪 Tester mode on — you’ll get new app builds first':'Tester mode off',3500);$('#s_ver').textContent=(NAT?'App build '+NAT.version():'Web version')+' · '+(on?'🧪 tester':'beta')}}
   $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();if($('#s_eq'))$('#s_eq').onclick=()=>eqSheet();
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;if(!v&&S.bday){e.target.value='2000-'+S.bday;return}S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
@@ -1294,19 +1296,22 @@ document.addEventListener('click',e=>{if(Date.now()-lpDone<900&&!e.target.closes
 function toggleFav(st,btn){const i=S.favs.findIndex(x=>x.u===st.u);if(i>=0){S.favs.splice(i,1);toast('Removed from favourites')}else{S.favs.unshift({...st});toast('Added to favourites');burst(px,py,['★','✦'],['#ffd08a','#ff9ccc'])}save('favs');
   $$(`[data-fav],[data-dfav]`).forEach(b=>{const s=b.dataset.fav?L[b.dataset.fav]?.arr[b.dataset.i]:dialList[b.dataset.dfav];if(s&&s.u===st.u){const on=isFav(st);b.classList.toggle('on',on);b.innerHTML=on?icf('star'):ic('star')}});renderMini();if(npOpen)renderNP();if(view==='library')render()}
 
-const APK='https://github.com/daniturn3/nightjar-radio/releases/download/radio-app/nightjar-radio.apk';
+const APK='https://github.com/daniturn3/nightjar-radio/releases/download/radio-app/nightjar-radio.apk',APK_TEST='https://github.com/daniturn3/nightjar-radio/releases/download/radio-beta/nightjar-radio-beta.apk';
+/* Tester mode (tap the build number in Settings 7 times): get new app builds before everyone else. */
+const tester=()=>LS.get('tester',false),apkUrl=()=>tester()&&LS.get('updTest',false)?APK_TEST:APK;
 async function checkUpdate(manual){if(!NAT)return;const last=LS.get('updChk',0);if(!manual&&Date.now()-last<30*6e4){if(LS.get('updAvail',0)>NAT.version())updPopup();return}
-  try{const r=await fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-app',{cache:'no-store'});const d=await r.json();const m=/build (\d+)/i.exec(d.name||'');LS.set('updChk',Date.now());
-    const v=m?+m[1]:0;LS.set('updAvail',v);if(v>NAT.version()){if(manual)closeSheet();updPopup(manual)}else if(manual)toast('You’re on the latest version')}catch{if(manual)toast('Couldn’t check for updates')}}
+  try{const get=async t=>{try{const r=await fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/'+t,{cache:'no-store'});if(!r.ok)return 0;const d=await r.json();const m=/build (\d+)/i.exec(d.name||'');return m?+m[1]:0}catch{return 0}};
+    const pub=await get('radio-app'),tst=tester()?await get('radio-beta'):0;LS.set('updChk',Date.now());
+    const v=Math.max(pub,tst);if(!pub&&!tst)throw 0;LS.set('updTest',tst>pub);LS.set('updAvail',v);if(v>NAT.version()){if(manual)closeSheet();updPopup(manual)}else if(manual)toast('You’re on the latest version')}catch{if(manual)toast('Couldn’t check for updates')}}
 let updShown=false;
 function updPopup(force){const v=LS.get('updAvail',0);if(!NAT||v<=NAT.version())return;if(updShown&&!force){updBanner();return}updShown=true;
   const items=NEWS.filter(n=>n.app&&n.app>NAT.version());
-  queueModal(()=>modal(`<div class="mic" style="--mc:var(--h-blue)">${ic('dl')}</div><div class="mono" style="text-align:center">New version · build ${v}</div><h2>Update available</h2>
+  queueModal(()=>modal(`<div class="mic" style="--mc:var(--h-blue)">${ic('dl')}</div><div class="mono" style="text-align:center">${LS.get('updTest',false)?'🧪 Test build ':'New version · build '}${v}</div><h2>${LS.get('updTest',false)?'Test update ready':'Update available'}</h2>
    <p>A new version of the Nightjar Radio app is ready to download.${items.length?' It brings:':''}</p>${items.length?`<div class="news">${items.map(newsRow).join('')}</div>`:''}
    <div class="mbtns"><button class="pill" data-m="later">Later</button><button class="pill amb" data-m="dl">${ic('dl')}Download</button></div>
    <p class="dim" style="font-size:12px;text-align:center;margin:12px 0 0">When it’s downloaded, open it and tap Update. Your stations and settings stay.</p>`,
-   {dl:()=>{NAT.openUrl(APK);toast('Open the download when it finishes, then tap Update')},later:()=>updBanner()}))}
-function updBanner(){if($('#updb'))return;const b=document.createElement('button');b.id='updb';b.className='updb';b.innerHTML=`${ic('dl')}<span><b>Update available</b>Tap to download the new version</span>`;b.onclick=()=>{NAT.openUrl(APK);b.remove();toast('Open the download when it finishes to install')};document.body.append(b)}
+   {dl:()=>{NAT.openUrl(apkUrl());toast('Open the download when it finishes, then tap Update')},later:()=>updBanner()}))}
+function updBanner(){if($('#updb'))return;const b=document.createElement('button');b.id='updb';b.className='updb';b.innerHTML=`${ic('dl')}<span><b>Update available</b>Tap to download the new version</span>`;b.onclick=()=>{NAT.openUrl(apkUrl());b.remove();toast('Open the download when it finishes to install')};document.body.append(b)}
 S.alarm=LS.get('alarm',{on:false,h:7,m:0,days:[1,2,3,4,5],st:null,vol:.6});
 if(NAT){try{const a=NAT.getAlarm();if(a){S.alarm={...S.alarm,...JSON.parse(a)};LS.set('alarm',S.alarm)}}catch{}}
 const pad2=n=>String(n).padStart(2,'0');

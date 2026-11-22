@@ -25,20 +25,11 @@ jobs:
           gradle -p android assembleRelease -PvCode=$((${{ github.run_number }} + 100)) --no-daemon --stacktrace
       - name: Check signature
         run: test -f android/app/build/outputs/apk/release/app-release.apk
-      - name: Publish release
+      - name: Publish TEST build (only testers get it — run "Release app to everyone" to make it public)
         env: { GH_TOKEN: '${{ github.token }}' }
         run: |
-          cp android/app/build/outputs/apk/release/app-release.apk nightjar-radio.apk
-          # Keep an all-time total: save the outgoing version's download count before it's replaced
-          old=$(gh api repos/$GITHUB_REPOSITORY/releases/tags/radio-app --jq '.name' 2>/dev/null | grep -o '[0-9]*$' || true)
-          cnt=$(gh api repos/$GITHUB_REPOSITORY/releases/tags/radio-app --jq '[.assets[]|select(.name=="nightjar-radio.apk")|.download_count][0] // 0' 2>/dev/null || echo 0)
-          if [ -n "$old" ]; then
-            git config user.name "github-actions"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git pull -q --rebase origin main
-            python3 -c "import json,sys,datetime;p='stats/downloads.json';d=json.load(open(p));d=[x for x in d if x['build']!=int(sys.argv[1])];d.append({'build':int(sys.argv[1]),'downloads':int(sys.argv[2]),'until':datetime.date.today().isoformat()});json.dump(d,open(p,'w'),indent=1)" "$old" "$cnt"
-            git add stats/downloads.json && git commit -qm "Download stats: build $old had $cnt downloads [skip ci]" && git push -q origin HEAD:main || true
-          fi
-          gh release view radio-app >/dev/null 2>&1 || gh release create radio-app --title "Nightjar Radio" --notes "Android app for Nightjar Radio" --latest=false
-          gh release upload radio-app nightjar-radio.apk --clobber
-          { cat android/RELEASE_NOTES.md; echo; echo "_Build $((${{ github.run_number }} + 100))_"; } > notes.md
-          gh release edit radio-app --title "Nightjar Radio build $((${{ github.run_number }} + 100))" --notes-file notes.md
+          cp android/app/build/outputs/apk/release/app-release.apk nightjar-radio-beta.apk
+          gh release view radio-beta >/dev/null 2>&1 || gh release create radio-beta --title "Nightjar Radio test build" --notes "Test builds for the developer. Not for general use." --prerelease --latest=false
+          gh release upload radio-beta nightjar-radio-beta.apk --clobber
+          { cat android/RELEASE_NOTES.md; echo; echo "_Test build $((${{ github.run_number }} + 100))_"; } > notes.md
+          gh release edit radio-beta --title "Nightjar Radio build $((${{ github.run_number }} + 100)) (test)" --notes-file notes.md --prerelease
