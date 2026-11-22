@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
       - uses: gradle/actions/setup-gradle@v4
-        with: { gradle-version: '8.7' }
+        with: { gradle-version: '8.11.1' }
       - name: Build APK
         env: { NJR_KS_PASS: '${{ secrets.NJR_KS_PASS }}' }
         run: |
