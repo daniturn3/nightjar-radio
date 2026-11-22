@@ -361,6 +361,10 @@ body.fool #app{transform:rotate(180deg);transition:transform .7s cubic-bezier(.5
 .faqg{margin:18px 0 6px;color:var(--acc,#ffd08a)}.faq{border-bottom:1px solid var(--line)}.faq summary{list-style:none;cursor:pointer;padding:12px 26px 12px 0;position:relative;font-weight:500;line-height:1.35}.faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:'+';position:absolute;right:2px;top:10px;font:400 20px var(--mono);color:var(--mut);transition:transform .2s}.faq[open] summary::after{transform:rotate(45deg)}.faq p{margin:0 0 14px;font-size:14px;line-height:1.55;color:var(--mut)}
 .vc{margin:22px 0 4px;padding:16px 0 14px;border-radius:24px;background:linear-gradient(135deg,rgba(255,95,162,.20),rgba(255,166,92,.12) 45%,rgba(64,214,214,.16));border:1px solid rgba(255,120,180,.35);overflow:hidden}
+.xc{position:relative;background:linear-gradient(135deg,rgba(220,60,70,.22),rgba(255,209,102,.10) 50%,rgba(47,179,138,.20));border-color:rgba(255,120,120,.38)}
+.xc .vctop b{background:linear-gradient(90deg,#ff6b6b,#ffd166,#5fd39a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.xcsnow{position:absolute;inset:0;pointer-events:none;overflow:hidden}.xcsnow i{position:absolute;top:-14px;left:var(--x);font-style:normal;font-size:12px;color:#fff;opacity:.35;animation:xcfall 9s linear infinite;animation-delay:var(--d)}
+@keyframes xcfall{to{transform:translate(18px,220px) rotate(120deg);opacity:0}}body.calm .xcsnow{display:none}.xc .vctop,.xc .chips,.xc #xclist{position:relative}
 .vctop{padding:0 16px}.vctop b{display:block;font:italic 600 24px var(--serif,Georgia),serif;background:linear-gradient(90deg,#ff6fb5,#ffb36b,#5fe3e0);-webkit-background-clip:text;background-clip:text;color:transparent}.vctop span{font-size:12.5px;color:var(--mut)}
 .vcchips{padding:12px 16px 4px;margin:0}.vcchips .chip.on{background:rgba(255,111,181,.22);border-color:#ff6fb5;color:var(--cream)}.vc #vclist{padding:4px 0 0 16px}
 
@@ -739,11 +743,30 @@ async function vcFill(tok){const el=$('#vclist');if(!el)return;el.innerHTML=skCa
   try{let r=await stations(q,16);if(r.length<4&&q2)r=r.concat(await stations(q2,16));if(tok!==renderTok||!$('#vclist'))return;$('#vclist').innerHTML=r.length?cards(r.slice(0,16),'Windows Down Radio · '+l):'<div class="empty">Nothing here right now.</div>';mark()}
   catch{if($('#vclist'))$('#vclist').innerHTML=errBox()}}
 function vcWire(tok){if(!$('.vc'))return;$$('[data-vc]').forEach(b=>b.onclick=()=>{vcSel=+b.dataset.vc;LS.set('vcSel',vcSel);$$('[data-vc]').forEach(x=>x.classList.toggle('on',x===b));vcFill(tok)});vcFill(tok)}
+/* ---------- Christmas Radio: seasonal collection, 15 Nov – 6 Jan every year ---------- */
+const xmasOn=()=>{const d=new Date(),md=(d.getMonth()+1)*100+d.getDate();return md>=1115||md<=106};
+const XC=[['🎄','All Christmas',[{tag:'christmas'},{tag:'xmas'}]],['🏠','Near you',()=>[{tag:'christmas',countrycode:S.country},{tag:'xmas',countrycode:S.country}]],
+ ['🎤','Pop & hits',[{tag:'christmas pop'},{tag:'christmas hits'},{tag:'christmas charts'},{tag:'last christmas'},{tag:'christmas songs'}]],
+ ['🔔','Carols & classical',[{tag:'carol'},{tag:'christmas choir'},{tag:'klassik weihnachten'},{tag:'traditional christmas'},{tag:'christmas classics'}]],
+ ['🎷','Jazz & cosy',[{tag:'christmas jazz'},{tag:'christmas lounge'},{tag:'christmas piano'},{tag:'christmas instrumental'},{name:'christmas jazz'}]],
+ ['🎸','Rockin’ Christmas',[{tag:'christmas rock'},{tag:'heavy christmas'},{name:'christmas rock'}]],
+ ['🌍','Around the world',[{tag:'weihnacht'},{tag:'navidad'},{tag:'noel'},{tag:'natale'},{tag:'kerst'}]]];
+let xcSel=LS.get('xcSel',0);
+function xcH(){const d=new Date(),dd=new Date(d.getFullYear()+(d.getMonth()===0?-1:0),11,25),left=Math.ceil((dd-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+  const sub=left>1?`Carols, classics and Christmas hits — ${left} sleeps to go`:left===1?'It’s Christmas Eve — the big day is tomorrow 🎅':left===0?'Merry Christmas! 🎁':'Christmas tunes until Twelfth Night';
+  return`<div class="vc xc"><div class="xcsnow">${'❄✦❅✧❄✦'.split('').map((g,i)=>`<i style="--x:${6+i*16}%;--d:${i*.9}s">${g}</i>`).join('')}</div><div class="vctop"><b>Christmas Radio 🎄</b><span>${sub}</span></div>
+  <div class="chips vcchips">${XC.map(([e,l],i)=>`<button class="chip${i===xcSel?' on':''}" data-xc="${i}">${e} ${l}</button>`).join('')}</div>
+  <div id="xclist">${skCards()}</div></div>`}
+async function xcFill(tok){const el=$('#xclist');if(!el)return;el.innerHTML=skCards();const [,l,qq]=XC[xcSel]||XC[0],qs=typeof qq==='function'?qq():qq;
+  try{const all=(await Promise.all(qs.map(q=>stations(q,16).catch(()=>[])))).flat(),seen=new Set(),r=all.filter(x=>{const k=x.id||x.u;if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>(b.votes||0)-(a.votes||0));
+    if(tok!==renderTok||!$('#xclist'))return;$('#xclist').innerHTML=r.length?cards(r.slice(0,16),'Christmas Radio · '+l):`<div class="empty">${xcSel===1?'No Christmas stations near you yet — try All Christmas.':'Nothing here right now.'}</div>`;mark()}
+  catch{if($('#xclist'))$('#xclist').innerHTML=errBox()}}
+function xcWire(tok){if(!$('.xc'))return;$$('[data-xc]').forEach(b=>b.onclick=()=>{xcSel=+b.dataset.xc;LS.set('xcSel',xcSel);$$('[data-xc]').forEach(x=>x.classList.toggle('on',x===b));xcFill(tok)});xcFill(tok)}
 /* ---------- Customise Home: reorder and hide sections ---------- */
-const HSEC=[['sotd','Station of the day','✦','A new pick every day','#ffb36b','#ff7a59'],['presets','Your presets','📻','Your six quick-tune buttons','#ffd166','#ff9f43'],['moods','Mood chips','🏷️','Jazz, 80s, chill and more','#ff9ccc','#c56cf0'],
+const HSEC=[['sotd','Station of the day','✦','A new pick every day','#ffb36b','#ff7a59'],['presets','Your presets','📻','Your six quick-tune buttons','#ffd166','#ff9f43'],['xmas','Christmas Radio','🎄','Festive stations · until 6 Jan','#ff6b6b','#2fb38a'],['moods','Mood chips','🏷️','Jazz, 80s, chill and more','#ff9ccc','#c56cf0'],
  ['vc','Windows Down Radio','🌴','Sunny-drive stations · until 18 Dec','#ff6fb5','#40d6d6'],['near','Near you','📍','Local stations, closest first','#86d9a8','#2fb38a'],['globe','Around the world now','🌍','Spin the globe','#86b4ff','#4f6cff'],
  ['recent','Tune back in','↺','Stations you played lately','#b8a2ff','#7b5cff'],['country','Popular in your country','🏠','Top stations where you live','#ffad6b','#e5533d'],['world','Most loved worldwide','❤','The world’s most-played','#ff8a8a','#e0435f'],['night','Late-night picks','🌙','Mellow stations for after dark','#7f8cff','#3a3f9e']];
-function homeAll(){const def=HSEC.map(h=>h[0]).filter(id=>id!=='vc'||vcOn()),saved=LS.get('homeOrder',[]).filter(id=>def.includes(id));
+function homeAll(){const def=HSEC.map(h=>h[0]).filter(id=>(id!=='vc'||vcOn())&&(id!=='xmas'||xmasOn())),saved=LS.get('homeOrder',[]).filter(id=>def.includes(id));
   def.forEach((id,i)=>{if(!saved.includes(id)){const prev=def.slice(0,i).reverse().find(x=>saved.includes(x));saved.splice(prev?saved.indexOf(prev)+1:0,0,id)}});return saved}
 const homeOrder=()=>{const hid=LS.get('homeHide',[]);return homeAll().filter(id=>!hid.includes(id))};
 function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
@@ -767,6 +790,7 @@ VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.cou
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
     moods:()=>`<div class="chips" style="margin-top:18px">${MOODS.map(([l,t,c])=>`<button class="chip" style="--c:${c}" data-mood="${esc(t)}">${l}</button>`).join('')}</div>`,
     vc:()=>vcOn()?vcH():'',
+    xmas:()=>xmasOn()?xcH():'',
     near:()=>sec('Near you',nearH(),S.geo?'Local stations, closest first':'',N()),
     globe:()=>sec('Around the world now',globeH(),'Spin the globe to land somewhere it’s night-time, morning — or anywhere — right now',N()),
     recent:()=>S.recent.length?sec('Tune back in',cards(S.recent.slice(0,12),'Recently played'),'',N()):'',
@@ -779,6 +803,7 @@ VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.cou
   if($('#hsotd'))sotd().then(st=>{if(tok===renderTok&&$('#hsotd'))$('#hsotd').innerHTML=st?sotdH(st):''}).catch(()=>{if($('#hsotd'))$('#hsotd').innerHTML=''});
   if(S.geo)fillNear(tok);
   if(vcOn())vcWire(tok);
+  if(xmasOn())xcWire(tok);
   gSetup();
   if($('#hcountry'))fill('#hcountry',stations({countrycode:S.country},16),r=>cards(r,'Popular in '+cn));
   if($('#hworld'))fill('#hworld',rb('/json/stations/topclick/80').then(d=>d.filter(good).map(mk).slice(0,8)),r=>rows(r,'Most loved worldwide'));
@@ -1557,8 +1582,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=20;
+const RV=21;
 const NEWS=[
+  {v:21,i:'🎄',c:'var(--h-green)',t:'Christmas Radio',d:'A festive collection on Home: Christmas hits, carols and classical, jazz, rockin’ Christmas, stations near you and from around the world, with a countdown to the big day. It’s here until Twelfth Night.'},
   {v:20,i:'📻',c:'var(--h-blue)',t:'A tidier player',d:'The Now Playing screen now fits on one screen, with no scrolling. Every radio style shows the stream quality, format, signal and country, and you can change style with the 🎨 button at the top.'},
   {v:19,i:'🐞',c:'var(--h-orange)',t:'Report a problem or suggest an idea',d:'Found a bug or have an idea? Tap “Report a problem” in Settings or at the bottom of any page. Every report is read.'},
   {v:18,i:'⚡',c:'var(--h-blue)',t:'Stable or Beta — you choose',d:'In Settings you can now pick how you get app updates. Stable is tried and tested, and gets new versions once they’ve been through beta. Beta gets them straight away, so you see new features first.'},
