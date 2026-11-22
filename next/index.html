@@ -519,7 +519,7 @@ const S={bday:LS.get('bday',''),theme:LS.get('theme','auto'),sfx:LS.get('sfx',tr
   vol:LS.get('vol',.9),last:LS.get('last',null),ldim:LS.get('ldim','auto'),playful:LS.get('playful','auto'),nightlight:LS.get('nightlight',false),staticfx:LS.get('staticfx',true),lastBackup:LS.get('lastBackup',0)};
 S.geo=LS.get('geo',null);S.gper=LS.get('gper','night');
 const NAT=window.NJR||null;let natList=[],natLoaded=false,natErr='',song='';
-const slim=x=>({u:x.u,n:x.n,url:x.url,fav:x.fav,cc:x.cc,c:x.c,tags:x.tags,hls:x.hls});
+const slim=x=>({u:x.u,n:x.n,url:x.url,fav:x.fav,cc:x.cc,c:x.c,tags:x.tags,hls:x.hls,br:x.br||0,cd:x.cd||''});
 const natSync=k=>{if(!NAT)return;try{const a=k==='presets'?S.presets.filter(Boolean):S[k];NAT.sync(k,JSON.stringify((a||[]).slice(0,40).map(slim)))}catch{}};
 const save=(...k)=>k.forEach(x=>{LS.set(x,S[x]);if(['presets','favs','recent'].includes(x))natSync(x)});
 /* Recent errors, only ever sent if the person sends a problem report themselves. */
