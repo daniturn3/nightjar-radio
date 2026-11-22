@@ -111,10 +111,13 @@ body.buffering .live{color:var(--acc)}body.buffering .live::before{background:va
 #tabs button.on::after{content:'';position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--tc);box-shadow:0 0 8px var(--tc)}
 #tabs [data-tab=home]{--tc:var(--h-orange)}#tabs [data-tab=dial]{--tc:var(--h-blue)}#tabs [data-tab=search]{--tc:var(--h-purple)}#tabs [data-tab=sport]{--tc:var(--h-green)}#tabs [data-tab=library]{--tc:var(--h-pink)}
 /* full player */
-#np{position:fixed;inset:0;z-index:50;background:radial-gradient(120% 70% at 50% 0%,#1f2a52,transparent 60%),var(--bg);transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.2,1);overflow-y:auto;padding:0 20px calc(30px + env(safe-area-inset-bottom))}
+#np{position:fixed;inset:0;z-index:50;scrollbar-width:none;background:radial-gradient(120% 70% at 50% 0%,#1f2a52,transparent 60%),var(--bg);transform:translateY(100%);transition:transform .38s cubic-bezier(.2,.8,.2,1);overflow-y:auto;padding:0 20px calc(30px + env(safe-area-inset-bottom))}
 #np.on{transform:none}
-.nph{display:flex;align-items:center;gap:6px;padding:14px 0 4px}.nph .t{flex:1;text-align:center}.nph .t b{display:block;font-weight:500;margin-top:2px}
-.radio{position:relative;width:min(92vw,420px);margin:16px auto 4px;--hue:220}
+.nph{display:flex;align-items:center;gap:2px;padding:10px 0 2px}.npst{font-size:19px}.nph .t{flex:1;text-align:center;min-width:0}
+.npq{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:8px 0 0}.npq>span{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:99px;font-size:11.5px;color:var(--mut);background:rgba(255,255,255,.05);border:1px solid var(--line);white-space:nowrap}
+.npq .qq{color:var(--cream);font-family:var(--mono);font-size:10.5px;letter-spacing:.03em}.npq .qq b{font-size:11.5px}.npq .qH{border-color:rgba(134,217,168,.45)}.npq .qL{border-color:rgba(255,150,100,.45)}
+.npq .qs .sig i{background:#86d9a8}.npq .live{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#86d9a8}body.buffering .npq .live{color:#ffd08a}.nph .t b{display:block;font-weight:500;margin-top:2px}
+.radio{position:relative;width:min(92vw,420px);margin:8px auto 2px;--hue:220}
 .rbody{position:relative;border-radius:30px;padding:12px 12px 0;background:linear-gradient(180deg,#2c2f3a,#17191f 70%);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -2px 0 rgba(0,0,0,.5),0 34px 60px -28px #000,0 0 0 1px rgba(255,255,255,.05)}
 .rscr{position:relative;aspect-ratio:1.02;border-radius:20px;overflow:hidden;background:#05060a;box-shadow:inset 0 0 0 2px #0a0b10,inset 0 0 0 3px rgba(255,255,255,.05)}
 .rscr .bg{position:absolute;inset:0;background:radial-gradient(90% 70% at 30% 20%,hsl(var(--hue) 70% 45% / .55),transparent 70%),radial-gradient(80% 60% at 90% 100%,hsl(calc(var(--hue) + 60) 70% 45% / .4),transparent 70%),#07080d;opacity:.35;transition:opacity .8s}
@@ -145,15 +148,15 @@ body.calm .eq i{animation:none!important;transform:scaleY(.25)}
 .knob.k2{transform:rotate(var(--kr,40deg));transition:transform 1s cubic-bezier(.3,1.3,.5,1)}
 .rled{width:7px;height:7px;border-radius:50%;background:#3a1a10;flex:none}body.playing .rled{background:#ff6b4a;box-shadow:0 0 8px #ff6b4a}
 .rfeet{display:flex;justify-content:space-between;padding:0 16%}.rfeet i{width:14%;height:6px;border-radius:0 0 5px 5px;background:#0e0f13}
-.npt{text-align:center;margin-top:18px}.npt h2{font:italic 400 clamp(28px,8vw,40px)/1.1 var(--serif);margin:6px 0}.npt p{margin:0;color:var(--mut)}
+.npt{text-align:center;margin-top:6px}.npt h2{font:italic 400 clamp(28px,8vw,40px)/1.1 var(--serif);margin:6px 0}.npt p{margin:0;color:var(--mut)}
 .tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}.tags span{font-size:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--mut)}
-.ctrls{display:flex;align-items:center;justify-content:center;gap:26px;margin:24px 0 16px}
+.ctrls{display:flex;align-items:center;justify-content:center;gap:26px;margin:12px 0 10px}
 .ctrls .ib{width:56px;height:56px}.ctrls .ib .i{width:28px;height:28px}
-.bigplay{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--acc),var(--cor));color:#1a1210;box-shadow:0 18px 40px -16px var(--cor)}.bigplay .i{width:34px;height:34px}
-.npx{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.npx:has(>:nth-child(6)){grid-template-columns:repeat(3,1fr)}.npx button{font-size:11.5px!important;padding:12px 2px!important}
+.bigplay{width:70px;height:70px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--acc),var(--cor));color:#1a1210;box-shadow:0 18px 40px -16px var(--cor)}.bigplay .i{width:34px;height:34px}
+.npx{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -20px;padding:0 20px 2px}.npx::-webkit-scrollbar{display:none}.npx button{flex:1 0 62px;font-size:11px!important;padding:9px 2px!important;gap:4px!important}.npx button span{white-space:nowrap}
 .npx button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:12.5px}
 .npx button.on{color:var(--acc2);border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
-.vol{display:flex;align-items:center;gap:12px;margin:18px 4px 0;color:var(--mut)}
+.vol{display:flex;align-items:center;gap:12px;margin:12px 4px 0;color:var(--mut)}
 .vol input{flex:1;accent-color:var(--acc)}
 /* sheet */
 #sheetbg{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .25s}
@@ -230,7 +233,7 @@ body:not(.calm) .modal.on .tourart{animation:tfloat 3.4s ease-in-out infinite}@k
 .tourm .mcard p{min-height:72px}
 .tdots{display:flex;justify-content:center;gap:6px;margin-top:14px}.tdots i{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,.2);transition:.25s}.tdots i.on{width:22px;background:var(--acc)}
 /* skins */
-.npinfo{text-align:center;margin-top:14px}.npinfo h2{font:italic 400 clamp(26px,7vw,36px)/1.15 var(--serif);margin:0 0 4px}.npinfo p{margin:0 0 4px;color:var(--mut);font-size:13.5px}
+.npinfo{text-align:center;margin-top:4px}.npinfo h2{font:italic 400 clamp(21px,6vw,28px)/1.15 var(--serif);margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npinfo p{margin:0 0 4px;color:var(--mut);font-size:13.5px}
 .skins{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:12px 0 8px}.skins button{padding:7px 12px;border-radius:999px;border:1px solid var(--line);font-size:12.5px;color:var(--mut)}.skins button.on{color:var(--acc2);border-color:color-mix(in srgb,var(--acc) 50%,transparent);background:color-mix(in srgb,var(--acc) 12%,transparent)}
 .mq{display:block;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.mq.run{text-overflow:clip}.mq.run>span{display:inline-block;animation:mq 14s linear infinite}@keyframes mq{to{transform:translateX(-50%)}}
 body.calm .mq.run>span{animation:none}
@@ -543,7 +546,7 @@ async function rb(path,ttl=6*36e5){const key='c:'+path,hit=CACHE[key]||(()=>{try
       const r=await fetch(RB[i]+path,{signal:c.signal});clearTimeout(to);if(!r.ok)throw new Error(r.status);const d=await r.json();
       if(i!==rbOk){rbOk=i;LS.set('rbOk',i)}CACHE[key]={t:Date.now(),d};try{sessionStorage.setItem('njr'+key,JSON.stringify(CACHE[key]))}catch{}return d}catch(e){err=e}}
   throw err||new Error('offline')}
-const mk=x=>({u:x.stationuuid,n:(x.name||'').trim().replace(/\s+/g,' '),url:x.url_resolved||x.url,fav:/^https:/.test(x.favicon||'')?x.favicon:'',tags:(x.tags||'').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4),cc:x.countrycode||'',c:x.country||'',br:x.bitrate||0,hls:!!x.hls,home:x.homepage||'',la:x.geo_lat,lo:x.geo_long});
+const mk=x=>({u:x.stationuuid,n:(x.name||'').trim().replace(/\s+/g,' '),url:x.url_resolved||x.url,fav:/^https:/.test(x.favicon||'')?x.favicon:'',tags:(x.tags||'').split(',').map(t=>t.trim()).filter(Boolean).slice(0,4),cc:x.countrycode||'',c:x.country||'',br:x.bitrate||0,cd:(x.codec||'').toUpperCase().slice(0,8),hls:!!x.hls,home:x.homepage||'',la:x.geo_lat,lo:x.geo_long});
 const good=x=>(NAT?/^https?:/i:/^https:/i).test(x.url_resolved||'')&&x.lastcheckok!==0&&x.name;
 async function stations(q={},n=60,ttl){const p=new URLSearchParams({hidebroken:'true',...(NAT?{}:{is_https:'true'}),order:'clickcount',reverse:'true',limit:String(n*2),...q});
   const d=await rb('/json/stations/search?'+p,ttl);const seen=new Set();return d.filter(good).map(mk).filter(s=>{const k=s.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true}).slice(0,n)}
@@ -1027,19 +1030,30 @@ function radioH(pi,L0,pos){const hue=hueOf(cur.n),np=L0.length>1?(pos/(L0.length
    <div class="rmid">${lgo(cur,'rart')}<div class="rname">${esc(cur.n)}</div><div class="rsub">${flag(cur.cc)} ${esc([cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '))}</div><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div>
    <div class="rbot"><span class="live">${buffering?'Tuning':'Live'}</span><div class="eq">${EQ}</div><span>${pi>=0?'P'+(pi+1):'NJR'}</span></div><div class="glass"></div></div>
    <div class="rstrip"><span class="rled"></span><div class="rspk"></div><div class="rpre">${S.presets.map(p=>`<i class="${p&&p.u===cur.u?'on':''}"></i>`).join('')}</div><div class="knob k2" id="k2"></div></div></div><div class="rfeet"><i></i><i></i></div></div>`}
+/* Same key info under every radio style: quality, format, signal, country, genre. */
+function npQ(){const br=+cur.br||0,q=br>=256?'Hi-fi':br>=128?'High':br>=64?'Standard':br?'Low':'',fmt=cur.hls?'HLS':(cur.cd&&cur.cd!=='UNKNOWN'?cur.cd.replace('MPEG','MP3').replace('AAC+','AAC+'):'');
+  const chips=[br?`<span class="qq q${q[0]}"><b>${br}</b> kbps${fmt?' · '+esc(fmt):''}${q?` · ${q}`:''}</span>`:fmt?`<span class="qq">${esc(fmt)}</span>`:'',
+    `<span class="qs"><span class="sig"><i></i><i></i><i></i><i></i></span><span class="live">${buffering?'Tuning':reconn?'Reconnecting':'Live'}</span></span>`,
+    cur.c?`<span>${flag(cur.cc)} ${esc(cur.c)}</span>`:'',cur.tags[0]?`<span>${esc(cur.tags.slice(0,2).join(' · '))}</span>`:''].filter(Boolean);
+  return`<div class="npq">${chips.join('')}</div>`}
+function styleSheet(){sheet(`<h3>🎨 Radio style</h3>${SKINS.map(([k,l])=>`<button class="mi${S.skin===k?' on':''}" data-skin="${k}">${({modern:'📱',wood:'🪵',boom:'📻',car:'🚗'})[k]} ${l}${S.skin===k?' <span class="dim">· current</span>':''}</button>`).join('')}`);
+  $$('#sheet [data-skin]').forEach(b=>b.onclick=()=>{S.skin=b.dataset.skin;LS.set('skin',S.skin);closeSheet();renderNP();burst(px,py,['✦'],['#ffd08a','#86b4ff'],7)})}
+/* Shrink the radio so the whole player fits on screen without scrolling. */
+function npFit(){const np=$('#np'),r=np&&np.querySelector('.radio');if(!r)return;r.style.zoom=1;const over=np.scrollHeight-np.clientHeight;
+  if(over>1){const h=r.getBoundingClientRect().height;r.style.zoom=Math.max(.55,(h-over-2)/h).toFixed(3)}}
+addEventListener('resize',()=>{if(npOpen)npFit()});
 function renderNP(){if(!npOpen||!cur)return;const pi=S.presets.findIndex(p=>p&&p.u===cur.u);const np=$('#np'),L0=list.length?list:S.presets.filter(Boolean),pos=Math.max(0,L0.findIndex(x=>x.u===cur.u));
-  np.innerHTML=`<div class="nph"><button class="ib" data-act="closenp" aria-label="Close">${ic('down')}</button><div class="t"><div class="mono">Tuned to</div><b>${esc(listName||'Nightjar Radio')}</b></div><button class="ib" data-act="car" aria-label="Car mode">${ic('car')}</button><button class="ib" data-act="night" aria-label="Night-light">${ic('moon')}</button></div>
-  ${radioH(pi,L0,pos)}
-  <div class="npt">${S.skin==='modern'?'':`<div class="npinfo"><h2>${esc(cur.n)}</h2><p>${flag(cur.cc)} ${esc([cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '))}</p><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div>`}
-   <div class="skins">${SKINS.map(([k,l])=>`<button data-skin="${k}" class="${S.skin===k?'on':''}">${l}</button>`).join('')}</div></div>
+  np.innerHTML=`<div class="nph"><button class="ib" data-act="closenp" aria-label="Close">${ic('down')}</button><div class="t"><div class="mono">Tuned to</div><b>${esc(listName||'Nightjar Radio')}</b></div><button class="ib npst" data-act="style" aria-label="Radio style">🎨</button><button class="ib" data-act="car" aria-label="Car mode">${ic('car')}</button><button class="ib" data-act="night" aria-label="Night-light">${ic('moon')}</button></div>
+  ${radioH(pi,L0,pos)}${npQ()}
+  ${S.skin==='modern'?'':`<div class="npt"><div class="npinfo"><h2>${esc(cur.n)}</h2><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div></div>`}
   <div class="ctrls"><button class="ib" data-act="prev" aria-label="Previous station">${ic('prev')}</button><button class="bigplay" data-act="toggle" id="npbig" aria-label="Play or pause">${playing||buffering?icf('pause'):icf('play')}</button><button class="ib" data-act="next" aria-label="Next station">${ic('next')}</button></div>
-  <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button>${WEBCH!=='stable'||chan()==='beta'?`<button data-act="bug">🐞<span>Report</span></button>`:''}${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button data-act="cast" class="${cast.on?'on':''}">${ic('cast')}<span>${cast.on?'Casting':'Cast'}</span></button>`:''}</div>
+  <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button>${WEBCH!=='stable'||chan()==='beta'?`<button data-act="bug">🐞<span>Report</span></button>`:''}${eqOK()?`<button data-act="eq" class="${eqName()!=='Normal'?'on':''}">🎚<span>${esc(eqName())}</span></button>`:''}${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button data-act="cast" class="${cast.on?'on':''}">${ic('cast')}<span>${cast.on?'Casting':'Cast'}</span></button>`:''}</div>
   <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div>
-  ${eqOK()?`<div style="text-align:center;margin-top:10px"><button class="eqpill" data-act="eq">🎚 Sound: <b>${esc(eqName())}</b></button></div>`:''}`;
+`;
   $('#volr').oninput=e=>{const v=+e.target.value;applyVol(v);S.vol=v;save('vol');if(cur){S.svol[cur.u]=v;const k=Object.keys(S.svol);if(k.length>300)delete S.svol[k[0]];LS.set('svol',S.svol);const n=$('#volnote');if(n){n.textContent='Volume remembered for '+cur.n;n.classList.add('on');clearTimeout(window.vnT);window.vnT=setTimeout(()=>n.classList.remove('on'),2200)}}};
-  $$('[data-skin]').forEach(b=>b.onclick=()=>{S.skin=b.dataset.skin;LS.set('skin',S.skin);renderNP();burst(px,py,['✦'],['#ffd08a','#86b4ff'],7)})}
+  requestAnimationFrame(npFit);setTimeout(npFit,350)}
 function renderNPctl(){if(!npOpen)return;const b=$('#npbig');if(b)b.innerHTML=playing||buffering?icf('pause'):icf('play');const s=$('#bsleep');if(s){s.classList.toggle('on',!!sleepAt);s.querySelector('span').textContent=sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}
-  const lv=$('#np .rbot .live');if(lv)lv.textContent=buffering?'Tuning':'Live'}
+  $$('#np .rbot .live,#np .npq .live').forEach(lv=>lv.textContent=buffering?'Tuning':reconn?'Reconnecting':'Live')}
 window.knobTurn=d=>{const k=$('#k2');if(!k)return;const r=(parseFloat(k.style.getPropertyValue('--kr'))||40)+d*55;k.style.setProperty('--kr',r+'deg')};
 function openNP(){if(!cur)return;npOpen=true;renderNP();$('#np').classList.add('on');history.pushState({np:1},'')}
 function closeNP(pop){if(!npOpen)return;npOpen=false;$('#np').classList.remove('on');if(!pop)history.back()}
@@ -1426,7 +1440,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
-      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),bug:()=>fbSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
+      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),bug:()=>fbSheet(),style:styleSheet,cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
       share:async()=>{const u=cur.home||ROOT;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
@@ -1535,8 +1549,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=19;
+const RV=20;
 const NEWS=[
+  {v:20,i:'📻',c:'var(--h-blue)',t:'A tidier player',d:'The Now Playing screen now fits on one screen, with no scrolling. Every radio style shows the stream quality, format, signal and country, and you can change style with the 🎨 button at the top.'},
   {v:19,i:'🐞',c:'var(--h-orange)',t:'Report a problem or suggest an idea',d:'Found a bug or have an idea? Tap “Report a problem” in Settings. Beta users also get a quick 🐞 button in the player. Every report is read.'},
   {v:18,i:'⚡',c:'var(--h-blue)',t:'Stable or Beta — you choose',d:'In Settings you can now pick how you get app updates. Stable is tried and tested, and gets new versions once they’ve been through beta. Beta gets them straight away, so you see new features first.'},
   {v:17,i:'🏆',c:'var(--h-orange)',t:'Big tournament specials',d:'During the men’s and women’s football, rugby, cricket and T20 World Cups, the Olympics, Winter Olympics and Paralympics, the app dresses up for the occasion — with a countdown card two weeks before, day-by-day progress, and quick links to live scores and radio coverage.'},
