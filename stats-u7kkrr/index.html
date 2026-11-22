@@ -6,19 +6,34 @@ main{max-width:520px;margin:0 auto;padding:36px 20px}h1{font:italic 400 34px Geo
 .big{font:italic 400 72px/1 Georgia,serif;color:#ffd08a;margin:18px 0 4px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
 .c{padding:16px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(234,242,255,.1)}.c b{display:block;font:italic 400 30px Georgia,serif}.c span{font-size:13px;color:#a3a7b8}
 table{width:100%;border-collapse:collapse;margin-top:8px}td,th{padding:10px 6px;border-bottom:1px solid rgba(234,242,255,.08);text-align:left;font-size:14.5px}th{color:#a3a7b8;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
-td:last-child,th:last-child{text-align:right}.bar{height:6px;border-radius:3px;background:linear-gradient(90deg,#ffb347,#ff6b4a);margin-top:4px}p.note{color:#a3a7b8;font-size:13px}button{margin-top:10px;border:1px solid rgba(234,242,255,.15);background:rgba(255,255,255,.05);color:inherit;border-radius:999px;padding:10px 18px;font:inherit}</style></head>
+td:last-child,th:last-child{text-align:right}.bar{height:6px;border-radius:3px;background:linear-gradient(90deg,#ffb347,#ff6b4a);margin-top:4px}p.note{color:#a3a7b8;font-size:13px}button{margin-top:10px;border:1px solid rgba(234,242,255,.15);background:rgba(255,255,255,.05);color:inherit;border-radius:999px;padding:10px 18px;font:inherit}.c i{display:block;font-style:normal;font-size:13px;color:#a3a7b8;margin-bottom:2px}.c.st{border-color:rgba(134,217,168,.35)}.c.bt{border-color:rgba(255,209,102,.35)}
+.split{display:flex;height:12px;border-radius:8px;overflow:hidden;margin:18px 0 0;background:rgba(255,255,255,.06)}.split i{display:block;height:100%}.split .s{background:linear-gradient(90deg,#3fbf7f,#86d9a8)}.split .b{background:linear-gradient(90deg,#ffd166,#ffb347)}
+.chs{display:grid;gap:8px;margin:-8px 0 18px;font-size:13.5px;color:#a3a7b8}.chs div{padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.03)}.chs b{color:#f3ecdf;font-weight:600}
+.tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:11px;vertical-align:1px}.tag.s{background:rgba(134,217,168,.16);color:#86d9a8}.tag.b{background:rgba(255,209,102,.16);color:#ffd166}.bar.b{background:linear-gradient(90deg,#ffd166,#ffb347)}.bar.s{background:linear-gradient(90deg,#3fbf7f,#86d9a8)}</style></head>
 <body><main><div class="mono">Private · Nightjar Radio</div><h1>Downloads</h1>
 <div class="big" id="total">…</div><div style="color:#a3a7b8">all-time Android app downloads</div>
-<div class="cards"><div class="c"><b id="cur">…</b><span id="curl">current version</span></div><div class="c"><b id="vers">…</b><span>versions released</span></div></div>
+<div class="split" id="split"></div>
+<div class="cards"><div class="c st"><i>🛡️ Stable</i><b id="stt">…</b><span id="stl">downloads</span></div><div class="c bt"><i>⚡ Beta</i><b id="btt">…</b><span id="btl">downloads</span></div></div>
+<div class="chs" id="chs"></div>
 <table><thead><tr><th>Version</th><th>Until</th><th>Downloads</th></tr></thead><tbody id="rows"></tbody></table>
 <button onclick="load()">↻ Refresh</button>
-<p class="note">Counts include repeat downloads and your own. Versions before build 105 weren't recorded. Browser users aren't counted. This page isn't linked anywhere, but it isn't password-protected either.</p></main>
+<p class="note">Counts include repeat downloads and your own. Beta vs Stable is worked out from downloads — people who switch channel inside the app aren’t counted again, and the app never reports who uses which. Versions before build 105 weren't recorded. Browser users aren't counted. This page isn't linked anywhere, but it isn't password-protected either.</p></main>
 <script>
-async function load(){try{const[h,r]=await Promise.all([fetch('../stats/downloads.json?'+Date.now()).then(x=>x.json()).catch(()=>[]),fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-app',{cache:'no-store'}).then(x=>x.json())]);
- const live=(r.assets||[]).find(a=>a.name==='nightjar-radio.apk')?.download_count||0,b=+(/(\d+)\s*$/.exec(r.name||'')||[0,0])[1];
- const all=[...h.filter(x=>x.build!==b),{build:b,downloads:live,until:'now'}].sort((x,y)=>y.build-x.build),tot=all.reduce((s,x)=>s+x.downloads,0),mx=Math.max(1,...all.map(x=>x.downloads));
- total.textContent=tot.toLocaleString('en-GB');cur.textContent=live.toLocaleString('en-GB');curl.textContent='build '+b+' (current)';vers.textContent=all.length;
- rows.innerHTML=all.map(x=>`<tr><td>Build ${x.build}${x.until==='now'?' · current':''}<div class="bar" style="width:${Math.max(3,x.downloads/mx*100)}%"></div></td><td>${x.until==='now'?'—':new Date(x.until).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td>${x.downloads.toLocaleString('en-GB')}</td></tr>`).join('')}
+const GH='https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/',fmt=n=>n.toLocaleString('en-GB'),day=d=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const rel=t=>fetch(GH+t,{cache:'no-store'}).then(x=>x.ok?x.json():{}).catch(()=>({}));
+const live=r=>({b:+((/build (\d+)/i.exec(r.name||'')||[0,0])[1]),n:(r.assets||[]).find(a=>a.name==='nightjar-radio.apk')?.download_count||0});
+async function load(){try{const[h,ch,ra,rb]=await Promise.all([fetch('../stats/downloads.json?'+Date.now()).then(x=>x.json()).catch(()=>[]),fetch('../stats/channels.json?'+Date.now()).then(x=>x.json()).catch(()=>null),rel('radio-app'),rel('radio-pubbeta')]);
+ const S=live(ra),B=live(rb),cn=x=>x.channel||'stable';
+ const all=h.filter(x=>!(cn(x)==='stable'&&x.build===S.b)&&!(cn(x)==='beta'&&x.build===B.b));if(S.b)all.push({build:S.b,downloads:S.n,until:'now',channel:'stable'});if(B.b)all.push({build:B.b,downloads:B.n,until:'now',channel:'beta'});
+ all.sort((x,y)=>y.build-x.build||(cn(x)==='beta'?-1:1));
+ const st=all.filter(x=>cn(x)==='stable').reduce((s,x)=>s+x.downloads,0),bt=all.filter(x=>cn(x)==='beta').reduce((s,x)=>s+x.downloads,0),tot=st+bt,mx=Math.max(1,...all.map(x=>x.downloads));
+ total.textContent=fmt(tot);stt.textContent=fmt(st);btt.textContent=fmt(bt);
+ const pc=tot?Math.round(bt/tot*100):0;stl.textContent=`${100-pc}% · now on build ${S.b||'—'}`;btl.textContent=B.b?`${pc}% · now on build ${B.b}`:'not started yet';
+ split.innerHTML=tot?`<i class="s" style="width:${100-pc}%"></i><i class="b" style="width:${pc}%"></i>`:'';
+ let c='';if(ch){const lb=(ch.beta||[]).slice(-1)[0],sv=ch.stable;if(lb)c+=`<div>⚡ Beta got <b>build ${lb.build}</b> on ${day(lb.at)}</div>`;if(sv)c+=`<div>🛡️ Stable got <b>build ${sv.build}</b> on ${day(sv.at)}${sv.how==='straight to stable'?' (pushed straight to Stable)':''}</div>`;
+   const wait=(ch.beta||[]).filter(x=>x.build>S.b);if(wait.length){const w=wait[wait.length-1],d=new Date(wait[0].at);d.setDate(d.getDate()+11);c+=`<div>⏳ Next for Stable: <b>build ${wait[0].build}</b> on ${day(d)}</div>`}}
+ chs.innerHTML=c;
+ rows.innerHTML=all.map(x=>{const b=cn(x)==='beta';return`<tr><td>Build ${x.build}<span class="tag ${b?'b':'s'}">${b?'Beta':'Stable'}</span>${x.until==='now'?' · current':''}<div class="bar ${b?'b':'s'}" style="width:${Math.max(3,x.downloads/mx*100)}%"></div></td><td>${x.until==='now'?'—':new Date(x.until).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td>${fmt(x.downloads)}</td></tr>`}).join('')}
  catch(e){total.textContent='—';rows.innerHTML='<tr><td colspan=3>Couldn’t load the numbers — try again in a minute.</td></tr>'}}
 load();
 </script></body></html>

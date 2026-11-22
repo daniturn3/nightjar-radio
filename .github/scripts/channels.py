@@ -59,6 +59,14 @@ def to_beta(d):
     if any(x["build"] == n for x in d["beta"]):
         print(f"Build {n} is already in beta"); return n
     sh("gh", "release", "download", TAGS["test"], "-p", "nightjar-radio-beta.apk", "-O", "nightjar-radio.apk", "--clobber")
+    # keep the outgoing beta build's download count before its file is replaced
+    ob = build_of(TAGS["beta"])
+    if ob:
+        bc = subprocess.run(["gh", "api", f"repos/{REPO}/releases/tags/{TAGS['beta']}", "--jq",
+            '[.assets[]|select(.name=="nightjar-radio.apk")|.download_count][0] // 0'], text=True, capture_output=True).stdout.strip() or "0"
+        p = pathlib.Path("stats/downloads.json"); dl = json.loads(p.read_text()) if p.exists() else []
+        dl = [x for x in dl if not (x["build"] == ob and x.get("channel") == "beta")] + [{"build": ob, "downloads": int(bc), "until": datetime.date.today().isoformat(), "channel": "beta"}]
+        p.write_text(json.dumps(dl, indent=1))
     ensure(TAGS["archive"], "Nightjar Radio build archive", "Every build that went to the public beta. Used to promote builds to stable.", True)
     sh("cp", "nightjar-radio.apk", f"nightjar-radio-{n}.apk")
     sh("gh", "release", "upload", TAGS["archive"], f"nightjar-radio-{n}.apk", "--clobber")
@@ -77,7 +85,7 @@ def to_stable(d, n, why):
         '[.assets[]|select(.name=="nightjar-radio.apk")|.download_count][0] // 0'], text=True, capture_output=True).stdout.strip() or "0"
     if cur:
         p = pathlib.Path("stats/downloads.json"); dl = json.loads(p.read_text()) if p.exists() else []
-        dl = [x for x in dl if x["build"] != cur] + [{"build": cur, "downloads": int(cnt), "until": datetime.date.today().isoformat()}]
+        dl = [x for x in dl if not (x["build"] == cur and x.get("channel", "stable") == "stable")] + [{"build": cur, "downloads": int(cnt), "until": datetime.date.today().isoformat(), "channel": "stable"}]
         p.write_text(json.dumps(dl, indent=1))
     ensure(TAGS["stable"], "Nightjar Radio", "Android app for Nightjar Radio", False)
     sh("gh", "release", "upload", TAGS["stable"], "nightjar-radio.apk", "--clobber")
