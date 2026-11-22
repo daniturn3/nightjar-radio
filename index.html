@@ -418,6 +418,11 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .lempty b{display:block;color:var(--cream);font:italic 500 19px var(--serif);margin-bottom:3px}
 .dbox{padding:12px 14px;border-radius:18px;background:rgba(134,217,168,.05);border:1px solid rgba(134,217,168,.25)}.drow{display:flex;align-items:center;gap:12px}.drow>div{flex:1}.drow b{display:block;font-weight:500;font-size:14.5px}.drow span{display:block;font-size:12px;color:var(--mut);margin-top:2px}
 .duse{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.duse div{padding:10px 12px;border-radius:14px;background:rgba(0,0,0,.2)}.duse b{display:block;font:600 19px var(--mono);color:#86d9a8}.duse span{font-size:11.5px;color:var(--mut)}
+.eqpill{font:inherit;font-size:12.5px;padding:7px 14px;border-radius:99px;border:1px solid rgba(255,179,107,.4);background:rgba(255,179,107,.08);color:var(--cream)}.eqpill b{color:#ffb36b;font-weight:600}
+.eqg{display:grid;grid-template-columns:1fr 1fr;gap:9px}.eqc{position:relative;font:inherit;text-align:left;padding:12px 12px 8px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--cream);overflow:hidden}
+.eqc.on{border-color:#ffb36b;background:linear-gradient(135deg,rgba(255,179,107,.18),rgba(255,122,89,.06));box-shadow:0 8px 22px -14px rgba(255,150,70,.7)}.eqe{font-size:20px}.eqc b{display:block;font-weight:600;font-size:14.5px;margin-top:4px}
+.eqc small{display:block;font-size:11px;color:var(--mut);line-height:1.35;min-height:30px}.eqsvg{display:block;width:100%;height:30px;margin-top:4px}.eqsvg line{stroke:rgba(255,255,255,.12);stroke-width:1}
+.eqsvg polyline{fill:none;stroke:#86b4ff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.eqc.on .eqsvg polyline{stroke:#ffb36b}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -454,7 +459,7 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* Keys also copied into the Android app's own storage, so they survive the phone clearing web data. */
-const KEEP=['bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
+const KEEP=['eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
 try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])})}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
@@ -921,7 +926,8 @@ function renderNP(){if(!npOpen||!cur)return;const pi=S.presets.findIndex(p=>p&&p
    <div class="skins">${SKINS.map(([k,l])=>`<button data-skin="${k}" class="${S.skin===k?'on':''}">${l}</button>`).join('')}</div></div>
   <div class="ctrls"><button class="ib" data-act="prev" aria-label="Previous station">${ic('prev')}</button><button class="bigplay" data-act="toggle" id="npbig" aria-label="Play or pause">${playing||buffering?icf('pause'):icf('play')}</button><button class="ib" data-act="next" aria-label="Next station">${ic('next')}</button></div>
   <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>${isFav(cur)?'Favourite':'Favourite'}</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="bed">${ic('moon')}<span>Bedtime</span></button><button data-act="share">${ic('share')}<span>Share</span></button>${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button data-act="cast" class="${cast.on?'on':''}">${ic('cast')}<span>${cast.on?'Casting':'Cast'}</span></button>`:''}</div>
-  <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div>`;
+  <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div>
+  ${eqOK()?`<div style="text-align:center;margin-top:10px"><button class="eqpill" data-act="eq">🎚 Sound: <b>${esc(eqName())}</b></button></div>`:''}`;
   $('#volr').oninput=e=>{const v=+e.target.value;applyVol(v);S.vol=v;save('vol');if(cur){S.svol[cur.u]=v;const k=Object.keys(S.svol);if(k.length>300)delete S.svol[k[0]];LS.set('svol',S.svol);const n=$('#volnote');if(n){n.textContent='Volume remembered for '+cur.n;n.classList.add('on');clearTimeout(window.vnT);window.vnT=setTimeout(()=>n.classList.remove('on'),2200)}}};
   $$('[data-skin]').forEach(b=>b.onclick=()=>{S.skin=b.dataset.skin;LS.set('skin',S.skin);renderNP();burst(px,py,['✦'],['#ffd08a','#86b4ff'],7)})}
 function renderNPctl(){if(!npOpen)return;const b=$('#npbig');if(b)b.innerHTML=playing||buffering?icf('pause'):icf('play');const s=$('#bsleep');if(s){s.classList.toggle('on',!!sleepAt);s.querySelector('span').textContent=sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}
@@ -936,6 +942,18 @@ function dataUse(){const m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);let al
   S.log.filter(e=>e.t>=m0.getTime()).forEach(e=>{const mb=e.s*(e.b||128)/8/1024;all+=mb;if(e.m)mob+=mb});
   const f=mb=>mb>=1024?(mb/1024).toFixed(mb>=10240?0:1)+' GB':Math.round(mb)+' MB';
   return`<div class="duse"><div><b>${f(all)}</b><span>this month</span></div><div><b>${f(mob)}</b><span>on mobile data</span></div></div><p class="dim" style="font-size:11.5px;margin:8px 0 0">Estimated from each station’s stream quality. A typical station uses about 30–60 MB an hour.</p>`}
+/* ---------- Equaliser (Android app) ---------- */
+const EQS=[['flat','〰️','Normal','As the station sends it',[0,0,0,0,0]],['bass','🔊','Bass boost','Deeper, punchier lows',[6,3.5,0,0,1]],['voice','🎙️','Voice','Clearer talk, news & sport',[-4,-1.5,3,4,1]],
+ ['treble','✨','Treble','Brighter, crisper highs',[0,0,0,3,6]],['rock','🎸','Rock','Big drums and guitars',[5,2,-1.5,3,4]],['pop','🎤','Pop','Vocals up front',[-1,2,4,2,-1]],
+ ['dance','🪩','Dance','Thumping bass, sparkle on top',[6,2,0,2,4]],['jazz','🎷','Jazz','Warm and smooth',[3,1.5,-1,2,3]],['classical','🎻','Classical','Wide and airy',[4,2,-1,2,4]],
+ ['night','🌙','Night','Softer bass for late listening',[-4,-2,1,1.5,-2]]];
+const eqOK=()=>!!(NAT&&NAT.setEq),eqCur=()=>LS.get('eq','flat'),eqName=()=>(EQS.find(e=>e[0]===eqCur())||EQS[0])[2];
+const eqCurve=g=>{const pts=g.map((v,i)=>`${4+i*23},${20-v*1.9}`).join(' ');return`<svg viewBox="0 0 100 40" class="eqsvg"><line x1="0" y1="20" x2="100" y2="20"/><polyline points="${pts}"/></svg>`};
+function eqSheet(){const c=eqCur();sheet(`<h3>Sound</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Pick a sound style. It applies to every station, in the car too.</p>
+  <div class="eqg">${EQS.map(([id,e,n,d,g])=>`<button class="eqc${id===c?' on':''}" data-eq="${id}"><span class="eqe">${e}</span><b>${n}</b><small>${d}</small>${eqCurve(g)}</button>`).join('')}</div>`);
+  $$('[data-eq]').forEach(b=>b.onclick=()=>{LS.set('eq',b.dataset.eq);try{NAT.setEq(b.dataset.eq)}catch{}$$('[data-eq]').forEach(x=>x.classList.toggle('on',x===b));
+    const p=$('.eqpill b');if(p)p.textContent=eqName();toast('🎚 '+eqName())})}
+setTimeout(()=>{try{if(eqOK())NAT.setEq(eqCur())}catch{}},1500);
 /* ---------- Help & FAQ ---------- */
 const FAQ=[
  ['Getting started',[
@@ -948,6 +966,7 @@ const FAQ=[
   ['Why won’t a station play?','Usually the station is offline, has moved its stream, or only allows listeners in its own country. Try again later, or pick another station.'],
   ['How do presets work?','Tap an empty preset while a station is playing to save it there. Long-press a preset to clear or replace it. You can also save from the player with the “Preset” button.'],
   ['Can I set a sleep timer?','Yes — tap “Sleep” in the full player. Or tap “Bedtime” for a calm station, a softer volume, a sleep timer and the night-light clock in one go.'],
+  ['Is there an equaliser?','Yes, in the Android app — tap “🎚 Sound” under the volume slider in the player, or Settings → Sound / equaliser. Choose Normal, Bass boost, Voice, Night, Rock, Pop, Dance, Jazz, Classical or Treble.'],
   ['Why is one station much louder than another?','Stations broadcast at different levels. Set the volume in the player and Nightjar Radio remembers it for that station.'],
   ['How much data does it use?','Most stations use roughly 30–60 MB an hour (higher-quality streams up to about 150 MB). Settings → Data shows roughly how much you’ve used this month, and Data saver switches to a lighter stream on mobile data when a station has one.'],
   ['Does it have RDS or recording?','It shows the song and artist when a station sends them — much like RDS in a car. Recording isn’t available yet.'],
@@ -1005,7 +1024,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="tog"><input type="checkbox" id="s_fx" ${S.sfx?'checked':''}>Sound effects — globe whoosh, ticks and chime</label>
   <label class="tog"><input type="checkbox" id="s_nl" ${S.nightlight?'checked':''}>Night-light clock after 20 seconds untouched while playing</label>
   <label class="tog"><input type="checkbox" id="s_pl" ${playful()?'checked':''}>Playful touches — bouncy buttons and sparkles</label></div>
-  <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button><button class="pill" id="s_faq">? Help &amp; FAQ</button><button class="pill" id="s_home">✎ Customise Home</button></div>
+  <div class="btnrow" style="margin-top:8px"><button class="pill" id="s_tour">${ic('play')}Show the tour</button><button class="pill" id="s_new">✦ What’s new</button><button class="pill" id="s_faq">? Help &amp; FAQ</button><button class="pill" id="s_home">✎ Customise Home</button>${eqOK()?'<button class="pill" id="s_eq">🎚 Sound / equaliser</button>':''}</div>
   ${S.geo?`<button class="pill" id="s_geo" style="margin-top:10px">${ic('x')}Forget my location</button>`:''}
   <div class="mono" style="margin:16px 0 6px">Backup</div><p class="dim" style="font-size:13px;margin:0 0 10px">Presets, favourites, history and settings in one file. ${ago==null?'Never backed up':ago<1?'Last backup today':'Last backup '+ago+' days ago'}</p>
   <div class="btnrow"><button class="pill amb" id="s_bk">${ic('dl')}Back up now</button><button class="pill" id="s_rs">${ic('ul')}Restore</button></div>
@@ -1021,7 +1040,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
   if($('#s_np'))$('#s_np').onchange=e=>{LS.set('npMode',e.target.value);npScan()};
   $('#s_saver').onchange=e=>{LS.set('saver',e.target.checked);toast(e.target.checked?'📉 Data saver on':'Data saver off')};
-  $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();
+  $('#s_faq').onclick=()=>faq();$('#s_home').onclick=()=>homeCustom();if($('#s_eq'))$('#s_eq').onclick=()=>eqSheet();
   $('#s_bk').onclick=backup;$('#s_bday').onchange=e=>{const v=e.target.value;if(!v&&S.bday){e.target.value='2000-'+S.bday;return}S.bday=v?v.slice(5):'';LS.set('bday',S.bday);toast(S.bday?'🎂 Birthday saved':'Birthday cleared');applyTheme();if(view==='home')render()};if($('#s_bdx'))$('#s_bdx').onclick=()=>{S.bday='';LS.set('bday','');closeSheet();toast('Birthday cleared');applyTheme()};$('#s_th').onchange=e=>{S.theme=e.target.value;LS.set('theme',S.theme);applyTheme();if(view==='home')render()};$('#s_fx').onchange=e=>{S.sfx=e.target.checked;LS.set('sfx',S.sfx)};$('#s_share').onclick=async()=>{const u='https://daniturn3.github.io/nightjar-radio/get/',t='Nightjar Radio — free live radio from around the world. Get it here: '+u;if(NAT)return NAT.share('Share Nightjar Radio',t);try{await navigator.share({title:'Nightjar Radio',text:t})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}};$('#s_bed').onchange=e=>{S.bedMin=+e.target.value;LS.set('bedMin',S.bedMin)};$('#s_tour').onclick=()=>{closeSheet();setTimeout(tour,400)};$('#s_new').onclick=()=>{closeSheet();setTimeout(()=>whatsNew(true),400)};if($('#s_upd'))$('#s_upd').onclick=()=>checkUpdate(true);if($('#s_geo'))$('#s_geo').onclick=()=>{S.geo=null;save('geo');closeSheet();toast('Location forgotten');if(view==='home')render()};$('#s_rs').onclick=()=>$('#s_file').click();
   $('#s_file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='nightjar-radio')throw 0;Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>localStorage.removeItem(k));Object.entries(d.all).forEach(([k,v])=>localStorage.setItem(k,v));toast('Restored — reloading');setTimeout(()=>location.reload(),700)}catch{toast('That isn’t a Nightjar Radio backup')}}}
 async function backup(){const all={};Object.keys(localStorage).filter(k=>k.startsWith('njr_')).forEach(k=>all[k]=localStorage.getItem(k));const txt=JSON.stringify({app:'nightjar-radio',v:1,at:Date.now(),all}),name=`nightjar-radio-backup-${new Date().toISOString().slice(0,10)}.txt`;
@@ -1227,7 +1246,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
-      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
+      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
       share:async()=>{const u=cur.home||location.href;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
@@ -1308,6 +1327,7 @@ let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
 const RV=13;
 const NEWS=[
+  {app:113,i:'🎚',c:'#ffb36b',t:'Sound styles',d:'New equaliser: Bass boost, Voice (great for talk and sport), Night, Rock, Pop, Dance, Jazz and more. Tap “🎚 Sound” under the volume in the player, or find it in Settings.'},
   {app:112,i:'👍',c:'#ffd166',t:'Favourite from the car',d:'In Android Auto, tap the 👍 on the playing screen to add the station to your favourites (tap again to remove). It shows on your phone’s playback notification too.'},
   {app:110,i:'🚗',c:'var(--h-blue)',t:'Better Android Auto',d:'In the car you now get Popular in your country, Sport and a Moods grid — plus search. Try: “Hey Google, play Kerrang on Nightjar Radio”.'},
   {app:108,i:'📺',c:'var(--h-blue)',t:'Cast, reconnect & data saver',d:'Tap “Cast” in the player to send a station to your Chromecast, Google/Nest speaker or Google TV. If your signal drops, Nightjar Radio now reconnects by itself. And Settings has a new Data saver for mobile data, plus how much data you’ve used this month.'},
