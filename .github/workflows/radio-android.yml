@@ -20,7 +20,7 @@ jobs:
         env: { NJR_KS_B64: '${{ secrets.NJR_KS_B64 }}' }
         run: |
           # The key lives in the NJR_KS_B64 secret. (Falls back to the old file only until that secret exists.)
-          if [ -n "$NJR_KS_B64" ]; then printf '%s' "$NJR_KS_B64" | tr -d '[:space:]' | base64 -d > android/njr-release.p12; echo "Signing key restored from secret"
+          if [ -n "$NJR_KS_B64" ]; then printf '%s' "$NJR_KS_B64" | tr -d '[:space:]' | base64 -d > android/njr-release.p12; echo "Signing key restored from secret ($(stat -c %s android/njr-release.p12) bytes, id $(sha256sum android/njr-release.p12 | cut -c1-12), pasted text was ${#NJR_KS_B64} characters)"
           elif [ -f android/njr-release.p12 ]; then echo "::warning::Using the signing key file from the repo — add the NJR_KS_B64 secret"
           else echo "::error::Add the NJR_KS_B64 secret"; exit 1; fi
       - name: Build APK
