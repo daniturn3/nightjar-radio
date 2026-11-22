@@ -429,6 +429,7 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .sgd{font:600 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#ff9ccc;margin:14px 0 4px}.lsong{cursor:pointer}
 .alfix{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;color:var(--cream);padding:11px 12px;margin-top:8px;border-radius:16px;border:1px solid rgba(255,179,107,.35);background:rgba(255,179,107,.08)}
 .alfix span{font-size:20px}.alfix div{flex:1}.alfix b{display:block;font-weight:600;font-size:14px}.alfix small{display:block;font-size:11.5px;color:var(--mut);line-height:1.35;margin-top:2px}.alfix i{font-style:normal;color:#ffb36b;font-size:20px}
+.alrep{margin-top:14px;padding:12px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:12.5px;line-height:1.45}.alrep>div:not(.mono){padding:3px 0;color:#cfe8d8}.alrep i{font-style:normal;font-family:var(--mono);color:var(--mut);margin-right:8px;font-size:11px}.alrep .bad{color:#ff9b8f}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -1327,7 +1328,10 @@ function alarmChecks(){const q=(f,d)=>{try{return f()}catch{return d}};const mk=
   if(!q(()=>NAT.batteryOk(),true))rows.push(['al_bat','🔋','Allow running in the background','So your phone doesn’t put the alarm to sleep']);
   if(NAT.openAutostart&&/xiaomi|redmi|poco|oppo|realme|oneplus|vivo|huawei|honor/.test(mk))rows.push(['al_auto','🚀','Turn on Autostart',`${/xiaomi|redmi|poco/.test(mk)?'Xiaomi, Redmi and POCO phones':'Your phone'} block alarms from waking apps unless Autostart is on for Nightjar Radio`]);
   return`<div class="alchk">${rows.length?`<div class="mono" style="margin:16px 0 8px;color:#ffb36b">Make sure it rings</div>${rows.map(([id,e,t,d])=>`<button class="alfix" id="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div><i>›</i></button>`).join('')}`:''}
-  ${NAT.testAlarm?`<button class="pill" id="al_test" style="margin-top:12px">⏰ Test it — rings in 1 minute</button><p class="dim" style="font-size:12px;margin:6px 0 0">Tap test, lock your phone and wait. It should light up and start playing.</p>`:''}</div>`}
+  ${NAT.testAlarm?`<button class="pill" id="al_test" style="margin-top:12px">⏰ Test it — rings in 1 minute</button><p class="dim" style="font-size:12px;margin:6px 0 0">Tap test, lock your phone and wait. It should light up and start playing.</p>`:''}${NAT.alarmLog?'<div id="alrep"></div>':''}</div>`}
+function alarmRep(){const el=$('#alrep');if(!el||!NAT.alarmLog)return;let a=[];try{a=JSON.parse(NAT.alarmLog()||'[]')}catch{}if(!a.length){el.innerHTML='';return}
+  const tm=t=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  el.innerHTML=`<div class="alrep"><div class="mono" style="margin-bottom:6px">Alarm report</div>${a.map(x=>`<div class="${/BLOCKED|NOT|OFF|error|couldn/i.test(x.m)?'bad':''}"><i>${tm(x.t)}</i>${esc(x.m)}</div>`).join('')}<p class="dim" style="font-size:11.5px;margin:8px 0 0">If something went wrong, screenshot this and send it to the developer.</p></div>`}
 function alarmText(t){const el=$('#al_next');if(!el)return;if(!t||!S.alarm.on){el.textContent=S.alarm.on?'Pick at least one day':'Alarm off';return}
   const d=new Date(t),mins=Math.round((t-Date.now())/6e4),hh=Math.floor(mins/60),mm=mins%60,today=new Date().toDateString()===d.toDateString(),tom=new Date(Date.now()+864e5).toDateString()===d.toDateString();
   el.textContent=`Rings ${today?'today':tom?'tomorrow':d.toLocaleDateString('en-GB',{weekday:'long'})} at ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · in ${hh?hh+'h ':''}${mm}m`}
@@ -1347,7 +1351,8 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   if($('#al_ntf'))$('#al_ntf').onclick=()=>{NAT.askNotif();back()};
   if($('#al_fs'))$('#al_fs').onclick=()=>{NAT.askFullScreen();back()};
   if($('#al_auto'))$('#al_auto').onclick=()=>{NAT.openAutostart();toast('Find Nightjar Radio and switch Autostart on',4000)};
-  if($('#al_test'))$('#al_test').onclick=()=>{if(!S.alarm.st){toast('Choose a station first');return}NAT.testAlarm();toast('⏰ Test alarm in 1 minute — lock your phone now',4500)}}
+  if($('#al_test'))$('#al_test').onclick=()=>{if(!S.alarm.st){toast('Choose a station first');return}NAT.testAlarm();alarmRep();toast('⏰ Test alarm in 1 minute — lock your phone now',4500)};
+  alarmRep();clearInterval(window.__alrT);window.__alrT=setInterval(()=>{if(view!=='library')return clearInterval(window.__alrT);alarmRep()},5000)}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&view==='library'&&NAT)alarmWire();if(!document.hidden&&NAT)checkUpdate()});
 /* ---------- now playing in lists (Android app: peeks at each stream's song title) ---------- */
 const NPC={},NPU={},npMode=()=>LS.get('npMode','wifi'),NPFRESH=90e3;
