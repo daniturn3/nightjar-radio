@@ -1,0 +1,13 @@
+name: One-off - move release tags to cleaned history
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  retag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          for t in radio-app radio-beta radio-builds radio-pubbeta; do
+            git tag -f "$t" HEAD && git push -f origin "refs/tags/$t"
+          done
