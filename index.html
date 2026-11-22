@@ -423,6 +423,10 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .eqc.on{border-color:#ffb36b;background:linear-gradient(135deg,rgba(255,179,107,.18),rgba(255,122,89,.06));box-shadow:0 8px 22px -14px rgba(255,150,70,.7)}.eqe{font-size:20px}.eqc b{display:block;font-weight:600;font-size:14.5px;margin-top:4px}
 .eqc small{display:block;font-size:11px;color:var(--mut);line-height:1.35;min-height:30px}.eqsvg{display:block;width:100%;height:30px;margin-top:4px}.eqsvg line{stroke:rgba(255,255,255,.12);stroke-width:1}
 .eqsvg polyline{fill:none;stroke:#86b4ff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.eqc.on .eqsvg polyline{stroke:#ffb36b}
+.sgl{display:flex;flex-direction:column}.sgr{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)}.sgl .sgr:first-child,.sgd+.sgr{border-top:0}
+.sgt{flex:1;min-width:0}.sgt b{display:block;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sgt span{display:block;font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sgb{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:12px;color:var(--cream)}.sgb.yt{color:#ff5a5a;border-color:rgba(255,90,90,.35)}.sgb.sp{color:#1ed760;border-color:rgba(30,215,96,.35);font-size:15px}
+.sgd{font:600 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#ff9ccc;margin:14px 0 4px}.lsong{cursor:pointer}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -459,7 +463,7 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* Keys also copied into the Android app's own storage, so they survive the phone clearing web data. */
-const KEEP=['eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
+const KEEP=['songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
 try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])})}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
@@ -553,7 +557,7 @@ window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true
   if(e.err&&e.err!==natErr){buffering=false;toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
   if((e.song||'')!==song){song=e.song||'';showSong()}setState()};
-function showSong(){renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
+function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
 au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
@@ -882,6 +886,7 @@ VIEWS.library=(el)=>{setTimeout(alarmWire,0);const rc=recapH();el.innerHTML=`<di
   ${scard(sec('Wake-up radio',alarmH(),NAT?'Wake up to a station, fading in gently':'','⏰'),'⏰','#ffb36b','#ff7a59')}
   ${rc}${rc?'':(wrapBtn()?scard(sec('Radio Wrapped',wrapBtn(),'Your year on the radio so far','✦'),'✦','#ff9ccc','#c56cf0'):'')}
   ${scard(sec('Favourites',S.favs.length?rows(S.favs,'Favourites'):'<div class="lempty"><span>⭐</span><b>No favourites yet</b>Tap the ☆ next to any station to keep it here.</div>','','01'),'⭐','#ffd166','#ff9f43')}
+  ${songsH()}
   ${scard(sec('Recently played',S.recent.length?rows(S.recent.slice(0,20),'Recently played'):'<div class="lempty"><span>📻</span><b>Nothing yet</b>Go tune in — stations you play will show up here.</div>','','02'),'↺','#b8a2ff','#7b5cff')}
   ${scard(sec('Presets',presetsH(),'Long-press a preset to clear or replace it','03'),'🎛️','#86d9a8','#2fb38a')}`};
 function wrapBtn(){const y=new Date().getFullYear(),secs=S.log.filter(e=>new Date(e.t).getFullYear()===y).reduce((a,e)=>a+e.s,0);return secs>=60?`<button class="pill amb wide" data-act="wrap" style="margin-top:12px">${icf('play')}Play your ${y} Radio Wrapped</button>`:''}
@@ -954,6 +959,26 @@ function eqSheet(){const c=eqCur();sheet(`<h3>Sound</h3><p class="dim" style="fo
   $$('[data-eq]').forEach(b=>b.onclick=()=>{LS.set('eq',b.dataset.eq);try{NAT.setEq(b.dataset.eq)}catch{}$$('[data-eq]').forEach(x=>x.classList.toggle('on',x===b));
     const p=$('.eqpill b');if(p)p.textContent=eqName();toast('🎚 '+eqName())})}
 setTimeout(()=>{try{if(eqOK())NAT.setEq(eqCur())}catch{}},1500);
+/* ---------- "What was that song?" — history of song titles heard (from stations that send them) ---------- */
+const SJUNK=/^(advert(isement)?s?|ad ?break|commercials?|jingle|news|traffic( news)?|weather|station id|unknown|untitled|live|on air|-|–)$/i;
+function logSong(){if(!song||!cur)return;const t=song.trim();if(t.length<3||SJUNK.test(t)||t.toLowerCase()===String(cur.n).toLowerCase())return;
+  const h=LS.get('songs',[]),last=h[0];if(last&&last.s===t&&last.u===cur.u)return;if(h.some(x=>x.s===t&&x.u===cur.u&&Date.now()-x.t<20*6e4))return;
+  h.unshift({s:t,n:cur.n,u:cur.u,f:cur.fav||'',t:Date.now()});LS.set('songs',h.slice(0,300));if(view==='library'&&$('#songsec'))$('#songsec').outerHTML=songsH()}
+const sOpen=u=>{if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
+const sYT=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q),sSP=q=>'https://open.spotify.com/search/'+encodeURIComponent(q);
+function sWhen(t){const d=new Date(t),now=new Date(),tm=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});const day=Math.round((new Date(now.toDateString())-new Date(d.toDateString()))/864e5);
+  return day===0?tm:day===1?'Yesterday '+tm:d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})+' '+tm}
+function songRow(x,i){return`<div class="sgr"><div class="sgt"><b>${esc(x.s)}</b><span>${esc(x.n)} · ${sWhen(x.t)}</span></div><button class="sgb yt" data-sy="${i}" aria-label="Find on YouTube">▶</button><button class="sgb sp" data-ss="${i}" aria-label="Find on Spotify">●</button></div>`}
+function songsH(){const h=LS.get('songs',[]);return`<div id="songsec">${scard(sec('What was that song?',h.length?`<div class="sgl">${h.slice(0,6).map(songRow).join('')}</div>${h.length>6?`<button class="pill" data-act="songs" style="margin-top:10px">See all ${h.length} songs</button>`:''}`
+  :'<div class="lempty"><span>🎵</span><b>No songs yet</b>Songs you hear on stations that show titles will be listed here, so you can find them later.</div>',h.length?'Tap ▶ for YouTube or ● for Spotify':'','♪'),'🎵','#ff9ccc','#c56cf0')}</div>`}
+function songsSheet(){const h=LS.get('songs',[]);let day='';sheet(`<h3>What was that song?</h3><p class="dim" style="font-size:13px;margin:0 0 6px">${h.length} song${h.length===1?'':'s'} heard · newest first</p>
+  <div class="sgl">${h.map((x,i)=>{const d=new Date(x.t).toDateString(),hd=d!==day?(day=d,`<div class="sgd">${sWhen(x.t).replace(/ \d\d:\d\d$/,'').replace(/^\d\d:\d\d$/,'Today')}</div>`):'';return hd+songRow(x,i)}).join('')}</div>
+  ${h.length?'<div class="btnrow" style="margin-top:14px"><button class="pill" id="sgclr">Clear history</button></div>':''}`);
+  if($('#sgclr'))$('#sgclr').onclick=()=>{if(confirm('Clear your song history?')){LS.set('songs',[]);closeSheet();if(view==='library')render()}}}
+function songFind(t){sheet(`<h3>♪ ${esc(t)}</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Find this song:</p><div class="btnrow"><button class="pill" id="sfy">▶ YouTube</button><button class="pill" id="sfs">● Spotify</button></div>`);
+  $('#sfy').onclick=()=>sOpen(sYT(t));$('#sfs').onclick=()=>sOpen(sSP(t))}
+document.addEventListener('click',e=>{const y=e.target.closest('[data-sy]'),p=e.target.closest('[data-ss]');if(!y&&!p)return;e.stopPropagation();const x=LS.get('songs',[])[+(y||p).dataset[y?'sy':'ss']];if(x)sOpen(y?sYT(x.s):sSP(x.s))},true);
+document.addEventListener('click',e=>{const l=e.target.closest('.lsong,#rsong');if(l&&song&&cur){e.stopPropagation();songFind(song)}},true);
 /* ---------- Help & FAQ ---------- */
 const FAQ=[
  ['Getting started',[
@@ -969,6 +994,7 @@ const FAQ=[
   ['Is there an equaliser?','Yes, in the Android app — tap “🎚 Sound” under the volume slider in the player, or Settings → Sound / equaliser. Choose Normal, Bass boost, Voice, Night, Rock, Pop, Dance, Jazz, Classical or Treble.'],
   ['Why is one station much louder than another?','Stations broadcast at different levels. Set the volume in the player and Nightjar Radio remembers it for that station.'],
   ['How much data does it use?','Most stations use roughly 30–60 MB an hour (higher-quality streams up to about 150 MB). Settings → Data shows roughly how much you’ve used this month, and Data saver switches to a lighter stream on mobile data when a station has one.'],
+  ['How do I find a song I heard?','Library → “What was that song?” lists songs you’ve heard (on stations that send song titles), with buttons to find each one on YouTube or Spotify. You can also tap the song name in the player.'],
   ['Does it have RDS or recording?','It shows the song and artist when a station sends them — much like RDS in a car. Recording isn’t available yet.'],
   ['What do the seasonal themes do?','The app dresses up for special days — snow at Christmas, fireworks on New Year’s Eve, your birthday and more. Turn them off in Settings → Seasonal themes.']]],
  ['Android app',[
@@ -1246,7 +1272,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
-      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
+      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
       share:async()=>{const u=cur.home||location.href;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
@@ -1325,8 +1351,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=13;
+const RV=14;
 const NEWS=[
+  {v:14,i:'🎵',c:'#ff9ccc',t:'What was that song?',d:'Library now keeps a list of songs you’ve heard, with one-tap ▶ YouTube and ● Spotify buttons. Tap the song name in the player to find it too.'},
   {app:113,i:'🎚',c:'#ffb36b',t:'Sound styles',d:'New equaliser: Bass boost, Voice (great for talk and sport), Night, Rock, Pop, Dance, Jazz and more. Tap “🎚 Sound” under the volume in the player, or find it in Settings.'},
   {app:112,i:'👍',c:'#ffd166',t:'Favourite from the car',d:'In Android Auto, tap the 👍 on the playing screen to add the station to your favourites (tap again to remove). It shows on your phone’s playback notification too.'},
   {app:110,i:'🚗',c:'var(--h-blue)',t:'Better Android Auto',d:'In the car you now get Popular in your country, Sport and a Moods grid — plus search. Try: “Hey Google, play Kerrang on Nightjar Radio”.'},
