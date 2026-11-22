@@ -10,7 +10,7 @@ on:
         type: boolean
         default: false
       web_only:
-        description: 'Website only (don\'t send the test app build)'
+        description: "Website only (no app update for Beta users)"
         type: boolean
         default: false
 permissions:
