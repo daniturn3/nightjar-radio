@@ -1,8 +1,8 @@
 name: Nightjar Radio Android app
+# The Android code lives in the PRIVATE repo daniturn3/nightjar-radio-sic. This workflow fetches it with the
+# read-only SRC_TOKEN secret, builds and signs it here (signing secrets stay in this repo), and publishes the
+# TEST build to this repo's releases. Run it by hand (Actions → Run workflow) after changing the Android code.
 on:
-  push:
-    branches: [main]
-    paths: ['android/**', '!android/RELEASE_NOTES.md', '.github/workflows/radio-android.yml']
   workflow_dispatch:
 permissions:
   contents: write
@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with: { repository: daniturn3/nightjar-radio-sic, token: '${{ secrets.SRC_TOKEN }}', ref: main }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: '17' }
       - uses: gradle/actions/setup-gradle@ed408507eac070d1f99cc633dbcf757c94c7933a  # v4.4.3, pinned (job has the signing secret)
@@ -19,9 +20,7 @@ jobs:
       - name: Restore signing key
         env: { NJR_KS_B64: '${{ secrets.NJR_KS_B64 }}' }
         run: |
-          # The key lives in the NJR_KS_B64 secret. (Falls back to the old file only until that secret exists.)
           if [ -n "$NJR_KS_B64" ]; then printf '%s' "$NJR_KS_B64" | tr -d '[:space:]' | base64 -d > android/njr-release.p12; echo "Signing key restored from secret ($(stat -c %s android/njr-release.p12) bytes, id $(sha256sum android/njr-release.p12 | cut -c1-12), pasted text was ${#NJR_KS_B64} characters)"
-          elif [ -f android/njr-release.p12 ]; then echo "::warning::Using the signing key file from the repo — add the NJR_KS_B64 secret"
           else echo "::error::Add the NJR_KS_B64 secret"; exit 1; fi
       - name: Build APK
         env: { NJR_KS_PASS: '${{ secrets.NJR_KS_PASS }}' }
@@ -33,7 +32,7 @@ jobs:
       - name: Check signature
         run: test -f android/app/build/outputs/apk/release/app-release.apk
       - name: Publish TEST build (only testers get it — run "Publish app" to send it to Beta)
-        env: { GH_TOKEN: '${{ github.token }}' }
+        env: { GH_TOKEN: '${{ github.token }}', GH_REPO: '${{ github.repository }}' }
         run: |
           cp android/app/build/outputs/apk/release/app-release.apk nightjar-radio-beta.apk
           gh release view radio-beta >/dev/null 2>&1 || gh release create radio-beta --title "Nightjar Radio test build" --notes "Test builds for the developer. Not for general use." --prerelease --latest=false
