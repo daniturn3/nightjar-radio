@@ -318,6 +318,7 @@ body[class*="th-"] .a2{--c:var(--t1)}body[class*="th-"] .a3{--c:var(--t2)}
 .chsel{margin-top:16px;text-align:left}.chsel .mono{display:block;margin-bottom:6px;font-size:11px;opacity:.7}.chseg{display:flex;gap:6px;padding:4px;border-radius:16px;background:rgba(255,255,255,.06)}.chseg button{flex:1;padding:9px;border:0;border-radius:12px;background:none;color:var(--cream);font:600 14px inherit;opacity:.7}.chseg button.on{background:rgba(134,217,168,.18);opacity:1;box-shadow:inset 0 0 0 1px rgba(134,217,168,.5)}.chsel p{margin:6px 2px 0;font-size:12.5px;opacity:.7}
 .fbseg{display:flex;gap:6px;padding:4px;margin:4px 0 10px;border-radius:16px;background:rgba(255,255,255,.06)}.fbseg button{flex:1;padding:9px;border:0;border-radius:12px;background:none;color:var(--cream);font-family:inherit;font-weight:600;font-size:14px;opacity:.7}.fbseg button.on{background:rgba(255,179,71,.18);opacity:1;box-shadow:inset 0 0 0 1px rgba(255,179,71,.5)}
 .fbta{width:100%;box-sizing:border-box;padding:12px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:15px;line-height:1.45;resize:vertical;margin-bottom:10px}
+.fbql{font-size:12.5px;opacity:.7;margin:2px 2px 6px}.fbch{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.fbch button{padding:7px 12px;border-radius:99px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:var(--cream);font-family:inherit;font-size:13.5px}.fbch button.on{background:rgba(255,179,71,.2);border-color:rgba(255,179,71,.6)}
 .fbd{margin-top:10px;font-size:13px;opacity:.85}.fbd summary{cursor:pointer;opacity:.75}.fbd pre{white-space:pre-wrap;word-break:break-word;font:11.5px/1.45 var(--mono);background:rgba(0,0,0,.25);padding:10px 12px;border-radius:12px;margin:8px 0}.fbd p{margin:0;opacity:.7;font-size:12px}
 .thchip{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:8px 14px;border-radius:999px;font-size:14px;background:color-mix(in srgb,var(--acc) 14%,transparent);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent);color:var(--acc2)}
 .poppy{display:inline-block;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#111 0 22%,#2a7d2a 23% 30%,#d62f2f 31%);box-shadow:0 0 0 1px rgba(0,0,0,.3);vertical-align:-2px}
@@ -1113,7 +1114,7 @@ const FAQ=[
   ['Who does the app talk to?','The station directory (radio-browser.info), the radio stations themselves when you listen, ESPN for football fixtures, and Google’s icon service for some station logos. “Near you” sends your approximate position to the station directory once, to find local stations — it isn’t stored by the app.'],
   ['How do I move to a new phone?','Settings → “Back up now” saves a small file. On the new phone, open Settings → Restore and pick that file — your favourites, presets and settings come with you.']]]];
 /* ---------- Problem reports & ideas → Google Form (only sent when the person taps Send) ---------- */
-const FBF={form:'',type:'',msg:'',contact:'',diag:''};   // filled in once Daniel's Google Form exists
+const FBF={form:'1FAIpQLSfsljC1cVqPnbRe05BNx_6O_20XyoxI-v1SmlvmYZ-DiDd_SQ',type:'entry.1634799765',msg:'entry.114415935',contact:'entry.1761160378',diag:'entry.285074959'};   // Daniel's Google Form → responses sheet
 function fbDiag(){const ua=navigator.userAgent,an=(/Android ([\d.]+)/.exec(ua)||[])[1],md=(/Android [\d.]+; ([^;)]+)/.exec(ua)||[])[1];
   return[`App: ${NAT?'build '+NAT.version():'browser'} · ${buildKind?buildKind():''} · updates: ${chan()} · site: ${WEBCH} · v${RV}`,
     NAT?`Phone: ${(NAT.maker&&NAT.maker())||''} ${md&&md!=='K'?md:''} · Android ${an||'?'}`.replace(/\s+/g,' '):`Browser: ${ua.slice(0,140)}`,
@@ -1125,16 +1126,20 @@ let fbLast=0;
 function fbSheet(kind='bug'){const d=fbDiag();
   sheet(`<h3>${kind==='idea'?'💡 Suggest an idea':'🐞 Report a problem'}</h3>
   <div class="fbseg"><button data-fbk="bug" class="${kind==='bug'?'on':''}">🐞 Problem</button><button data-fbk="idea" class="${kind==='idea'?'on':''}">💡 Idea</button></div>
+  <div id="fbq"><div class="fbql">How often?</div><div class="fbch" data-q="often">${['Just once','Sometimes','Every time'].map(x=>`<button>${x}</button>`).join('')}</div>
+  <div class="fbql">Which part?</div><div class="fbch" data-q="part">${['Playing a station','Android Auto','Wake-up alarm','Search','Sport & scores','Something else'].map(x=>`<button>${x}</button>`).join('')}</div></div>
   <textarea id="fbmsg" class="fbta" rows="5" maxlength="2000" placeholder="${kind==='idea'?'What would you like Nightjar Radio to do?':'What happened? What were you doing when it went wrong?'}"></textarea>
   <input id="fbwho" class="fbta" maxlength="80" placeholder="Your name or Reddit username (optional)">
   <details class="fbd"><summary>Details sent with your report</summary><pre>${esc(d)}</pre><p>These help fix things faster. Nothing is sent until you tap Send, and nothing identifies you unless you add your name.</p></details>
   <button class="pill amb" id="fbsend" style="width:100%;justify-content:center;margin-top:12px">${ic('share')}Send</button>`);
-  let k=kind;$$('[data-fbk]').forEach(b=>b.onclick=()=>{k=b.dataset.fbk;$$('[data-fbk]').forEach(x=>x.classList.toggle('on',x===b));$('#sheet h3').textContent=k==='idea'?'💡 Suggest an idea':'🐞 Report a problem';$('#fbmsg').placeholder=k==='idea'?'What would you like Nightjar Radio to do?':'What happened? What were you doing when it went wrong?'});
+  let k=kind;const qa={};const qv=()=>{$('#fbq').hidden=k==='idea'};qv();
+  $$('.fbch').forEach(g=>g.querySelectorAll('button').forEach(b=>b.onclick=()=>{const on=!b.classList.contains('on');g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.toggle('on',on);qa[g.dataset.q]=on?b.textContent:''}));
+  $$('[data-fbk]').forEach(b=>b.onclick=()=>{k=b.dataset.fbk;qv();$$('[data-fbk]').forEach(x=>x.classList.toggle('on',x===b));$('#sheet h3').textContent=k==='idea'?'💡 Suggest an idea':'🐞 Report a problem';$('#fbmsg').placeholder=k==='idea'?'What would you like Nightjar Radio to do?':'What happened? What were you doing when it went wrong?'});
   $('#fbsend').onclick=async()=>{const m=$('#fbmsg').value.trim();if(m.length<4){toast('Tell me a little about it first');$('#fbmsg').focus();return}
     if(Date.now()-fbLast<60e3){toast('Thanks — you can send another in a minute');return}
     if(!FBF.form){toast('Reports aren’t switched on yet — coming very soon');return}
     const b=$('#fbsend');b.disabled=true;b.textContent='Sending…';
-    try{await fetch(`https://docs.google.com/forms/d/e/${FBF.form}/formResponse`,{method:'POST',mode:'no-cors',body:new URLSearchParams({[FBF.type]:k==='idea'?'Idea':'Problem',[FBF.msg]:m,[FBF.contact]:$('#fbwho').value.trim(),[FBF.diag]:fbDiag()})});
+    try{await fetch(`https://docs.google.com/forms/d/e/${FBF.form}/formResponse`,{method:'POST',mode:'no-cors',body:new URLSearchParams({[FBF.type]:k==='idea'?'Idea':'Problem',[FBF.msg]:m,[FBF.contact]:$('#fbwho').value.trim(),[FBF.diag]:(k==='bug'&&(qa.often||qa.part)?`How often: ${qa.often||'—'} · Part: ${qa.part||'—'}\n`:'')+fbDiag()})});
       fbLast=Date.now();closeSheet();toast(k==='idea'?'💡 Thanks! Your idea has been sent':'🐞 Thanks! Your report has been sent')}
     catch{b.disabled=false;b.innerHTML=ic('share')+'Send';toast('Couldn’t send — check your connection and try again')}}}
 function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px">‹ Settings</button><h3>Help &amp; FAQ</h3>
