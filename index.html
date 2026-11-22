@@ -961,8 +961,13 @@ function eqSheet(){const c=eqCur();sheet(`<h3>Sound</h3><p class="dim" style="fo
 setTimeout(()=>{try{if(eqOK())NAT.setEq(eqCur())}catch{}},1500);
 /* ---------- "What was that song?" — history of song titles heard (from stations that send them) ---------- */
 const SJUNK=/^(advert(isement)?s?|ad ?break|commercials?|jingle|news|traffic( news)?|weather|station id|unknown|untitled|live|on air|-|–)$/i;
+const sKey=t=>[...new Set(sNorm(String(t).replace(/[\(\[][^\)\]]*[\)\]]/g,' ').replace(/\b(radio edit|edit|remaster(ed)?|feat|ft|official|version|mix)\b/gi,' ')).split(' ').filter(w=>w.length>1))].sort().join(' ');
+/* Tidy any duplicates saved before this check existed. */
+(()=>{try{const h=LS.get('songs',[]);if(!h.length)return;const out=[];h.forEach(x=>{const k=sKey(x.s);if(!out.some(y=>sKey(y.s)===k&&Math.abs(y.t-x.t)<3*36e5))out.push(x)});if(out.length!==h.length)LS.set('songs',out)}catch{}})();
 function logSong(){if(!song||!cur)return;const t=song.trim();if(t.length<3||SJUNK.test(t)||t.toLowerCase()===String(cur.n).toLowerCase())return;
-  const h=LS.get('songs',[]),last=h[0];if(last&&last.s===t&&last.u===cur.u)return;if(h.some(x=>x.s===t&&x.u===cur.u&&Date.now()-x.t<20*6e4))return;
+  const h=LS.get('songs',[]),k=sKey(t);if(!k)return;
+  // Same song (ignoring case, punctuation, "(Radio Edit)" etc. and artist/title order) heard in the last 3 hours on any station? Just refresh its time.
+  const i=h.findIndex(x=>sKey(x.s)===k&&Date.now()-x.t<3*36e5);if(i>=0){if(i===0)return;h.splice(i,1)}
   h.unshift({s:t,n:cur.n,u:cur.u,f:cur.fav||'',t:Date.now()});LS.set('songs',h.slice(0,300));if(view==='library'&&$('#songsec'))$('#songsec').outerHTML=songsH()}
 const sOpen=u=>{if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
 const sYT=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q),sSP=q=>'https://open.spotify.com/search/'+encodeURIComponent(q);
