@@ -66,7 +66,7 @@ def to_beta(d):
     """Copy the test web app and (if newer) the test APK to beta. Returns (build, changed)."""
     n, last = build_of(TAGS["test"]), build_of(TAGS["beta"])
     web = webcopy("test", "beta")
-    native = bool(n) and n > last
+    native = bool(n) and n > last and "--web-only" not in sys.argv
     if native:
         sh("gh", "release", "download", TAGS["test"], "-p", "nightjar-radio-beta.apk", "-O", "nightjar-radio.apk", "--clobber")
         if last:  # keep the outgoing beta build's download count before its file is replaced
