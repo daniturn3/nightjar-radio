@@ -1326,12 +1326,13 @@ function alarmChecks(){const q=(f,d)=>{try{return f()}catch{return d}};const mk=
   if(NAT.notifOk&&!q(()=>NAT.notifOk(),true))rows.push(['al_ntf','🔔','Allow notifications','Needed to show the wake-up screen']);
   if(NAT.fullScreenOk&&!q(()=>NAT.fullScreenOk(),true))rows.push(['al_fs','📱','Allow the wake-up screen','Lets the alarm light up your phone, even when locked']);
   if(!q(()=>NAT.batteryOk(),true))rows.push(['al_bat','🔋','Allow running in the background','So your phone doesn’t put the alarm to sleep']);
+  if(NAT.openMiuiBattery&&/xiaomi|redmi|poco/.test(mk))rows.push(['al_miui','🔋','Battery saver → “No restrictions”','Xiaomi holds back alarms while the screen is off unless Nightjar Radio has no battery restrictions']);
   if(NAT.openAutostart&&/xiaomi|redmi|poco|oppo|realme|oneplus|vivo|huawei|honor/.test(mk))rows.push(['al_auto','🚀','Turn on Autostart',`${/xiaomi|redmi|poco/.test(mk)?'Xiaomi, Redmi and POCO phones':'Your phone'} block alarms from waking apps unless Autostart is on for Nightjar Radio`]);
   return`<div class="alchk">${rows.length?`<div class="mono" style="margin:16px 0 8px;color:#ffb36b">Make sure it rings</div>${rows.map(([id,e,t,d])=>`<button class="alfix" id="${id}"><span>${e}</span><div><b>${t}</b><small>${d}</small></div><i>›</i></button>`).join('')}`:''}
   ${NAT.testAlarm?`<button class="pill" id="al_test" style="margin-top:12px">⏰ Test it — rings in 1 minute</button><p class="dim" style="font-size:12px;margin:6px 0 0">Tap test, lock your phone and wait. It should light up and start playing.</p>`:''}${NAT.alarmLog?'<div id="alrep"></div>':''}</div>`}
 function alarmRep(){const el=$('#alrep');if(!el||!NAT.alarmLog)return;let a=[];try{a=JSON.parse(NAT.alarmLog()||'[]')}catch{}if(!a.length){el.innerHTML='';return}
   const tm=t=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  el.innerHTML=`<div class="alrep"><div class="mono" style="margin-bottom:6px">Alarm report</div>${a.map(x=>`<div class="${/BLOCKED|NOT|OFF|error|couldn/i.test(x.m)?'bad':''}"><i>${tm(x.t)}</i>${esc(x.m)}</div>`).join('')}<p class="dim" style="font-size:11.5px;margin:8px 0 0">If something went wrong, screenshot this and send it to the developer.</p></div>`}
+  el.innerHTML=`<div class="alrep"><div class="mono" style="margin-bottom:6px">Alarm report</div>${a.map(x=>`<div class="${/BLOCKED|NOT|OFF|LATE|error|couldn/i.test(x.m)?'bad':''}"><i>${tm(x.t)}</i>${esc(x.m)}</div>`).join('')}<p class="dim" style="font-size:11.5px;margin:8px 0 0">If something went wrong, screenshot this and send it to the developer.</p></div>`}
 function alarmText(t){const el=$('#al_next');if(!el)return;if(!t||!S.alarm.on){el.textContent=S.alarm.on?'Pick at least one day':'Alarm off';return}
   const d=new Date(t),mins=Math.round((t-Date.now())/6e4),hh=Math.floor(mins/60),mm=mins%60,today=new Date().toDateString()===d.toDateString(),tom=new Date(Date.now()+864e5).toDateString()===d.toDateString();
   el.textContent=`Rings ${today?'today':tom?'tomorrow':d.toLocaleDateString('en-GB',{weekday:'long'})} at ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · in ${hh?hh+'h ':''}${mm}m`}
@@ -1350,6 +1351,7 @@ function alarmWire(){if(!NAT||!$('.alarm'))return;const a=S.alarm;alarmText(a.on
   if($('#al_bat'))$('#al_bat').onclick=()=>{NAT.askBattery();back()};
   if($('#al_ntf'))$('#al_ntf').onclick=()=>{NAT.askNotif();back()};
   if($('#al_fs'))$('#al_fs').onclick=()=>{NAT.askFullScreen();back()};
+  if($('#al_miui'))$('#al_miui').onclick=()=>{NAT.openMiuiBattery();toast('Choose “No restrictions”',4000)};
   if($('#al_auto'))$('#al_auto').onclick=()=>{NAT.openAutostart();toast('Find Nightjar Radio and switch Autostart on',4000)};
   if($('#al_test'))$('#al_test').onclick=()=>{if(!S.alarm.st){toast('Choose a station first');return}NAT.testAlarm();alarmRep();toast('⏰ Test alarm in 1 minute — lock your phone now',4500)};
   alarmRep();clearInterval(window.__alrT);window.__alrT=setInterval(()=>{if(view!=='library')return clearInterval(window.__alrT);alarmRep()},5000)}
