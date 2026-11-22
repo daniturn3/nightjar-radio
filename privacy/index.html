@@ -7,8 +7,7 @@
 <meta name="description" content="How Nightjar Radio handles your information: no account, no ads, no tracking.">
 <meta name="theme-color" content="#0b0b14">
 <link rel="icon" href="../icon-192.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../fonts/fonts.css">
 <style>
 :root{--bg:#0b0b14;--card:#15151f;--ink:#f3ecdf;--mut:#a7a3b5;--line:rgba(255,255,255,.09);--amb:#ffb36b;--grn:#86d9a8}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
@@ -45,7 +44,7 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
 </div>
 
 <h2>Who runs Nightjar Radio</h2>
-<p>Nightjar Radio is a free hobby project made in the UK by an independent developer. It isn’t a company, and it isn’t affiliated with any radio station, broadcaster or Rockstar Games.</p>
+<p>Nightjar Radio is a free hobby project made in the UK by an independent developer. It isn’t a company, and it isn’t affiliated with, endorsed by or sponsored by any radio station or broadcaster, ESPN, TheSportsDB, radio-browser.info, Rockstar Games, the IOC or IPC, FIFA, UEFA, World Rugby, the ICC or any other sports body. Names of stations, teams and tournaments are used only to describe what’s on. You can contact me on Reddit at <a href="https://www.reddit.com/user/Daniturn1" target="_blank" rel="noopener">u/Daniturn1</a>.</p>
 
 <h2>What’s stored on your device</h2>
 <p>Everything you set up in the app is saved only on your phone (or in your browser, if you use the web version):</p>
@@ -64,8 +63,9 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
 <tr><td><b>radio-browser.info</b><br><span class="note">community station directory</span></td><td>Finding stations, search, popular lists</td><td>Your searches and the country you browse. When you play a station, the app tells the directory it was played (this powers its popularity charts). For “Near you”, your position <b>rounded to about 1 km</b>.</td></tr>
 <tr><td><b>The radio stations</b></td><td>Playing the stream you choose</td><td>The connection needed to stream audio. For song titles in lists, the app briefly connects to those stations too.</td></tr>
 <tr><td><b>ESPN</b> (public scores feed)</td><td>Live scores on the Sport tab</td><td>A request for that day’s fixtures and scores for the sport and leagues you’re viewing</td></tr>
-<tr><td><b>Google</b></td><td>Station logos (icon service), fonts, and Cast</td><td>The station website a logo is fetched for; font downloads; and, only if you use Cast, the station sent to your Chromecast or Google speaker</td></tr>
+<tr><td><b>Google</b></td><td>Station logos (icon service) and Cast</td><td>The station website a logo is fetched for; and, only if you use Cast, the station sent to your Chromecast or Google speaker</td></tr>
 <tr><td><b>Google Forms</b></td><td>Problem reports and ideas — <b>only when you tap Send</b></td><td>What you type, a name or username if you choose to add one, and the details shown on the report screen before sending (app version, phone model and Android version, country setting, the station playing, recent error messages)</td></tr>
+<tr><td><b>ntfy.sh</b></td><td>Passing a new problem report or idea to my phone as a notification</td><td>A short copy of the report (what you wrote, how often / which part, your name if added, and the app version)</td></tr>
 <tr><td><b>GitHub</b></td><td>Hosting the app’s pages and checking for updates</td><td>Standard web requests when the app loads or checks for a new version</td></tr>
 <tr><td><b>YouTube / Spotify / Buy Me a Coffee</b></td><td>Only if you tap a link to them</td><td>Whatever you do there is covered by their own policies</td></tr>
 </table>
@@ -79,8 +79,17 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
 <li><b>Battery optimisation</b> (only if you allow it) — so the alarm and background play aren’t stopped by your phone.</li>
 </ul>
 
+<h2>Problem reports and ideas</h2>
+<p>If you send a report or idea from the app, it’s stored in a private Google spreadsheet that only I can see, and a short copy is sent to my phone through ntfy.sh. I use reports only to fix problems and improve the app — never for marketing, and they’re never sold or shared.</p>
+<ul>
+<li><b>What’s included:</b> exactly what’s shown on the report screen before you tap Send. Adding a name or username is optional.</li>
+<li><b>Why:</b> you choose to send it, and I have a legitimate interest in fixing the app you’re using.</li>
+<li><b>How long it’s kept:</b> reports are deleted within 12 months of being sent.</li>
+<li><b>Your rights:</b> you can ask to see, correct or delete a report you sent — message me on Reddit (<a href="https://www.reddit.com/user/Daniturn1" target="_blank" rel="noopener">u/Daniturn1</a>) with roughly when you sent it and what it said. You can also complain to the UK Information Commissioner’s Office (<a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener">ico.org.uk</a>).</li>
+</ul>
+
 <h2>Children</h2>
-<p>Nightjar Radio isn’t aimed at children and doesn’t knowingly collect information from anyone — it doesn’t collect personal information at all.</p>
+<p>Nightjar Radio isn’t aimed at children. Apart from problem reports you choose to send, it doesn’t collect personal information at all — please don’t include personal details in a report.</p>
 
 <h2>Your choices</h2>
 <ul>
@@ -93,9 +102,9 @@ footer{margin-top:44px;padding-top:18px;border-top:1px solid var(--line);font-si
 <p>If this policy changes, the new version will appear on this page with a new date.</p>
 
 <h2>Questions</h2>
-<p>Use the feedback link in the app’s Settings, or the community linked from the <a href="../get/">download page</a>.</p>
+<p>Message me on Reddit at <a href="https://www.reddit.com/user/Daniturn1" target="_blank" rel="noopener">u/Daniturn1</a>, or use <b>Report a problem</b> in the app’s Settings.</p>
 
-<footer><span>Nightjar Radio · Made in the UK 🇬🇧</span><a href="../get/">Download</a><a href="../">Open the web app</a></footer>
+<footer><span>Nightjar Radio · Made in the UK 🇬🇧</span><a href="../terms/">Terms of use</a><a href="../credits/">Credits &amp; licences</a><a href="../get/">Download</a><a href="../">Open the web app</a></footer>
 </main>
 </body>
 </html>

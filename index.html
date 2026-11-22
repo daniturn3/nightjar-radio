@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <base href="/nightjar-radio/">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src * data: blob:; media-src * data: blob:; connect-src *; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src * data: blob:; media-src * data: blob:; connect-src *; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <script>/* Web channels: the app shows Stable (this folder's root), Beta (beta/) or Test (next/) — see CLAUDE.md */
 window.ROOT='https://daniturn3.github.io/nightjar-radio/';window.WEBCH=/\/nightjar-radio\/next\//.test(location.pathname)?'test':/\/nightjar-radio\/beta\//.test(location.pathname)?'beta':'stable';
@@ -16,9 +16,7 @@ window.njrRoute=function(){try{if(!window.NJR)return;var L=localStorage,want=L.g
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <title>Nightjar Radio — live radio after dark</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
 :root{--bg:#0c0e16;--bg2:#121522;--card:#171a28;--line:rgba(234,242,255,.09);--cream:#f3ecdf;--mut:#a3a7b8;--dim:#676c80;
   --acc:#ffb347;--acc2:#ffd08a;--cor:#ff6b4a;--sky:#86b4ff;--serif:'Fraunces',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace;
