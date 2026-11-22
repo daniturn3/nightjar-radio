@@ -1,0 +1,17 @@
+name: Update stable app
+# Every day: moves the newest beta build that has been out for 10+ days to the Stable channel.
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: radio-android
+jobs:
+  stable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Promote to stable if due
+        env: { GH_TOKEN: '${{ github.token }}', STABLE_AFTER_DAYS: '10' }
+        run: python3 .github/scripts/channels.py auto-stable
