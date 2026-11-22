@@ -432,6 +432,10 @@ body.playing .onair i{background:#fff;box-shadow:0 0 8px #fff;animation:oap 1.6s
 .alrep{margin-top:14px;padding:12px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:12.5px;line-height:1.45}.alrep>div:not(.mono){padding:3px 0;color:#cfe8d8}.alrep i{font-style:normal;font-family:var(--mono);color:var(--mut);margin-right:8px;font-size:11px}.alrep .bad{color:#ff9b8f}
 #brand small.btest{white-space:nowrap;letter-spacing:.06em;background:linear-gradient(90deg,#ff9ccc,#ffb36b);color:#1a0f05;border-color:transparent;font-weight:700}
 .hios{padding-left:20px;line-height:1.55}.hios li{margin:0 0 12px;color:#dcd6ca}
+.fxsp{display:flex;gap:6px;overflow-x:auto;padding:0 12px 10px;scrollbar-width:none}.fxsp::-webkit-scrollbar{display:none}.fxsp button{flex:none;font:inherit;font-size:12.5px;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--mut);white-space:nowrap}
+.fxsp button.on{background:rgba(134,217,168,.16);border-color:rgba(134,217,168,.55);color:var(--cream)}.fxres{font-size:12px;color:#86d9a8}
+.fxb{padding:8px 0;border-top:1px solid var(--line)}.fxlg+.fxb{border-top:0}.fxbh{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);margin-bottom:4px}.fxbh b{font-weight:500}
+.fxbr{display:flex;align-items:center;gap:10px;font-size:14px;padding:3px 0}.fxbr em{font:normal 600 11.5px var(--mono);color:var(--mut);width:30px}.fxbr span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fxbr b{font:600 13.5px var(--mono);color:#86d9a8}
 .spnote{background:rgba(255,255,255,.03)}.fx{border-radius:22px;box-shadow:0 10px 28px -18px rgba(80,220,150,.5)}
 .spnote{margin:12px 0 4px;padding:12px 14px;border-radius:16px;font-size:13px;line-height:1.5;color:var(--mut);background:rgba(255,255,255,.035);border:1px solid var(--line)}
 .splist{display:flex;flex-direction:column;gap:8px}.sprow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
@@ -840,34 +844,78 @@ async function fxDb(cc,days){const cn=cName(cc),uk={GB:['England','Scotland','Wa
   const mine=all.filter(e=>uk.includes(e.strCountry)),use=mine.length?mine:all;
   return use.map(e=>({id:e.idEvent,t:Date.parse((e.strTimestamp||e.dateEvent+'T'+(e.strTime||'00:00:00')).replace(/(\+00:00)?$/,'')+'Z'),h:e.strHomeTeam,a:e.strAwayTeam,hs:e.intHomeScore??'',as:e.intAwayScore??'',
     s:/FT|AET|PEN|Match Finished/i.test(e.strStatus||'')?'post':/Postp|Cancel/i.test(e.strStatus||'')?'off':(e.intHomeScore!=null&&Date.parse(e.strTimestamp+'Z')<Date.now()?'in':'pre'),clk:'',lg:e.strLeague||'Football',o:0}))}
-let fxBusy=null,fxDay=0;
-async function fxLoad(force){const k=S.country+'|'+ymd(new Date()),c0=LS.get('fx',null),c=c0&&c0.k===k?c0:null,live=c&&c.ev.some(e=>e.s==='in'),age=c?Date.now()-c.at:1e12;
+/* ---------- Live scores for many sports (ESPN public feed). Football keeps its own country-league logic above. ---------- */
+const SPORTS={soccer:['⚽','Football'],rugby:['🏉','Rugby'],f1:['🏎️','F1'],golf:['⛳','Golf'],tennis:['🎾','Tennis'],ufc:['🥊','UFC'],nfl:['🏈','NFL'],nba:['🏀','NBA'],nhl:['🏒','NHL'],mlb:['⚾','MLB']};
+const SPORDER={US:'nfl nba soccer nhl mlb golf tennis f1 ufc rugby',CA:'nhl nfl nba mlb soccer golf tennis f1 ufc rugby',AU:'rugby soccer f1 tennis golf nba ufc nfl nhl mlb',NZ:'rugby soccer f1 tennis golf nba ufc nfl nhl mlb',ZA:'rugby soccer f1 golf tennis ufc nba nfl nhl mlb',
+  FR:'soccer rugby f1 tennis golf nba ufc nfl nhl mlb',IE:'soccer rugby golf f1 tennis ufc nfl nba nhl mlb',GB:'soccer rugby f1 golf tennis ufc nfl nba nhl mlb'};
+const spOrder=()=>(SPORDER[S.country]||'soccer f1 tennis golf rugby nba ufc nfl nhl mlb').split(' ');
+const RUGLG='267979 180659 270557 271937 270559 289234 244293 242041'.split(' ');
+const TEAMP={nfl:['football/nfl'],nba:['basketball/nba'],nhl:['hockey/nhl'],mlb:['baseball/mlb'],rugby:RUGLG.map(x=>'rugby/'+x)};
+const SOLOP={f1:['racing/f1'],golf:['golf/pga','golf/eur'],tennis:['tennis/atp','tennis/wta'],ufc:['mma/ufc']};
+let fxBusy={},fxDay=0,fxSport=LS.get('fxSport','');
+async function espnGet(path,d){try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),9000);const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/${path}/scoreboard${d?'?dates='+d:''}`,{signal:ctl.signal});clearTimeout(tm);
+  if(r.status===400)return{events:[]};return r.ok?await r.json():null}catch{return null}}
+const espnState=st=>/POSTPONED|CANCELED|CANCELLED|SUSPENDED|DELAYED/.test(st?.name||'')?'off':st?.state||'pre';
+function espnTeam(j,li,path){const ln=fxTidy(j.leagues?.[0]?.abbreviation||j.leagues?.[0]?.name||path);
+  return(j.events||[]).map(e=>{const c=e.competitions?.[0]||{},cs=c.competitors||[],h=cs.find(x=>x.homeAway==='home')||cs[0]||{},a=cs.find(x=>x.homeAway==='away')||cs[1]||{},st=e.status?.type||{};
+    const nm=x=>x.team?.shortDisplayName||x.team?.displayName||x.athlete?.displayName||'?';
+    return{id:e.id,t:Date.parse(e.date),h:nm(h),a:nm(a),hs:h.score??'',as:a.score??'',s:espnState(st),clk:st.state==='in'?(/HALF/.test(st.name||'')?'HT':st.shortDetail||e.status?.displayClock||''):'',lg:ln,o:li}})}
+const F1S={FP1:'Practice 1',FP2:'Practice 2',FP3:'Practice 3',Qual:'Qualifying',SS:'Sprint Shootout',SQ:'Sprint Qualifying',Sprint:'Sprint',Race:'Race'};
+function espnSolo(sp,j,li){const out=[];(j.events||[]).forEach(e=>{const lgn=fxTidy(e.shortName&&sp==='golf'?e.name:e.name||'');
+  if(sp==='f1')(e.competitions||[]).forEach((c,ci)=>{const st=c.status?.type||{},ab=c.type?.abbreviation||'',cs=[...(c.competitors||[])].sort((x,y)=>(x.order||99)-(y.order||99)),top=cs[0]?.athlete?.displayName||'';
+    out.push({k:'solo',id:e.id+'_'+ci,t:Date.parse(c.date||e.date),lg:lgn,ttl:F1S[ab]||c.type?.text||ab||'Session',s:espnState(st),res:st.state==='post'&&top?'🏆 '+top:st.state==='in'&&top?'Leading: '+top:'',o:li})});
+  else if(sp==='golf'){const c=e.competitions?.[0]||{},st=e.status?.type||c.status?.type||{},cs=[...(c.competitors||[])].sort((x,y)=>(x.order||999)-(y.order||999)).slice(0,5);
+    out.push({k:'board',id:e.id,t:Date.parse(e.date),te:Date.parse(e.endDate||e.date)+864e5,lg:lgn,ttl:st.state==='pre'?'Starts '+new Date(Date.parse(e.date)).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}):st.detail||st.shortDetail||'',s:espnState(st),
+      rows:cs.map((x,i)=>[x.status?.position?.displayName||String(x.order||i+1),x.athlete?.displayName||x.athlete?.shortName||'?',typeof x.score==='object'?x.score?.displayValue:x.score??'']),o:li})}
+  else{const groups=e.groupings?.length?e.groupings.filter(g=>!/doubles/i.test(g.grouping?.displayName||'')):[{grouping:{displayName:''},competitions:e.competitions||[]}];
+    groups.forEach(g=>(g.competitions||[]).forEach(c=>{const st=c.status?.type||{},cs=c.competitors||[],[h,a]=[cs[0]||{},cs[1]||{}];
+      const nm=x=>x.athlete?.displayName||x.athlete?.shortName||x.roster?.displayName||x.team?.displayName||'TBC';
+      const sets=x=>(x.linescores||[]).map(l=>l.value??l.displayValue).filter(v=>v!=null&&v!=='').join(' ');
+      const win=x=>x.winner?'✓':'';const ten=sp==='tennis';
+      out.push({id:c.id||e.id+nm(h),t:Date.parse(c.date||c.startDate||e.date),h:nm(h),a:nm(a),hs:ten?sets(h):win(h),as:ten?sets(a):win(a),s:espnState(st),clk:st.state==='in'?(st.shortDetail||'Live'):'',
+        lg:lgn+(g.grouping?.displayName?' · '+g.grouping.displayName:''),o:li})}))}});return out}
+async function fxOther(sp,days){const ds=espnDates(days);let ok=0,ev=[];
+  if(TEAMP[sp]){const r=await Promise.all(TEAMP[sp].flatMap((p,li)=>ds.map(d=>espnGet(p,d).then(j=>{if(j){ok++;return espnTeam(j,li,p)}return[]}))));ev=r.flat()}
+  else{const r=await Promise.all(SOLOP[sp].map((p,li)=>espnGet(p).then(j=>{if(j){ok++;return espnSolo(sp,j,li)}return[]})));ev=r.flat()}
+  if(!ok)throw new Error('espn');return ev}
+async function fxLoad(force){const sp=fxSport,key=sp==='soccer'?'fx':'fx_'+sp,k=S.country+'|'+ymd(new Date()),c0=LS.get(key,null),c=c0&&c0.k===k?c0:null,live=c&&c.ev.some(e=>e.s==='in'),age=c?Date.now()-c.at:1e12;
   const need=fxDay?[0,1]:[0],have=c?c.days||[0]:[],miss=need.filter(n=>!have.includes(n)),stale=force||age>(live?120e3:600e3);
-  if(c&&!stale&&!miss.length)return c;if(fxBusy)return fxBusy;const get=stale?need:miss;
-  fxBusy=(async()=>{let ev,src='ESPN';try{ev=await fxEspn(S.country,get)}catch{try{ev=await fxDb(S.country,get);src='TheSportsDB'}catch{ev=null}}
-    fxBusy=null;if(!ev)return c?Object.assign({},c,{stale:1}):null;
-    if(c&&!stale)ev=c.ev.concat(ev);const seen=new Set();ev=ev.filter(e=>e.t&&!seen.has(e.id)&&seen.add(e.id));
-    const o={k,at:stale||!c?Date.now():c.at,days:stale||!c?get:[...new Set(have.concat(get))],src,ev};LS.set('fx',o);return o})();return fxBusy}
-const fxOn=(e,n)=>ymd(new Date(e.t))===ymd(dOff(n));
-function fxRows(o,n){const ev=o.ev.filter(e=>fxOn(e,n)).sort((a,b)=>a.o-b.o||a.t-b.t);if(!ev.length)return`<div class="fxnone">No ${n?'matches tomorrow':'more matches today'} in the leagues we follow for ${esc(cName(S.country))}.</div>`;
-  let lg='',h='';ev.forEach(e=>{if(e.lg!==lg){lg=e.lg;h+=`<div class="fxlg">${esc(lg)}</div>`}
-    const tm=new Date(e.t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),sc=e.s==='in'||e.s==='post';
-    const left=e.s==='in'?`<em class="lv">${esc(e.clk||'Live')}</em>`:e.s==='post'?'<em>FT</em>':e.s==='off'?'<em>P–P</em>':`<em>${tm}</em>`;
-    h+=`<div class="fxm${e.s==='in'?' in':''}">${left}<div><span>${esc(e.h)}</span><span>${esc(e.a)}</span></div>${sc?`<b>${esc(e.hs)}<br>${esc(e.as)}</b>`:''}</div>`});return h}
-function fxSub(o){if(!o)return'Fixtures unavailable right now';const t=o.ev.filter(e=>fxOn(e,0)),lv=t.filter(e=>e.s==='in').length,tm=(o.days||[]).includes(1)?o.ev.filter(e=>fxOn(e,1)).length:0;
-  return t.length?`${t.length} match${t.length>1?'es':''} today${lv?` · <i class="lvdot"></i>${lv} live`:''}`:tm?`No matches today · ${tm} tomorrow`:'No matches today — check Tomorrow'}
-function fxH(){return`<details class="fx" id="fx"${LS.get('fxOpen',false)?' open':''}><summary><span class="spb">⚽</span><div><b>Football · ${esc(cName(S.country))}</b><span id="fxsub">Checking today’s matches…</span></div><i class="fxchev">▾</i></summary>
+  if(c&&!stale&&(!miss.length||SOLOP[sp]))return c;if(fxBusy[sp])return fxBusy[sp];const get=stale?need:miss;
+  fxBusy[sp]=(async()=>{let ev,src='ESPN';try{ev=sp==='soccer'?await fxEspn(S.country,get):await fxOther(sp,SOLOP[sp]?[0,1]:get)}catch{try{ev=sp==='soccer'?await fxDb(S.country,get):null;src='TheSportsDB'}catch{ev=null}}
+    fxBusy[sp]=null;if(!ev)return c?Object.assign({},c,{stale:1}):null;
+    if(c&&!stale&&!SOLOP[sp])ev=c.ev.concat(ev);const seen=new Set();ev=ev.filter(e=>e.t&&!seen.has(e.id)&&seen.add(e.id));
+    const o={k,at:stale||!c?Date.now():c.at,days:SOLOP[sp]?[0,1]:stale||!c?get:[...new Set(have.concat(get))],src,ev};LS.set(key,o);return o})();return fxBusy[sp]}
+const dayRange=n=>{const a=dOff(n);a.setHours(0,0,0,0);return[a.getTime(),a.getTime()+864e5]};
+const fxOn=(e,n)=>{if(e.k==='board'){const[a,b]=dayRange(n);return e.s==='in'?n===0:e.t<b&&e.te>a}return ymd(new Date(e.t))===ymd(dOff(n))};
+const fxTm=t=>new Date(t).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+function fxRow(e){if(e.k==='board')return`<div class="fxb${e.s==='in'?' in':''}"><div class="fxbh"><b>${esc(e.ttl||'')}</b>${e.s==='in'?'<i class="lvdot"></i>':''}</div>${e.rows.length&&e.s!=='pre'?e.rows.map(r=>`<div class="fxbr"><em>${esc(r[0])}</em><span>${esc(r[1])}</span><b>${esc(r[2]??'')}</b></div>`).join(''):''}</div>`;
+  if(e.k==='solo'){const left=e.s==='in'?'<em class="lv">Live</em>':e.s==='post'?'<em>Done</em>':e.s==='off'?'<em>Off</em>':`<em>${fxTm(e.t)}</em>`;
+    return`<div class="fxm${e.s==='in'?' in':''}">${left}<div><span>${esc(e.ttl)}</span>${e.res?`<span class="fxres">${esc(e.res)}</span>`:''}</div></div>`}
+  const sc=e.s==='in'||e.s==='post',left=e.s==='in'?`<em class="lv">${esc(e.clk||'Live')}</em>`:e.s==='post'?`<em>${fxSport==='soccer'||fxSport==='rugby'?'FT':'Final'}</em>`:e.s==='off'?'<em>P–P</em>':`<em>${fxTm(e.t)}</em>`;
+  return`<div class="fxm${e.s==='in'?' in':''}">${left}<div><span>${esc(e.h)}</span><span>${esc(e.a)}</span></div>${sc&&(e.hs!==''||e.as!=='')?`<b>${esc(e.hs)}<br>${esc(e.as)}</b>`:''}</div>`}
+function fxRows(o,n){const ev=o.ev.filter(e=>fxOn(e,n)).sort((a,b)=>a.o-b.o||a.t-b.t);
+  if(!ev.length){const nx=o.ev.filter(e=>e.t>Date.now()&&e.s==='pre').sort((a,b)=>a.t-b.t)[0];
+    return`<div class="fxnone">Nothing ${n?'tomorrow':'more today'}${fxSport==='soccer'?` in the leagues we follow for ${esc(cName(S.country))}`:''}.${nx?`<br>Next: <b>${esc(nx.lg)}</b>${nx.ttl&&nx.k!=='board'?' · '+esc(nx.ttl):''} · ${new Date(nx.t).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} ${fxTm(nx.t)}`:''}</div>`}
+  let lg='',h='';ev.forEach(e=>{if(e.lg!==lg){lg=e.lg;h+=`<div class="fxlg">${esc(lg)}</div>`}h+=fxRow(e)});return h}
+function fxSub(o){if(!o)return'Scores unavailable right now';const t=o.ev.filter(e=>fxOn(e,0)),lv=t.filter(e=>e.s==='in').length,tm=(o.days||[]).includes(1)?o.ev.filter(e=>fxOn(e,1)).length:0,w=fxSport==='soccer'||TEAMP[fxSport]||fxSport==='tennis'||fxSport==='ufc'?['match','matches']:['event','events'];
+  if(/nfl|nba|nhl|mlb/.test(fxSport))w[0]='game',w[1]='games';  if(fxSport==='ufc')w[0]='fight',w[1]='fights';if(fxSport==='f1')w[0]='session',w[1]='sessions';
+  return t.length?`${t.length} ${t.length>1?w[1]:w[0]} today${lv?` · <i class="lvdot"></i>${lv} live`:''}`:tm?`Nothing today · ${tm} tomorrow`:`No ${w[1]} today — check Tomorrow`}
+function fxH(){const ord=spOrder();if(!SPORTS[fxSport])fxSport=ord[0];const [ic,nm]=SPORTS[fxSport];
+  return`<details class="fx" id="fx"${LS.get('fxOpen',false)?' open':''}><summary><span class="spb" id="fxic">${ic}</span><div><b>Live scores · <span id="fxnm">${nm}</span></b><span id="fxsub">Checking today…</span></div><i class="fxchev">▾</i></summary>
+  <div class="fxsp">${ord.map(id=>`<button data-fxs="${id}" class="${id===fxSport?'on':''}">${SPORTS[id][0]} ${SPORTS[id][1]}</button>`).join('')}</div>
   <div class="fxtabs"><button data-fxd="0" class="${fxDay?'':'on'}">Today</button><button data-fxd="1" class="${fxDay?'on':''}">Tomorrow</button></div><div id="fxbody">${skRows(3)}</div>
   <div class="fxfoot"><span id="fxupd"></span><button data-fxgo>Find sports radio ›</button></div></details>`}
 function fxPaint(o){const sub=$('#fxsub'),b=$('#fxbody');if(!sub)return;sub.innerHTML=fxSub(o);
-  if(!o){b.innerHTML='<div class="fxnone">Couldn’t reach the fixtures service. Check your connection, or try again in a bit.</div>';$('#fxupd').textContent='';return}
+  if(!o){b.innerHTML='<div class="fxnone">Couldn’t reach the scores service. Check your connection, or try again in a bit.</div>';$('#fxupd').textContent='';return}
   b.innerHTML=fxRows(o,fxDay);$('#fxupd').textContent=`Your local times · updated ${new Date(o.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${o.stale?' (offline)':''}`}
-function fxWire(tok){const d=$('#fx');if(!d)return;
-  d.addEventListener('toggle',()=>{LS.set('fxOpen',d.open);if(d.open)fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})});
-  d.querySelectorAll('[data-fxd]').forEach(b=>b.onclick=()=>{fxDay=+b.dataset.fxd;d.querySelectorAll('[data-fxd]').forEach(x=>x.classList.toggle('on',x===b));fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})});
+function fxWire(tok){const d=$('#fx');if(!d)return;const go=()=>{const sp=fxSport;fxLoad().then(o=>{if(tok===renderTok&&sp===fxSport)fxPaint(o)})};
+  d.addEventListener('toggle',()=>{LS.set('fxOpen',d.open);if(d.open)go()});
+  d.querySelectorAll('[data-fxs]').forEach(b=>b.onclick=()=>{fxSport=b.dataset.fxs;LS.set('fxSport',fxSport);d.querySelectorAll('[data-fxs]').forEach(x=>x.classList.toggle('on',x===b));
+    $('#fxic').textContent=SPORTS[fxSport][0];$('#fxnm').textContent=SPORTS[fxSport][1];$('#fxbody').innerHTML=skRows(3);$('#fxsub').textContent='Checking today…';go()});
+  d.querySelectorAll('[data-fxd]').forEach(b=>b.onclick=()=>{fxDay=+b.dataset.fxd;d.querySelectorAll('[data-fxd]').forEach(x=>x.classList.toggle('on',x===b));go()});
   d.querySelector('[data-fxgo]').onclick=()=>$('#spcc')?.scrollIntoView({behavior:'smooth',block:'start'});
-  fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)});
-  const iv=setInterval(()=>{if(tok!==renderTok||!document.body.contains(d))return clearInterval(iv);if(!document.hidden&&d.open)fxLoad().then(o=>{if(tok===renderTok)fxPaint(o)})},60e3)}
+  go();
+  const iv=setInterval(()=>{if(tok!==renderTok||!document.body.contains(d))return clearInterval(iv);if(!document.hidden&&d.open)go()},60e3)}
 const scard=(html,ic,a,b)=>html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${a};--b:${b};--hc:${a}">`).replace(/<h2><i>[^<]*<\/i>/,`<h2><span class="hico">${ic}</span>`);
 VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];
   el.innerHTML=`<div class="hero"><div class="mono">Sports radio</div><h1>Sport<b>.</b></h1></div>
@@ -1388,8 +1436,9 @@ function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.query
 function npScan(){if(!npOK())return;npPaint();npButtons();if(view==='home'||view==='library')npPeek(npAuto())}
 let npT=0;if(npOK()){new MutationObserver(()=>{clearTimeout(npT);npT=setTimeout(npScan,250)}).observe(document.getElementById('view'),{childList:true,subtree:true});
   setInterval(()=>{if(!document.hidden&&(view==='home'||view==='library'))npPeek(npAuto())},60e3)}
-const RV=14;
+const RV=15;
 const NEWS=[
+  {v:15,i:'🏆',c:'var(--h-green)',t:'Live scores for more sports',d:'The Sport tab’s fold-out now covers Football, Rugby, F1, Golf, Tennis, UFC, NFL, NBA, NHL and MLB — tap a sport to see today’s and tomorrow’s scores, live as they happen.'},
   {app:114,i:'⏰',c:'#ffb36b',t:'A proper wake-up alarm',d:'Your radio alarm now lights up the phone with a full wake-up screen — Stop, Snooze or Keep listening — and starts playing even with the screen off. Open Library → Wake-up radio to check your phone’s settings and test it.'},
   {v:14,i:'🎵',c:'#ff9ccc',t:'What was that song?',d:'Library now keeps a list of songs you’ve heard, with one-tap ▶ YouTube and ● Spotify buttons. Tap the song name in the player to find it too.'},
   {app:113,i:'🎚',c:'#ffb36b',t:'Sound styles',d:'New equaliser: Bass boost, Voice (great for talk and sport), Night, Rock, Pop, Dance, Jazz and more. Tap “🎚 Sound” under the volume in the player, or find it in Settings.'},
