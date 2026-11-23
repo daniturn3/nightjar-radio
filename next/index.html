@@ -806,7 +806,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||evCard()}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -882,6 +882,23 @@ VIEWS.search=async(el,tok)=>{const sug=SSUG[S.country]||SSUG._;el.innerHTML=`<di
 function bigEv(){if(S.theme==='off')return null;const n0=dayN(TODAY()),y=TODAY().getFullYear();let best=null;
   for(const e of sportEvents(y-1,y+1)){const t=THEMES[e.id];if(!t||!t.big)continue;const s0=dayN(e.st),day=n0-s0+1;
     if(day>=1&&day<=e.len){if(!best||best.pre)best={id:e.id,t,day,len:e.len}}else if(day<=0&&day>-14&&!best)best={id:e.id,t,pre:1-day,len:e.len}}return best}
+
+/* An event card on Home for every event (like the big-tournament card): badge, name, how far through, a line about it and a button. */
+var THID=null;
+const EVQ={christmas:'christmas',newyear:'party',burns:'scottish',valentine:'love songs',pancake:'pop',stdavid:'welsh',mothers:'love songs',stpatrick:'irish',easter:'easy listening',stgeorge:'english',fathers:'classic rock',halloween:'halloween',bonfire:'rock',remembrance:'classical',birthday:'party',aprilfools:'comedy',worldradio:'talk',standrew:'scottish',solstice:'chill',clocksfwd:'breakfast',clocksback:'chill',bank:'hits',eurovision:'eurovision',eurosemi:'eurovision',cin:'pop',comicrelief:'comedy',lny:'chinese',diwali:'bollywood',eidfitr:'arabic',eidadha:'arabic',hanukkah:'jewish',pride:'dance'};
+const EVT={christmas:'Carols, classics and Christmas hits on the radio',newyear:'Party stations to see the new year in',burns:'Ceilidh, folk and a wee dram of Scottish radio',valentine:'Love songs and slow jams for the one you love',pancake:'Flip, toss and turn up the radio',stdavid:'Dydd Gŵyl Dewi Hapus — Welsh radio to celebrate',mothers:'Something lovely to listen to with Mum',stpatrick:'Irish radio, trad and craic all day',easter:'Easy listening for a long weekend',stgeorge:'A day for English radio',fathers:'Classic rock and favourites for Dad',halloween:'Spooky sounds and creepy classics',bonfire:'Bangers on the radio while the sky lights up',remembrance:'A moment of quiet, then music to remember',birthday:'It’s your day — turn the party up',aprilfools:'Comedy and silly stations (honest)',worldradio:'A day to celebrate radio around the world',standrew:'Scottish radio for St Andrew’s Day',solstice:'The longest day — plenty of time to listen',clocksfwd:'An hour less sleep — wake up with breakfast radio',clocksback:'An extra hour — spend it with the radio',bank:'A long weekend of radio',eurovision:'Douze points for Eurovision radio',eurosemi:'Warming up for the Eurovision final',cin:'Pudsey’s back — tune in and help out',comicrelief:'Get your red nose on',lny:'Lanterns, celebrations and music for the new year',diwali:'Lights, sweets and festive music',eidfitr:'Celebrations and music for Eid',eidadha:'Celebrations and music for Eid',hanukkah:'Eight nights of light and music',pride:'Proud, loud and dancing all month'};
+function evCard(){const t=TH,id=THID;if(!t||!id||!t.greet||['spring','summer','autumn','winter'].includes(id))return'';
+  const d=TODAY(),gr=typeof t.greet==='function'?t.greet():t.greet;let line=gr,pct=null,p=EVT[id]||'';
+  if(id==='christmas'){const D=d.getDate();if(D<=24){pct=D/25;line=D===24?'Christmas Eve · Santa’s on his way':`${25-D} sleeps till Christmas`}
+    else if(D===25){const ph=xdPhase();line=ph==='m'?'Christmas morning · presents time':ph==='a'?'Christmas afternoon · party time':'Christmas night · cosy by the fire';pct=1;p=ph==='a'?'Party hits and festive bangers':ph==='e'?'Cosy classics for a quiet night in':'Christmas songs while the presents get opened'}
+    else line='Merry Christmas & happy holidays'}
+  else if(t.sport){const n0=dayN(d),y=d.getFullYear(),e=sportEvents(y-1,y+1).find(e=>e.id===id&&n0>=dayN(e.st)&&n0<dayN(e.st)+e.len);
+    if(e){const day=n0-dayN(e.st)+1;pct=day/e.len;line=e.len===1?'It’s today':`Day ${day} of ${e.len}`+(e.len-day?` · ${e.len-day} day${e.len-day>1?'s':''} to go`:' · final day!')}p=gr}
+  const btn=t.sport?`${t.fxs?`<button data-bigfx="${t.fxs}">📊 Live scores</button>`:''}<button data-sgo="${esc(t.q||'sport')}">📻 Find coverage</button>`:`<button data-sgo="${esc(EVQ[id]||t.name)}">🎵 Play ${esc(t.name.replace(/^Your /,''))} radio</button>`;
+  const pp=(t.p&&t.p.length?t.p:[t.badge]);
+  return`<div class="bigev evc" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${pp.concat(pp).concat(pp).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
+    <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div>${p&&p!==line?`<p>${esc(p)}</p>`:''}
+    ${pct!=null?`<div class="bgbar"><i style="width:${Math.round(pct*100)}%"></i></div>`:''}<div class="bgbt">${btn}</div></div>`}
 function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0);
   const line=b.pre?(b.pre===1?'Starts tomorrow':`Starts in ${b.pre} days`):b.day===1?`Day 1 of ${b.len} · it starts today`:left===0?'Final day!':`Day ${b.day} of ${b.len} · ${left} day${left>1?'s':''} to go`;
   return`<div class="bigev" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${(t.p||[t.badge]).concat(t.p||[]).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
@@ -1361,9 +1378,9 @@ const dayN=d=>Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e
 const nthSun=(y,m,n)=>{const d=new Date(y,m,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
 const THEMES={
   christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=TODAY().getDate(),n=25-d;return d===24?'Happy Christmas Eve — Santa’s on his way':d===25?'Merry Christmas!':d===26?'Happy Boxing Day':d>26?'Merry Christmas & happy holidays':(d===21?'The longest night · ':'')+(n===1?'1 sleep till Christmas':n+' sleeps till Christmas')},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
-  newyear:{name:'New Year',badge:'🎆',greet:()=>new Date().getMonth()===11?'Happy Hogmanay & New Year’s Eve':'Happy New Year',fx:'fireworks',p:['✦','✧','★'],c:['#ffd166','#f3ecdf','#86b4ff']},
+  newyear:{name:'New Year',badge:'🎆',greet:()=>TODAY().getMonth()===11?'Happy Hogmanay & New Year’s Eve':'Happy New Year',fx:'fireworks',p:['✦','✧','★'],c:['#ffd166','#f3ecdf','#86b4ff']},
   burns:{name:'Burns Night',badge:'🏴',greet:'Happy Burns Night',fx:'none',c:['#5b8def','#ffffff','#5b8def']},
-  valentine:{name:'Valentine’s',badge:'💗',greet:()=>new Date().getDate()===14?'Happy Valentine’s Day':'Love is in the air',fx:'float',p:['💗','💕','❤'],c:['#ff7aa8','#ffc2d6','#ff4f7b']},
+  valentine:{name:'Valentine’s',badge:'💗',greet:()=>TODAY().getDate()===14?'Happy Valentine’s Day':'Love is in the air',fx:'float',p:['💗','💕','❤'],c:['#ff7aa8','#ffc2d6','#ff4f7b']},
   pancake:{name:'Pancake Day',badge:'🥞',greet:'Happy Pancake Day',fx:'fall',p:['🥞','🍋'],c:['#ffc46b','#ffe2a8','#ff9f43']},
   stdavid:{name:'St David’s Day',badge:'🌼',greet:'Happy St David’s Day',fx:'fall',p:['🌼'],c:['#ffd84d','#fff2a8','#3fbf7f']},
   mothers:{name:'Mother’s Day',badge:'💐',greet:'Happy Mother’s Day',fx:'fall',p:['🌷','🌸','💐'],c:['#ff9ccc','#ffd1e6','#b8a2ff']},
@@ -1371,7 +1388,7 @@ const THEMES={
   easter:{name:'Easter',badge:'🐣',greet:'Happy Easter',fx:'fall',p:['🥚','🐣','🌷','🐰'],c:['#ffd6a5','#cdeac0','#b8a2ff']},
   stgeorge:{name:'St George’s Day',badge:'🌹',greet:'Happy St George’s Day',fx:'fall',p:['🌹'],c:['#ff4f5e','#ffffff','#ff4f5e']},
   fathers:{name:'Father’s Day',badge:'👔',greet:'Happy Father’s Day',fx:'none',c:['#6fa8ff','#cfe0ff','#ffb347']},
-  halloween:{name:'Halloween',badge:'🎃',greet:()=>new Date().getDate()===31?'Happy Halloween':'Spooky season',fx:'bats',p:['🦇','🦇','🎃','👻'],c:['#ff8c1a','#ffc266','#9b5de5']},
+  halloween:{name:'Halloween',badge:'🎃',greet:()=>TODAY().getDate()===31?'Happy Halloween':'Spooky season',fx:'bats',p:['🦇','🦇','🎃','👻'],c:['#ff8c1a','#ffc266','#9b5de5']},
   bonfire:{name:'Bonfire Night',badge:'🎆',greet:'Remember, remember the 5th of November',fx:'fireworks',p:['✦','✧','✺'],c:['#ff6b4a','#ffd166','#ff9ccc']},
   remembrance:{name:'Remembrance',badge:'<span class="poppy"></span>',greet:'We will remember them',fx:'none',c:['#d64545','#f3ecdf','#d64545']},
   birthday:{name:'Your birthday',badge:'🎂',greet:'Happy birthday!',fx:'fall',p:['🎉','🎈','✨','🎂'],c:['#ff9ccc','#ffd166','#86b4ff']},
@@ -1379,9 +1396,9 @@ const THEMES={
   worldradio:{name:'World Radio Day',badge:'📻',greet:'Happy World Radio Day',fx:'fall',p:['📻','♪','🎵'],c:['#ffb347','#ffd08a','#86b4ff']},
   standrew:{name:'St Andrew’s Day',badge:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',greet:'Happy St Andrew’s Day',fx:'snow',p:['✕','❄','·'],c:['#4a90e2','#ffffff','#4a90e2']},
   solstice:{name:'Longest day',badge:'☀️',greet:'The longest day of the year',fx:'fireflies',p:[],c:['#ffc84d','#ffe6a3','#ff8c42']},
-  clocksfwd:{name:'Clocks go forward',badge:'🕐',greet:()=>new Date().getDay()===6?'Clocks go forward an hour tonight':'The clocks went forward — one hour less sleep',fx:'none',c:['#86b4ff','#cfe0ff','#ffb347']},
-  clocksback:{name:'Clocks go back',badge:'🕐',greet:()=>new Date().getDay()===6?'Clocks go back an hour tonight':'The clocks went back — an extra hour in bed',fx:'none',c:['#86b4ff','#cfe0ff','#ffb347']},
-  bank:{name:'Bank holiday',badge:'🏖️',greet:()=>new Date().getDay()===1?'Happy bank holiday Monday':'Happy bank holiday weekend',fx:'none',c:['#4fc3f7','#b3ecff','#ffb347']},
+  clocksfwd:{name:'Clocks go forward',badge:'🕐',greet:()=>TODAY().getDay()===6?'Clocks go forward an hour tonight':'The clocks went forward — one hour less sleep',fx:'none',c:['#86b4ff','#cfe0ff','#ffb347']},
+  clocksback:{name:'Clocks go back',badge:'🕐',greet:()=>TODAY().getDay()===6?'Clocks go back an hour tonight':'The clocks went back — an extra hour in bed',fx:'none',c:['#86b4ff','#cfe0ff','#ffb347']},
+  bank:{name:'Bank holiday',badge:'🏖️',greet:()=>TODAY().getDay()===1?'Happy bank holiday Monday':'Happy bank holiday weekend',fx:'none',c:['#4fc3f7','#b3ecff','#ffb347']},
   eurovision:{name:'Eurovision',badge:'🎤',greet:'It’s Eurovision final night!',fx:'float',p:['✨','💫','🎤','⭐'],c:['#ff5fa2','#ffd1e6','#5b8def']},
   cin:{name:'Children in Need',badge:'🐻',greet:'It’s Children in Need tonight',fx:'fall',p:['🐻','💛'],c:['#ffd400','#fff3a6','#ffb347']},
   comicrelief:{name:'Red Nose Day',badge:'🔴',greet:'Happy Red Nose Day',fx:'fall',p:['🔴'],c:['#ff3b30','#ffb3ad','#ffb347']},
@@ -1521,7 +1538,7 @@ function dress(id){if(['spring','summer','autumn','winter'].includes(id))return;
   const fly=ph==='a'?'🎉 🎊 🥂':ph==='m'?'🦌 🦌 🛷 🎁':FLY[id]||(t.sport||t.big?t.badge:'');if(!fly)return;
   const f=document.createElement('div');f.id='thfly';f.setAttribute('aria-hidden','true');f.className=(id==='birthday'||ph==='a')?'rise':'';f.textContent=fly;document.body.append(f)}
 let xdLast=xdPhase();setInterval(()=>{const p=xdPhase();if(p!==xdLast){xdLast=p;try{applyTheme();render()}catch{}}},300000);
-function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;
+function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;THID=id;
   document.body.className=document.body.className.replace(/\b(th|xd)-\S+/g,'').trim();$('#xhat')?.remove();$('#thfly')?.remove();$('#thstk')?.remove();$('#xglow')?.remove();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
   if(!TH){['--acc','--acc2','--cor'].forEach(v=>document.documentElement.style.removeProperty(v));$('#thbadge')?.remove();return}
   document.body.classList.add('th-'+id);if(TH.rainbow)document.body.classList.add('th-rainbow');thOnce(id);const r=document.documentElement.style;
