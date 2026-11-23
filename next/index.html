@@ -475,6 +475,17 @@ body.ldim img{filter:brightness(.8)}
 body.ldim #car{color:#5e554b}body.ldim .carbtns button{background:#0b090b;color:#7c6f60}body.ldim #carpp{background:#1c140a;color:#a87a40}
 body.ldim #nl{color:rgba(255,179,71,.12)}
 @media (prefers-reduced-motion:reduce){.aur{animation:none}}
+
+/* More Christmas: snow on the cards, a Santa hat on the logo and Santa's sleigh across the sky. */
+.th-christmas .hcard::before{content:'';position:absolute;left:0;right:0;top:0;height:13px;z-index:2;pointer-events:none;opacity:.9;
+  background:radial-gradient(circle at 11px 0,#fff 0 8px,transparent 9px) 0 0/22px 13px repeat-x,linear-gradient(#fff,#fff) 0 0/100% 3px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.brand{position:relative}
+#xhat{position:absolute;left:-7px;top:-11px;transform:rotate(-14deg);pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+#sleigh{position:fixed;top:calc(env(safe-area-inset-top) + 64px);left:100%;z-index:3;pointer-events:none;display:flex;gap:2px;font-size:20px;white-space:nowrap;animation:sleigh 45s linear infinite;animation-delay:4s;opacity:0}
+#sleigh b{font-size:13px;align-self:flex-end;opacity:.8}
+@keyframes sleigh{0%{transform:translate(0,0);opacity:0}1%{opacity:.95}12%{transform:translate(calc(-100vw - 160px),-26px);opacity:.95}12.1%,100%{opacity:0;transform:translate(calc(-100vw - 160px),-26px)}}
+body.calm #sleigh,body.calm #xhat{animation:none}
+@media (prefers-reduced-motion:reduce){#sleigh{display:none}}
 </style>
 </head>
 <body>
@@ -1337,7 +1348,7 @@ function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=
 const dayN=d=>Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);
 const nthSun=(y,m,n)=>{const d=new Date(y,m,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
 const THEMES={
-  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=TODAY().getDate();return d===21?'The longest night of the year — perfect for radio':d===24?'Happy Christmas Eve':d===25?'Merry Christmas':d===26?'Happy Boxing Day':'Merry Christmas'},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
+  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=TODAY().getDate(),n=25-d;return d===24?'Happy Christmas Eve — Santa’s on his way':d===25?'Merry Christmas!':d===26?'Happy Boxing Day':d>26?'Merry Christmas & happy holidays':(d===21?'The longest night · ':'')+(n===1?'1 sleep till Christmas':n+' sleeps till Christmas')},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
   newyear:{name:'New Year',badge:'🎆',greet:()=>new Date().getMonth()===11?'Happy Hogmanay & New Year’s Eve':'Happy New Year',fx:'fireworks',p:['✦','✧','★'],c:['#ffd166','#f3ecdf','#86b4ff']},
   burns:{name:'Burns Night',badge:'🏴',greet:'Happy Burns Night',fx:'none',c:['#5b8def','#ffffff','#5b8def']},
   valentine:{name:'Valentine’s',badge:'💗',greet:()=>new Date().getDate()===14?'Happy Valentine’s Day':'Love is in the air',fx:'float',p:['💗','💕','❤'],c:['#ff7aa8','#ffc2d6','#ff4f7b']},
@@ -1486,6 +1497,9 @@ function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S
   if(!['spring','summer','autumn','winter'].includes(id)){r.setProperty('--acc',TH.c[0]);r.setProperty('--acc2',TH.c[1]);r.setProperty('--cor',TH.c[2])}else['--acc','--acc2','--cor'].forEach(v=>r.removeProperty(v));
   sky.style.setProperty('--t1',TH.c[0]);sky.style.setProperty('--t2',TH.c[2]);
   let bd=$('#thbadge');if(!bd){bd=document.createElement('span');bd.id='thbadge';$('#brand').append(bd)}bd.innerHTML=TH.badge;bd.title=TH.name;
+  $('#xhat')?.remove();$('#sleigh')?.remove();
+  if(id==='christmas'){const h=document.createElement('i');h.id='xhat';h.setAttribute('aria-hidden','true');h.innerHTML='<svg viewBox="0 0 32 28" width="22" height="19"><path d="M4 22 C8 8 16 2 26 6 L24 14 C20 10 16 12 14 22 Z" fill="#e23b3b"/><rect x="2" y="20" width="16" height="6" rx="3" fill="#fff"/><circle cx="26" cy="7" r="4" fill="#fff"/></svg>';$('#brand').append(h);
+    if(playful()){const sl=document.createElement('div');sl.id='sleigh';sl.setAttribute('aria-hidden','true');sl.innerHTML='<span>🦌</span><span>🦌</span><span>🛷</span><b>✨</b>';document.body.append(sl)}}
   if(TH.lights){const l=document.createElement('div');l.id='thlights';l.innerHTML=Array.from({length:22},(_,i)=>`<i style="--c:${TH.c[i%3]};--d:${(i%4)*.4}s"></i>`).join('');document.body.append(l)}
   if(!playful()||TH.fx==='none')return;const fx=document.createElement('div');fx.id='thfx';fx.className='fx-'+TH.fx;
   if(TH.fx==='fireworks'){sky.append(fx);const boom=()=>{if(document.hidden||!$('#thfx'))return;const x=10+Math.random()*80,y=8+Math.random()*40,col=TH.c[Math.random()*3|0];for(let i=0;i<16;i++){const s=document.createElement('i');const a=Math.PI*2*i/16,rr=40+Math.random()*30;s.style.cssText=`left:${x}%;top:${y}%;--dx:${Math.cos(a)*rr}px;--dy:${Math.sin(a)*rr}px;background:${col};box-shadow:0 0 6px ${col}`;fx.append(s);setTimeout(()=>s.remove(),1600)}};boom();thFw=setInterval(boom,2600);return}
