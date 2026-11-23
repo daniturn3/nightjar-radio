@@ -835,7 +835,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||evCard()}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${evBoth()}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -928,6 +928,8 @@ function evCard(){const t=TH,id=THID;if(!t||!id||!t.greet||['spring','summer','a
   return`<div class="bigev evc" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${pp.concat(pp).concat(pp).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
     <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div>${p&&p!==line?`<p>${esc(p)}</p>`:''}
     ${pct!=null?`<div class="bgbar"><i style="width:${Math.round(pct*100)}%"></i></div>`:''}<div class="bgbt">${btn}</div></div>`}
+/* Big tournament card and today's own event card: show both when they're different events (today's first if the tournament hasn't started). */
+function evBoth(){const b=bigEv(),big=bigH(),ev=b&&b.id===THID?'':evCard();return b&&b.pre?ev+big:big+ev}
 function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0);
   const line=b.pre?(b.pre===1?'Starts tomorrow':`Starts in ${b.pre} days`):b.day===1?`Day 1 of ${b.len} · it starts today`:left===0?'Final day!':`Day ${b.day} of ${b.len} · ${left} day${left>1?'s':''} to go`;
   return`<div class="bigev" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${(t.p||[t.badge]).concat(t.p||[]).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
