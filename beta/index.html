@@ -784,7 +784,7 @@ const XC=[['🎄','All Christmas',[{tag:'christmas'},{tag:'xmas'}]],['🏠','Nea
  ['🌍','Around the world',[{tag:'weihnacht'},{tag:'navidad'},{tag:'noel'},{tag:'natale'},{tag:'kerst'}]]];
 let xcSel=LS.get('xcSel',0);
 
-/* Live countdown to Christmas in the Christmas Radio section. Follows the Developer tools preview date too. */
+/* Live countdown to Christmas in the Christmas Radio section. */
 const xcdBase=[TODAY().getTime(),Date.now()];
 function xcdNow(){return devNow?new Date(new Date(devNow).getTime()+(Date.now()-xcdBase[1])):new Date()}
 function xcdH(){const n=xcdNow(),y=n.getMonth()===0?n.getFullYear()-1:n.getFullYear(),ms=new Date(y,11,25)-n;if(ms<=0)return'';
