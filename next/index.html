@@ -786,7 +786,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -1216,7 +1216,7 @@ function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.
 /*@TESTONLY*/
 /* Developer tools — only in Daniel's Test copy. Everything between these markers is cut out when publishing to Beta. */
 function devOpen(u){if(NAT&&NAT.openUrl)NAT.openUrl(u);else open(u,'_blank','noopener')}
-function devSet(v){devNow=v;LS.set('devNow',v);closeSheet();render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'🛠 Back to today’s date',3000)}
+function devSet(v){devNow=v;LS.set('devNow',v);closeSheet();try{applyTheme()}catch{}render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'🛠 Back to today’s date',3000)}
 function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x.toISOString()};
   const ev=sportEvents(y,y+2).filter(e=>THEMES[e.id]&&THEMES[e.id].big&&dayN(e.st)+e.len>dayN(new Date())).sort((a,b)=>a.st-b.st).slice(0,10);
   const bd=S.bday&&/^\d{2}-\d{2}$/.test(S.bday)?S.bday:null,inbox=LS.get('devInbox','');
@@ -1337,7 +1337,7 @@ function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=
 const dayN=d=>Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);
 const nthSun=(y,m,n)=>{const d=new Date(y,m,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
 const THEMES={
-  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=new Date().getDate();return d===21?'The longest night of the year — perfect for radio':d===24?'Happy Christmas Eve':d===25?'Merry Christmas':d===26?'Happy Boxing Day':'Merry Christmas'},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
+  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=TODAY().getDate();return d===21?'The longest night of the year — perfect for radio':d===24?'Happy Christmas Eve':d===25?'Merry Christmas':d===26?'Happy Boxing Day':'Merry Christmas'},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
   newyear:{name:'New Year',badge:'🎆',greet:()=>new Date().getMonth()===11?'Happy Hogmanay & New Year’s Eve':'Happy New Year',fx:'fireworks',p:['✦','✧','★'],c:['#ffd166','#f3ecdf','#86b4ff']},
   burns:{name:'Burns Night',badge:'🏴',greet:'Happy Burns Night',fx:'none',c:['#5b8def','#ffffff','#5b8def']},
   valentine:{name:'Valentine’s',badge:'💗',greet:()=>new Date().getDate()===14?'Happy Valentine’s Day':'Love is in the air',fx:'float',p:['💗','💕','❤'],c:['#ff7aa8','#ffc2d6','#ff4f7b']},
