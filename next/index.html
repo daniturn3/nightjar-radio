@@ -495,6 +495,12 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 body.calm #thfly{display:none}
 @media (prefers-reduced-motion:reduce){#thfly{display:none}}
 
+
+.xcd{position:relative;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:10px 0 4px}
+.xcd span{display:flex;flex-direction:column;align-items:center;min-width:52px;padding:7px 6px 5px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.xcd b{font-family:'JetBrains Mono',monospace;font-size:22px;line-height:1;color:#ffd166}
+.xcd i{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-top:3px}
+.xcd small{align-self:center;font-size:12px;opacity:.75;line-height:1.3;max-width:70px}
 </style>
 </head>
 <body>
@@ -740,10 +746,17 @@ async function globeSpin(){if(globeBusy)return;globeBusy=true;const out=$('#gres
   play(st,{list:[st],name:'Around the world · '+z[1]});burst(px,py,['✦','♪','☆'],['#86b4ff','#ffd08a','#b8a2ff'],10)}
 function globeH(){return`<div class="gcard"><div class="gwrap"><canvas id="globe" aria-label="Globe — drag to turn it"></canvas></div><div class="chips gch">${PERS.map(([k,l,c])=>`<button class="chip${S.gper===k?' on':''}" style="--c:${c}" data-gper="${k}">${l}</button>`).join('')}</div>
   <button class="pill amb" data-act="globe">${ic('globe')}Spin the globe</button></div><div id="gres"></div>`}
-function sotdDay(){return new Date().toLocaleDateString('en-CA')}
-async function sotd(){const all=(await rb('/json/stations/topvote/500',864e5)).filter(good).map(mk);const seen=new Set(),uniq=all.filter(s=>{const k=s.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true});
+function sotdDay(){return TODAY().toLocaleDateString('en-CA')}
+
+/* In the Christmas season the station of the day is a Christmas station, from a different country each day. */
+async function xmSotd(){const [a,b]=await Promise.all([stations({tag:'christmas'},150,864e5).catch(()=>[]),stations({tag:'xmas'},80,864e5).catch(()=>[])]);
+  const seen=new Set(),pool=a.concat(b).filter(x=>{const k=x.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true});if(!pool.length)return null;
+  const by={};pool.forEach(x=>{const c=x.cc||'??';(by[c]=by[c]||[]).push(x)});const cs=Object.keys(by).sort((p,q)=>by[q].length-by[p].length);
+  const mix=[];for(let r=0;mix.length<pool.length;r++){let any=false;for(const c of cs)if(by[c][r]){mix.push(by[c][r]);any=true}if(!any)break}
+  const d=TODAY(),y=d.getMonth()===0?d.getFullYear()-1:d.getFullYear(),n=Math.max(0,Math.floor((d-new Date(y,10,15))/864e5));return{...mix[n%mix.length],xm:1}}
+async function sotd(){if(xmasOn()){try{const x=await xmSotd();if(x)return x}catch{}}const all=(await rb('/json/stations/topvote/500',864e5)).filter(good).map(mk);const seen=new Set(),uniq=all.filter(s=>{const k=s.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true});
   let h=7;for(const c of sotdDay())h=(h*131+c.charCodeAt(0))%1000003;return uniq[h%uniq.length]}
-function sotdH(st){const k=reg([st],'Station of the day');return`<div class="sotd" style="--hue:${hueOf(st.n)}" data-st="${k}" data-i="0"><div class="mono" style="color:hsl(var(--hue) 80% 78%)">✦ Station of the day · ${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
+function sotdH(st){const k=reg([st],'Station of the day');return`<div class="sotd" style="--hue:${hueOf(st.n)}" data-st="${k}" data-i="0"><div class="mono" style="color:hsl(var(--hue) 80% 78%)">${st.xm?'🎄 Christmas station of the day':'✦ Station of the day'} · ${TODAY().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
   <div class="sotdin">${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc(st.c||'')}</span><div class="tags" style="justify-content:flex-start;margin-top:8px">${st.tags.slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div><span class="sotdplay">${icf('play')}</span></div></div>`}
 const getPos=()=>new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('nogeo'));navigator.geolocation.getCurrentPosition(p=>res({la:+p.coords.latitude.toFixed(2),lo:+p.coords.longitude.toFixed(2)}),rej,{timeout:15000,maximumAge:36e5})});
 const km=(a,b,c,d)=>{const R=6371,r=x=>x*Math.PI/180,x=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
@@ -774,9 +787,17 @@ const XC=[['🎄','All Christmas',[{tag:'christmas'},{tag:'xmas'}]],['🏠','Nea
  ['🎸','Rockin’ Christmas',[{tag:'christmas rock'},{tag:'heavy christmas'},{name:'christmas rock'}]],
  ['🌍','Around the world',[{tag:'weihnacht'},{tag:'navidad'},{tag:'noel'},{tag:'natale'},{tag:'kerst'}]]];
 let xcSel=LS.get('xcSel',0);
+
+/* Live countdown to Christmas in the Christmas Radio section. Follows the Developer tools preview date too. */
+const xcdBase=[TODAY().getTime(),Date.now()];
+function xcdNow(){return devNow?new Date(new Date(devNow).getTime()+(Date.now()-xcdBase[1])):new Date()}
+function xcdH(){const n=xcdNow(),y=n.getMonth()===0?n.getFullYear()-1:n.getFullYear(),ms=new Date(y,11,25)-n;if(ms<=0)return'';
+  const d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60,sc=Math.floor(ms/1e3)%60,b=(v,l)=>`<span><b>${String(v).padStart(2,'0')}</b><i>${l}</i></span>`;
+  return`${b(d,d===1?'day':'days')}${b(h,'hrs')}${b(m,'mins')}${b(sc,'secs')}<small>till Christmas Day</small>`}
+setInterval(()=>{const e=$('#xcd');if(e&&!document.hidden)e.innerHTML=xcdH()},1000);
 function xcH(){const d=TODAY(),dd=new Date(d.getFullYear()+(d.getMonth()===0?-1:0),11,25),left=Math.ceil((dd-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
   const sub=left>1?`Carols, classics and Christmas hits — ${left} sleeps to go`:left===1?'It’s Christmas Eve — the big day is tomorrow 🎅':left===0?'Merry Christmas! 🎁':'Christmas tunes until Twelfth Night';
-  return`<div class="vc xc"><div class="xcsnow">${'❄✦❅✧❄✦'.split('').map((g,i)=>`<i style="--x:${6+i*16}%;--d:${i*.9}s">${g}</i>`).join('')}</div><div class="vctop"><b>Christmas Radio 🎄</b><span>${sub}</span></div>
+  return`<div class="vc xc"><div class="xcsnow">${'❄✦❅✧❄✦'.split('').map((g,i)=>`<i style="--x:${6+i*16}%;--d:${i*.9}s">${g}</i>`).join('')}</div><div class="vctop"><b>Christmas Radio 🎄</b><span>${sub}</span></div>${left>=1?`<div class="xcd" id="xcd">${xcdH()}</div>`:''}
   <div class="chips vcchips">${XC.map(([e,l],i)=>`<button class="chip${i===xcSel?' on':''}" data-xc="${i}">${e} ${l}</button>`).join('')}</div>
   <div id="xclist">${skCards()}</div></div>`}
 async function xcFill(tok){const el=$('#xclist');if(!el)return;el.innerHTML=skCards();const [,l,qq]=XC[xcSel]||XC[0],qs=typeof qq==='function'?qq():qq;
@@ -790,7 +811,7 @@ const HSEC=[['sotd','Station of the day','✦','A new pick every day','#ffb36b',
  ['recent','Tune back in','↺','Stations you played lately','#b8a2ff','#7b5cff'],['country','Popular in your country','🏠','Top stations where you live','#ffad6b','#e5533d'],['world','Most loved worldwide','❤','The world’s most-played','#ff8a8a','#e0435f'],['night','Late-night picks','🌙','Mellow stations for after dark','#7f8cff','#3a3f9e']];
 function homeAll(){const def=HSEC.map(h=>h[0]).filter(id=>(id!=='vc'||vcOn())&&(id!=='xmas'||xmasOn())),saved=LS.get('homeOrder',[]).filter(id=>def.includes(id));
   def.forEach((id,i)=>{if(!saved.includes(id)){const prev=def.slice(0,i).reverse().find(x=>saved.includes(x));saved.splice(prev?saved.indexOf(prev)+1:0,0,id)}});return saved}
-const homeOrder=()=>{const hid=LS.get('homeHide',[]);return homeAll().filter(id=>!hid.includes(id))};
+const homeOrder=()=>{const hid=LS.get('homeHide',[]);let o=homeAll().filter(id=>!hid.includes(id));if(xmasOn()&&o.includes('xmas'))o=['xmas',...o.filter(x=>x!=='xmas')];return o};
 function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
   sheet(`<h3>Customise Home</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Move sections up or down, and switch off the ones you don’t use.</p>
   <div class="hcl">${ord.map((id,i)=>{const h=HSEC.find(x=>x[0]===id),on=!hid.includes(id);return`<div class="hcr${on?'':' off'}" style="--a:${h[4]};--b:${h[5]}"><span class="hcn">${String(i+1).padStart(2,'0')}</span><span class="hce">${h[2]}</span><div class="hct"><b>${esc(h[1])}</b><small>${on?esc(h[3]):'Hidden'}</small></div>
