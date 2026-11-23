@@ -20,10 +20,20 @@ REPO = os.environ["GITHUB_REPOSITORY"]
 DAYS = int(os.environ.get("STABLE_AFTER_DAYS", "10"))
 STATE = pathlib.Path("stats/channels.json")
 WEB = {"test": pathlib.Path("next/index.html"), "beta": pathlib.Path("beta/index.html"), "stable": pathlib.Path("index.html")}
-def webid(ch): return hashlib.sha256(WEB[ch].read_bytes()).hexdigest()[:12] if WEB[ch].exists() else ""
+# Daniel's own extras in the Test copy sit between /*@TESTONLY*/ ... /*@END*/ (or <!--@TESTONLY--> ... <!--@END-->)
+# and are cut out whenever the Test copy is published, so they never reach Beta or Stable.
+STRIP = re.compile(r"/\*@TESTONLY\*/.*?/\*@END\*/|<!--@TESTONLY-->.*?<!--@END-->", re.S)
+def body(ch):
+    b = WEB[ch].read_bytes()
+    if ch == "test":
+        t = STRIP.sub("", b.decode("utf-8"))
+        if "@TESTONLY" in t or "@END*/" in t: raise SystemExit("Unmatched @TESTONLY/@END marker in next/index.html")
+        b = t.encode("utf-8")
+    return b
+def webid(ch): return hashlib.sha256(body(ch)).hexdigest()[:12] if WEB[ch].exists() else ""
 def webcopy(a, b):
     if webid(a) == webid(b): return False
-    shutil.copyfile(WEB[a], WEB[b]); return True
+    WEB[b].write_bytes(body(a)); return True
 TAGS = {"test": "radio-beta", "beta": "radio-pubbeta", "stable": "radio-app", "archive": "radio-builds"}
 
 def sh(*a, check=True, capture=True):

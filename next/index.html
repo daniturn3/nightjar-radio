@@ -502,6 +502,8 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const KEEP=['tester','chan','songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
 try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])});njrRoute()}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
+let devNow=null;const TODAY=()=>devNow?new Date(devNow):new Date();
+/*@TESTONLY*/try{if(LS.get('tester',false))devNow=LS.get('devNow',null)}catch{}/*@END*/
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
 const P={ball:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.4 2.5-1.3 4h-4.2l-1.3-4zM12 3v4.5M15.4 10l5-1.5M14.1 14l3 4M9.9 14l-3 4M8.6 10l-5-1.5',home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  play:'M8 5.5v13l10.5-6.5z',pause:'M7.5 5h3v14h-3zM13.5 5h3v14h-3z',prev:'M6 5v14M19 5.5v13L8.5 12z',next:'M18 5v14M5 5.5v13L15.5 12z',star:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
@@ -744,7 +746,7 @@ async function vcFill(tok){const el=$('#vclist');if(!el)return;el.innerHTML=skCa
   catch{if($('#vclist'))$('#vclist').innerHTML=errBox()}}
 function vcWire(tok){if(!$('.vc'))return;$$('[data-vc]').forEach(b=>b.onclick=()=>{vcSel=+b.dataset.vc;LS.set('vcSel',vcSel);$$('[data-vc]').forEach(x=>x.classList.toggle('on',x===b));vcFill(tok)});vcFill(tok)}
 /* ---------- Christmas Radio: seasonal collection, 15 Nov – 6 Jan every year ---------- */
-const xmasOn=()=>{const d=new Date(),md=(d.getMonth()+1)*100+d.getDate();return md>=1115||md<=106};
+const xmasOn=()=>{const d=TODAY(),md=(d.getMonth()+1)*100+d.getDate();return md>=1115||md<=106};
 const XC=[['🎄','All Christmas',[{tag:'christmas'},{tag:'xmas'}]],['🏠','Near you',()=>[{tag:'christmas',countrycode:S.country},{tag:'xmas',countrycode:S.country}]],
  ['🎤','Pop & hits',[{tag:'christmas pop'},{tag:'christmas hits'},{tag:'christmas charts'},{tag:'last christmas'},{tag:'christmas songs'}]],
  ['🔔','Carols & classical',[{tag:'carol'},{tag:'christmas choir'},{tag:'klassik weihnachten'},{tag:'traditional christmas'},{tag:'christmas classics'}]],
@@ -752,7 +754,7 @@ const XC=[['🎄','All Christmas',[{tag:'christmas'},{tag:'xmas'}]],['🏠','Nea
  ['🎸','Rockin’ Christmas',[{tag:'christmas rock'},{tag:'heavy christmas'},{name:'christmas rock'}]],
  ['🌍','Around the world',[{tag:'weihnacht'},{tag:'navidad'},{tag:'noel'},{tag:'natale'},{tag:'kerst'}]]];
 let xcSel=LS.get('xcSel',0);
-function xcH(){const d=new Date(),dd=new Date(d.getFullYear()+(d.getMonth()===0?-1:0),11,25),left=Math.ceil((dd-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+function xcH(){const d=TODAY(),dd=new Date(d.getFullYear()+(d.getMonth()===0?-1:0),11,25),left=Math.ceil((dd-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
   const sub=left>1?`Carols, classics and Christmas hits — ${left} sleeps to go`:left===1?'It’s Christmas Eve — the big day is tomorrow 🎅':left===0?'Merry Christmas! 🎁':'Christmas tunes until Twelfth Night';
   return`<div class="vc xc"><div class="xcsnow">${'❄✦❅✧❄✦'.split('').map((g,i)=>`<i style="--x:${6+i*16}%;--d:${i*.9}s">${g}</i>`).join('')}</div><div class="vctop"><b>Christmas Radio 🎄</b><span>${sub}</span></div>
   <div class="chips vcchips">${XC.map(([e,l],i)=>`<button class="chip${i===xcSel?' on':''}" data-xc="${i}">${e} ${l}</button>`).join('')}</div>
@@ -857,7 +859,7 @@ VIEWS.search=async(el,tok)=>{const sug=SSUG[S.country]||SSUG._;el.innerHTML=`<di
     $('#sres').innerHTML=r.length?scard(sec(title,rows(r,sq?`“${sq}”`:'Stations'),`${r.length===50?'50+':r.length} station${r.length===1?'':'s'}${scc&&sq?' in '+esc(cName(scc)):''}`,'01'),'🔎','#b8a2ff','#7b5cff')
       :`<div class="sempty"><div class="semo">🤔</div><b>No stations found</b><span>Try a shorter name, check the spelling, or set the country to “Any country”.</span></div>`;mark()}
   catch{if(tok===renderTok)$('#sres').innerHTML=errBox()}};
-function bigEv(){if(S.theme==='off')return null;const n0=dayN(new Date()),y=new Date().getFullYear();let best=null;
+function bigEv(){if(S.theme==='off')return null;const n0=dayN(TODAY()),y=TODAY().getFullYear();let best=null;
   for(const e of sportEvents(y-1,y+1)){const t=THEMES[e.id];if(!t||!t.big)continue;const s0=dayN(e.st),day=n0-s0+1;
     if(day>=1&&day<=e.len){if(!best||best.pre)best={id:e.id,t,day,len:e.len}}else if(day<=0&&day>-14&&!best)best={id:e.id,t,pre:1-day,len:e.len}}return best}
 function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0);
@@ -866,7 +868,7 @@ function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0)
     <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div><p>${esc(t.tag||t.greet)}</p>
     ${b.pre?'':`<div class="bgbar"><i style="width:${Math.round(b.day/b.len*100)}%"></i></div>`}
     <div class="bgbt">${t.fxs?`<button data-bigfx="${t.fxs}">📊 Live scores</button>`:''}<button data-sgo="${esc(t.q||'sport')}">📻 Find coverage</button></div></div>`}
-function upcomingSport(){const n0=dayN(new Date()),y=new Date().getFullYear(),seen=new Set();return sportEvents(y,y+1).filter(e=>dayN(e.st)+e.len>n0).sort((a,b)=>a.st-b.st).filter(e=>{if(seen.has(e.id))return false;seen.add(e.id);return true}).slice(0,16)}
+function upcomingSport(){const n0=dayN(TODAY()),y=TODAY().getFullYear(),seen=new Set();return sportEvents(y,y+1).filter(e=>dayN(e.st)+e.len>n0).sort((a,b)=>a.st-b.st).filter(e=>{if(seen.has(e.id))return false;seen.add(e.id);return true}).slice(0,16)}
 function sportRowH(e){const t=THEMES[e.id],n0=dayN(new Date()),s0=dayN(e.st),on=n0>=s0&&n0<s0+e.len,end=new Date(e.st);end.setDate(end.getDate()+e.len-1);
   const f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}),yr=e.st.getFullYear()!==new Date().getFullYear()?' '+e.st.getFullYear():'';
   const when=on?'<em class="on">On now</em>':`<em>${s0-n0===1?'Tomorrow':'in '+(s0-n0)+' days'}</em>`;
@@ -1211,6 +1213,36 @@ function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px
 function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.favEdits()||'[]');if(!e.length)return;let n=0;
   e.forEach(x=>{if(x.op==='add'&&x.st&&x.st.u&&!S.favs.some(f=>f.u===x.st.u)){S.favs.unshift({tags:[],...x.st});n++}else if(x.op==='del'){const i=S.favs.findIndex(f=>f.u===x.u);if(i>=0){S.favs.splice(i,1);n++}}});
   if(n){save('favs');if(view==='library'||view==='home')render();mark&&mark()}}catch{}}
+/*@TESTONLY*/
+/* Developer tools — only in Daniel's Test copy. Everything between these markers is cut out when publishing to Beta. */
+function devOpen(u){if(NAT&&NAT.openUrl)NAT.openUrl(u);else open(u,'_blank','noopener')}
+function devSet(v){devNow=v;LS.set('devNow',v);closeSheet();render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'🛠 Back to today’s date',3000)}
+function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x.toISOString()};
+  const ev=sportEvents(y,y+2).filter(e=>THEMES[e.id]&&THEMES[e.id].big&&dayN(e.st)+e.len>dayN(new Date())).sort((a,b)=>a.st-b.st).slice(0,10);
+  const bd=S.bday&&/^\d{2}-\d{2}$/.test(S.bday)?S.bday:null,inbox=LS.get('devInbox','');
+  const xm=new Date(new Date().getMonth()===0&&new Date().getDate()<7?y-1:y,11,25);
+  sheet(`<h3>🛠 Developer tools</h3><p class="dim" style="margin:0 0 10px">Only in your Test app — never published.</p>
+  <div class="fbql">Preview a theme (pretend today is…)</div>
+  ${devNow?`<p class="dim" style="margin:4px 0 8px">Now previewing: <b>${new Date(devNow).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</b></p>`:''}
+  <button class="mi${devNow?'':' on'}" data-dev="">📅 Real date (today)</button>
+  <button class="mi" data-dev="${iso(xm)}">🎄 Christmas Day</button>
+  <button class="mi" data-dev="${iso(new Date(xm.getFullYear(),10,16))}">🎄 Christmas Radio starts</button>
+  ${bd?`<button class="mi" data-dev="${iso(new Date(y,+bd.slice(0,2)-1,+bd.slice(3)))}">🎂 Your birthday</button>`:''}
+  ${ev.map(e=>`<button class="mi" data-dev="${iso(new Date(e.st.getTime()+864e5))}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· day 2, ${e.st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></button>`).join('')}
+  ${ev.length?`<button class="mi" data-dev="${iso(new Date(ev[0].st.getTime()-5*864e5))}">⏳ Countdown to ${esc(THEMES[ev[0].id].name)}</button>`:''}
+  <div style="display:flex;gap:8px;margin:8px 0 14px"><input type="date" id="dev_d" style="flex:1"><button class="pill" id="dev_go">Go</button></div>
+  <div class="fbql">Problem reports</div>
+  <button class="mi" id="dev_inbox">📬 ${inbox?'Open report inbox':'Set up report inbox link'}</button>
+  <div id="dev_set" ${inbox?'hidden':''} style="margin-top:6px"><input id="dev_url" placeholder="Paste your report spreadsheet link" value="${esc(inbox)}" style="width:100%"><button class="pill" id="dev_save" style="margin-top:8px">Save link</button>${inbox?'':'<p class="dim" style="margin:6px 0 0">Open your responses spreadsheet, tap Share → Copy link, and paste it here. It’s saved on this phone only.</p>'}</div>
+  ${inbox?'<button class="mi" id="dev_chg"><span class="dim">Change inbox link</span></button>':''}`);
+  $$('#sheet [data-dev]').forEach(b=>b.onclick=()=>devSet(b.dataset.dev||null));
+  $('#dev_go').onclick=()=>{const v=$('#dev_d').value;if(v)devSet(iso(v+'T12:00:00'))};
+  $('#dev_inbox').onclick=()=>{const u=LS.get('devInbox','');if(u)devOpen(u);else{$('#dev_set').hidden=false;$('#dev_url').focus()}};
+  const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
+  $('#dev_save').onclick=()=>{const u=$('#dev_url').value.trim();if(u&&!/^https:\/\/(docs|drive)\.google\.com\//.test(u)){toast('That doesn’t look like a Google Sheets link');return}LS.set('devInbox',u);toast(u?'📬 Inbox link saved':'Inbox link removed');devSheet()}}
+document.addEventListener('click',e=>{if(e.target.closest('#s_dev'))devSheet()});
+if(devNow)setTimeout(()=>toast('🛠 Previewing as '+new Date(devNow).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' — Settings → Developer tools to change',4500),1200);
+/*@END*/
 /* Plays started in Android Auto (or the lock screen / widget) — native keeps a log; add them to Recent and stats. */
 function pullPlays(){try{if(!NAT||!NAT.plays)return;const a=JSON.parse(NAT.plays()||'[]');if(!a.length)return;let rec=0;
   a.sort((x,y)=>x.t-y.t).forEach(p=>{const st=p.st;if(!st||!st.u||!st.n)return;const s=Math.max(0,Math.round(p.s||0));
@@ -1252,6 +1284,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <div class="btnrow"><button class="pill amb" id="s_bk">${ic('dl')}Back up now</button><button class="pill" id="s_rs">${ic('ul')}Restore</button></div>
   <button class="pill" id="s_share" style="margin-top:14px">${ic('share')}Share the app</button>
   ${NAT?`<div class="chsel"><span class="mono">App updates</span><div class="chseg"><button data-chan="stable" class="${chan()==='stable'?'on':''}">🛡️ Stable</button><button data-chan="beta" class="${chan()==='beta'?'on':''}">⚡ Beta</button></div><p id="chtxt">${chan()==='beta'?'You get new versions as soon as they’re released. They may have the odd bug.':'Tried and tested: new versions arrive once they’ve been through beta.'}</p></div><button class="pill" id="s_upd" style="margin-top:10px">${ic('dl')}Check for app updates</button>`:`<a class="pill" href="${APK}" style="margin-top:14px;text-decoration:none">${ic('dl')}Get the Android app</a>`}
+  ${''/*@TESTONLY*/+(LS.get('tester',false)?`<button class="pill" id="s_dev" style="margin-top:10px">🛠 Developer tools</button>`:'')/*@END*/}
   <input type="file" id="s_file" accept=".txt,.json,text/plain,application/json" hidden>
   <div class="about"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span class="mono" id="s_ver">${verLabel()}</span><p>Live radio after dark</p><i>Made in the UK 🇬🇧</i><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><small>Stations from radio-browser.info · <a href="#" id="s_priv" style="color:inherit;text-decoration:underline">Privacy policy</a> · <a href="#" data-lpage="terms/" style="color:inherit;text-decoration:underline">Terms</a> · <a href="#" data-lpage="credits/" style="color:inherit;text-decoration:underline">Credits</a></small></div>`);
   $('#s_priv').onclick=e=>{e.preventDefault();const u=ROOT+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
@@ -1422,7 +1455,7 @@ const lastMon=(y,m)=>{const d=new Date(y,m+1,0);d.setDate(d.getDate()-((d.getDay
 function festOn(n){for(const[id,iso,len]of FEST){const[a,b,c]=iso.split('-').map(Number),st=dayN(new Date(a,b-1,c));if(n>=st&&n<st+len)return id}return null}
 const SOUTH=['AU','NZ','ZA','AR','CL','UY','PY','BR','PE','BO','NA','BW','ZW','MZ','MG','FJ','WS','TO','PG','LS','SZ'];
 const MAYMUM=['US','CA','AU','NZ','IN','JP','DE','IT','CH','BE','NL','DK','FI','BR','CN','HK','SG','MY','PH','ZA','AT','TR','GR','CO','PE','CL','VE','EC','UY','IS','EE','CZ','SK','UA','JM','TT','BB','KE','GH','NG','ZW'];
-function themeId(d=new Date()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getDate(),n=dayN(d),E=dayN(easter(y)),md=m*100+D,cc=S.country,uk=UKI.includes(cc),gb=['GB','IM','JE','GG'].includes(cc),south=SOUTH.includes(cc);
+function themeId(d=TODAY()){const y=d.getFullYear(),m=d.getMonth()+1,D=d.getDate(),n=dayN(d),E=dayN(easter(y)),md=m*100+D,cc=S.country,uk=UKI.includes(cc),gb=['GB','IM','JE','GG'].includes(cc),south=SOUTH.includes(cc);
   let f=festOn(n);if(f==='comicrelief'&&!gb)f=null;if((f==='eurovision'||f==='eurosemi')&&!(EUR.includes(cc)||['AU','IL'].includes(cc)))f=null;
   if(S.bday&&S.bday===String(m).padStart(2,'0')+'-'+String(D).padStart(2,'0'))return'birthday';
   if(md>=1231||md<=102)return'newyear';if(md>=1224&&md<=1226)return'christmas';if(f==='hanukkah')return'hanukkah';if(md>=1201&&md<=1230)return'christmas';
