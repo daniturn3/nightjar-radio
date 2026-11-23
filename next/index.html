@@ -908,6 +908,11 @@ VIEWS.search=async(el,tok)=>{const sug=SSUG[S.country]||SSUG._;el.innerHTML=`<di
     $('#sres').innerHTML=r.length?scard(sec(title,rows(r,sq?`“${sq}”`:'Stations'),`${r.length===50?'50+':r.length} station${r.length===1?'':'s'}${scc&&sq?' in '+esc(cName(scc)):''}`,'01'),'🔎','#b8a2ff','#7b5cff')
       :`<div class="sempty"><div class="semo">🤔</div><b>No stations found</b><span>Try a shorter name, check the spelling, or set the country to “Any country”.</span></div>`;mark()}
   catch{if(tok===renderTok)$('#sres').innerHTML=errBox()}};
+/* Every big tournament on now (or starting within two weeks) — they can overlap, e.g. the Rugby and Cricket World Cups. */
+function bigList(){if(S.theme==='off')return[];const n0=dayN(TODAY()),y=TODAY().getFullYear(),on=[],pre=[];
+  for(const e of sportEvents(y-1,y+1)){const t=THEMES[e.id];if(!t||!t.big)continue;const s0=dayN(e.st),day=n0-s0+1;
+    if(day>=1&&day<=e.len)on.push({id:e.id,t,day,len:e.len});else if(day<=0&&day>-14)pre.push({id:e.id,t,pre:1-day,len:e.len})}
+  pre.sort((a,b)=>a.pre-b.pre);const seen=new Set();return on.concat(pre).filter(b=>!seen.has(b.id)&&seen.add(b.id)).slice(0,3)}
 function bigEv(){if(S.theme==='off')return null;const n0=dayN(TODAY()),y=TODAY().getFullYear();let best=null;
   for(const e of sportEvents(y-1,y+1)){const t=THEMES[e.id];if(!t||!t.big)continue;const s0=dayN(e.st),day=n0-s0+1;
     if(day>=1&&day<=e.len){if(!best||best.pre)best={id:e.id,t,day,len:e.len}}else if(day<=0&&day>-14&&!best)best={id:e.id,t,pre:1-day,len:e.len}}return best}
@@ -929,8 +934,8 @@ function evCard(){const t=TH,id=THID;if(!t||!id||!t.greet||['spring','summer','a
     <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div>${p&&p!==line?`<p>${esc(p)}</p>`:''}
     ${pct!=null?`<div class="bgbar"><i style="width:${Math.round(pct*100)}%"></i></div>`:''}<div class="bgbt">${btn}</div></div>`}
 /* Big tournament card and today's own event card: show both when they're different events (today's first if the tournament hasn't started). */
-function evBoth(){const b=bigEv(),big=bigH(),ev=b&&b.id===THID?'':evCard();return b&&b.pre?ev+big:big+ev}
-function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0);
+function evBoth(){const L=bigList(),ev=L.some(b=>b.id===THID)?'':evCard();return L.filter(b=>!b.pre).map(bigH).join('')+ev+L.filter(b=>b.pre).map(bigH).join('')}
+function bigH(b=bigEv()){if(!b)return'';const t=b.t,left=b.len-(b.day||0);
   const line=b.pre?(b.pre===1?'Starts tomorrow':`Starts in ${b.pre} days`):b.day===1?`Day 1 of ${b.len} · it starts today`:left===0?'Final day!':`Day ${b.day} of ${b.len} · ${left} day${left>1?'s':''} to go`;
   return`<div class="bigev" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${(t.p||[t.badge]).concat(t.p||[]).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
     <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div><p>${esc(t.tag||t.greet)}</p>
@@ -1076,7 +1081,7 @@ function fxWire(tok){const d=$('#fx');if(!d)return;const go=()=>{const sp=fxSpor
   const iv=setInterval(()=>{if(tok!==renderTok||!document.body.contains(d))return clearInterval(iv);if(!document.hidden&&d.open)go()},60e3)}
 const scard=(html,ic,a,b)=>html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${a};--b:${b};--hc:${a}">`).replace(/<h2><i>[^<]*<\/i>/,`<h2><span class="hico">${ic}</span>`);
 VIEWS.sport=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];
-  el.innerHTML=`<div class="hero"><div class="mono">Sports radio</div><h1>Sport<b>.</b></h1></div>${bigH()}
+  el.innerHTML=`<div class="hero"><div class="mono">Sports radio</div><h1>Sport<b>.</b></h1></div>${bigList().map(bigH).join('')}
   <div class="spban"><div class="spfl l"></div><div class="spfl r"></div><div class="spbt"><b>Live sport on the radio</b><span>Commentary, phone-ins and match-day shows from ${esc(cn)} ${flag(S.country)} and around the world</span></div>
     <div class="spem">${['⚽','🏉','🏏','🎾','🏇','⛳','🏎️','🥊','🏀','🎯'].map((e,i)=>`<i style="--d:${i*.25}s">${e}</i>`).join('')}</div></div>
   <div class="spnote">📻 Live commentary depends on each station’s broadcasting rights. Some stations play music instead of commentary online, or only stream it in their own country — so if a match isn’t on, try another station.</div>
