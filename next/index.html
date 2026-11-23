@@ -638,7 +638,10 @@ window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true
   if(reconn&&!wasRc)toast('📶 Signal dropped — reconnecting…');if(wasRc&&playing)toast('✓ Back on air');
   if(e.err&&e.err!==natErr){buffering=false;logErr('player: '+e.err+' · '+(cur?.n||''));toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station');trouble('play')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
-  if((e.song||'')!==song){song=e.song||'';showSong()}setState()};
+  if((e.song||'')!==song){song=unent(e.song||'');showSong()}setState()};
+/* Some stations send song titles with HTML codes in them (e.g. &#8212; for a dash) — turn them back into the real characters. */
+function unent(s){if(!s||s.indexOf('&')<0)return s;const N={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',mdash:'—',ndash:'–',hellip:'…',rsquo:'’',lsquo:'‘',rdquo:'”',ldquo:'“'};
+  return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(m,c)=>c[0]==='#'?(()=>{const n=c[1]==='x'||c[1]==='X'?parseInt(c.slice(2),16):+c.slice(1);try{return n>0&&n<0x110000?String.fromCodePoint(n):m}catch{return m}})():(N[c.toLowerCase()]??m))}
 function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
 au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
