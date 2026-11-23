@@ -28,6 +28,8 @@ def body(ch):
     if ch == "test":
         t = STRIP.sub("", b.decode("utf-8"))
         if "@TESTONLY" in t or "@END*/" in t: raise SystemExit("Unmatched @TESTONLY/@END marker in next/index.html")
+        for bad in ("devSheet", "Developer tools", "devInbox"):
+            if bad in t: raise SystemExit(f"Developer tools code ({bad}) is outside the @TESTONLY markers — not publishing")
         b = t.encode("utf-8")
     return b
 def webid(ch): return hashlib.sha256(body(ch)).hexdigest()[:12] if WEB[ch].exists() else ""
