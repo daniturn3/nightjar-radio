@@ -585,6 +585,24 @@ const lgo=(st,cls='lg')=>`<div class="${cls} art" style="--hue:${hueOf(st.n)}"><
 /* ---------- radio directory (radio-browser.info, a free community directory) ---------- */
 const RB=['https://de1.api.radio-browser.info','https://de2.api.radio-browser.info','https://fi1.api.radio-browser.info','https://all.api.radio-browser.info'];
 let rbOk=LS.get('rbOk',0);const CACHE={};
+/* Truly random stations: count how many stations match, pick exact positions with a cryptographic
+   random number, and fetch just those. Every station has the same chance, big or small. */
+const RNDC={};
+function rnd(n){const a=new Uint32Array(1);crypto.getRandomValues(a);return n>0?a[0]%n:0}
+async function rndCount(q){const k=JSON.stringify(q)+(NAT?'a':'w');if(RNDC[k]&&Date.now()-RNDC[k].t<6*36e5)return RNDC[k].n;let n=0;
+  try{if(q.tag&&Object.keys(q).length===1){const r=await rb('/json/tags/'+encodeURIComponent(q.tag),864e5);n=(r.find(x=>x.name===q.tag.toLowerCase())||{}).stationcount||0}
+    else if(q.countrycode&&Object.keys(q).length===1){const r=await rb('/json/countrycodes/'+encodeURIComponent(q.countrycode),864e5);n=(r.find(x=>x.name===q.countrycode)||r[0]||{}).stationcount||0}
+    else if(!Object.keys(q).length){const r=await rb('/json/stats',36e5);n=(r.stations||0)-(r.stations_broken||0)}}catch{}
+  RNDC[k]={n,t:Date.now()};return n}
+async function trueRandom(q={},want=1,avoid=new Set()){const key=JSON.stringify(q)+(NAT?'a':'w');let n=await rndCount(q);const out=[],seen=new Set(avoid);if(!n)return out;
+  /* The directory's count includes stations this app hides (offline, not secure), so a pick past the end comes back empty:
+     each empty pick lowers the upper bound to that position and we pick again — still every station has an equal chance. */
+  for(let round=0;round<5&&out.length<want;round++){const k=Math.min(12,(want-out.length)*2),offs=Array.from({length:k},()=>rnd(n));
+    const got=await Promise.all(offs.map(o=>{const p=new URLSearchParams({hidebroken:'true',...(NAT?{}:{is_https:'true'}),order:'name',offset:String(o),limit:'1',...q,...(q.tag?{tagExact:'true'}:{})});
+      return rb('/json/stations/search?'+p,0).then(d=>{if(!d.length&&o<n)n=o;return d.filter(good).map(mk)[0]}).catch(()=>null)}));
+    if(RNDC[key])RNDC[key].n=n;
+    for(const x of got)if(x&&!seen.has(x.u)&&out.length<want){seen.add(x.u);out.push(x)}}
+  return out}
 async function rb(path,ttl=6*36e5){const key='c:'+path,hit=CACHE[key]||(()=>{try{return JSON.parse(sessionStorage.getItem('njr'+key))}catch{return null}})();
   if(hit&&Date.now()-hit.t<ttl)return hit.d;let err;
   for(let k=0;k<RB.length;k++){const i=(rbOk+k)%RB.length;try{const c=new AbortController(),to=setTimeout(()=>c.abort(),8000);
@@ -745,9 +763,9 @@ async function globeSpin(){if(globeBusy)return;globeBusy=true;const out=$('#gres
   const seen=LS.get('gseen',[]),heard=new Set(S.recent.map(x=>x.u));let fresh=pool.filter(z=>!seen.includes(z[1]));if(fresh.length<3)fresh=pool;
   let st,z;for(let tries=0;tries<4&&!st;tries++){z=fresh.splice(Math.random()*fresh.length|0,1)[0]||pool[Math.random()*pool.length|0];
     const feat=G.feats?.find(f=>f.id===ISO[z[0]]),ll=ZLL[z[1]]||(feat&&window.d3?d3.geoCentroid(feat).reverse():[0,0]),short=z[1].replace(/^the /,'');
-    const look=(async()=>{try{const q={countrycode:z[0],order:'random'};if(z[3])q.state=z[3];let r=await stations(q,40,0);if(r.length<3&&z[3])r=await stations({countrycode:z[0],order:'random'},40,0);
+    const look=(async()=>{try{if(!z[3]){const tr=await trueRandom({countrycode:z[0]},6);if(tr.length>=2)return tr}const q={countrycode:z[0],order:'random'};if(z[3])q.state=z[3];let r=await stations(q,40,0);if(r.length<3&&z[3])r=await stations({countrycode:z[0],order:'random'},40,0);
       const pop=Math.random()<.35?await stations({countrycode:z[0]},25).catch(()=>[]):[];return[...r,...pop]}catch{return[]}})();
-    const[,r]=await Promise.all([gSpinTo(ll[0],ll[1],flag(z[0])+' '+short,feat),look]);const nw=r.filter(x=>!heard.has(x.u));const R2=nw.length?nw:r;if(R2.length)st=R2[Math.random()*R2.length|0]}
+    const[,r]=await Promise.all([gSpinTo(ll[0],ll[1],flag(z[0])+' '+short,feat),look]);const nw=r.filter(x=>!heard.has(x.u));const R2=nw.length?nw:r;if(R2.length)st=R2[rnd(R2.length)]}
   if(z){LS.set('gseen',[z[1],...seen.filter(x=>x!==z[1])].slice(0,15))}
   globeBusy=false;if(!st){if(out)out.innerHTML=errBox();return}
   if($('#gres'))$('#gres').innerHTML=`<div class="gwhere"><span class="gflag">${flag(z[0])}</span><div><b>${esc(z[1].replace(/^the /,'').replace(/^./,c=>c.toUpperCase()))}</b><span>It’s ${zTime(z[2])} there · ${PERS.find(p=>p[0]!=='any'&&p[3](zHour(z[2])))?.[1].toLowerCase()||''}</span></div></div>${rows([st],'Around the world · '+z[1])}`;
@@ -870,7 +888,7 @@ VIEWS.dial=async(el,tok)=>{window.dialSpin=null;el.innerHTML=`<div class="hero">
     <div class="rshint">Swipe the dial to tune · tap the knob to spin</div></div>`})()}
   <div class="dialcard" id="dialcard"><div class="dim">Tuning…</div></div>
   <div class="btnrow" style="margin-top:14px;justify-content:center"><button class="pill amb" data-act="spin">${ic('shuffle')}Spin the dial</button></div>`;
-  try{const[pop,rnd]=await Promise.all([stations({tag:dialTag},20).catch(()=>[]),stations({tag:dialTag,order:'random'},60,0).catch(()=>[])]);const m=new Map();[...pop.sort(()=>Math.random()-.5).slice(0,12),...rnd].forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});dialList=[...m.values()].sort(()=>Math.random()-.5).slice(0,48);if(!dialList.length)throw 0}catch{if(tok===renderTok)$('#dialcard').innerHTML=errBox();return}if(tok!==renderTok)return;
+  try{const[pop,rnd]=await Promise.all([stations({tag:dialTag},20).catch(()=>[]),trueRandom({tag:dialTag},16).then(r=>r.length>=6?r:stations({tag:dialTag,order:'random'},60,0)).catch(()=>[])]);const m=new Map();[...pop.sort(()=>Math.random()-.5).slice(0,12),...rnd].forEach(x=>{if(!m.has(x.u))m.set(x.u,x)});dialList=[...m.values()].sort(()=>Math.random()-.5).slice(0,48);if(!dialList.length)throw 0}catch{if(tok===renderTok)$('#dialcard').innerHTML=errBox();return}if(tok!==renderTok)return;
   if(!dialList.length){$('#dialcard').innerHTML='<div class="empty" style="padding:6px">No stations on this band — try another mood.</div>';return}
   const N=dialList.length,f=i=>(88+i*(20/Math.max(1,N-1))).toFixed(1);
   $('#scale').innerHTML=Array.from({length:N*2-1},(_,j)=>j%2?`<div class="tk"><i></i><span></span></div>`:`<div class="tk has" data-di="${j/2}"><i></i><span>${f(j/2)}</span></div>`).join('');
@@ -883,7 +901,7 @@ VIEWS.dial=async(el,tok)=>{window.dialSpin=null;el.innerHTML=`<div class="hero">
     if(!onSt&&live&&S.staticfx&&playing){/* passing between stations */}};
   const startI=Math.max(0,dialList.findIndex(s=>s.u===cur?.u));d.scrollLeft=startI*2*60;lastI=cur&&dialList[startI]?.u===cur.u?startI:-1;show(startI*2,false);
   turn();d.addEventListener('scroll',()=>{turn();const j=at();show(j,false);clearTimeout(settle);if(d.dataset.spin)return;settle=setTimeout(()=>show(at(),true),420)},{passive:true});
-  window.dialSpin=()=>{if(d.dataset.spin)return;const from=d.scrollLeft,cj=at();const heard=new Set(S.recent.slice(0,15).map(x=>x.u));let j,g=0;do{j=Math.floor(Math.random()*N)*2;g++}while(g<60&&N>4&&(Math.abs(j-cj)<8||heard.has(dialList[j/2].u)));
+  window.dialSpin=()=>{if(d.dataset.spin)return;const from=d.scrollLeft,cj=at();const heard=new Set(S.recent.slice(0,15).map(x=>x.u));let j,g=0;do{j=rnd(N)*2;g++}while(g<60&&N>4&&(Math.abs(j-cj)<8||heard.has(dialList[j/2].u)));
     const to=j*60,dur=playful()?6000:0,t0=performance.now();d.dataset.spin=1;d.style.scrollSnapType='none';staticOn();
     const f=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=1-Math.pow(1-k,4);d.scrollLeft=from+(to-from)*e;if(k<1)requestAnimationFrame(f);else{d.style.scrollSnapType='';delete d.dataset.spin;show(j,true);if(dialList[j/2]?.u===cur?.u&&!buffering)staticOff()}};requestAnimationFrame(f)}};
 let sq=LS.get('sq',''),scc=LS.get('scc','');
@@ -1860,7 +1878,7 @@ function onboard(){if(!LS.get('seenTour',0)){tour()}else whatsNew();if(NAT)check
 const CALM=['sleep','ambient','chill','lofi','lo-fi','classical','relax','meditat','piano','jazz','easy listening','downtempo','new age','nature'];
 const isCalm=st=>st&&(st.tags||[]).some(t=>CALM.some(c=>t.toLowerCase().includes(c)));
 async function bedtime(){let st=isCalm(cur)?cur:[...S.favs,...S.presets.filter(Boolean),...S.recent].find(isCalm);
-  if(!st){toast('Finding something calm…');try{const r=await stations({tag:['ambient','sleep','chillout','classical'][Math.random()*4|0],order:'random'},30,0);st=r[Math.random()*Math.min(r.length,15)|0]}catch{}}
+  if(!st){toast('Finding something calm…');try{const tg=['ambient','sleep','chillout','classical'][rnd(4)];st=(await trueRandom({tag:tg},1))[0];if(!st){const r=await stations({tag:tg,order:'random'},30,0);st=r[rnd(Math.min(r.length,15))]}}catch{}}
   if(!st)return toast('Couldn’t find a calm station — try again');
   if(cur?.u!==st.u||!(playing||buffering))play(st,{list:[st],name:'Bedtime'});
   const v=Math.min(stVol(st),.45);applyVol(v);
