@@ -486,6 +486,19 @@ body.ldim #nl{color:rgba(255,179,71,.12)}
 @keyframes sleigh{0%{transform:translate(0,0);opacity:0}1%{opacity:.95}12%{transform:translate(calc(-100vw - 160px),-26px);opacity:.95}12.1%,100%{opacity:0;transform:translate(calc(-100vw - 160px),-26px)}}
 body.calm #sleigh,body.calm #xhat{animation:none}
 @media (prefers-reduced-motion:reduce){#sleigh{display:none}}
+
+/*@TESTONLY*/
+.xday{margin:16px 0 4px;border-radius:22px;overflow:hidden;position:relative;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.xday svg{display:block;width:100%;height:auto}
+.xdlab{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#fff;background:#1a1410;padding:10px 14px}
+.xdlab span{font-size:12px;opacity:.85;white-space:nowrap}
+.xnote{opacity:0}
+body.playing .xnote{animation:xnote 3s ease-in infinite}
+@keyframes xnote{0%{opacity:0;transform:translateY(0)}15%{opacity:.95}100%{opacity:0;transform:translateY(-60px)}}
+.xflame{transform-origin:center bottom;transform-box:fill-box;animation:xfl 1.2s ease-in-out infinite alternate}
+@keyframes xfl{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
+body.calm .xnote,body.calm .xflame{animation:none}
+/*@END*/
 </style>
 </head>
 <body>
@@ -659,7 +672,7 @@ const cardH=(st,k,i)=>`<div class="card" data-st="${k}" data-i="${i}">${lgo(st)}
 const rows=(arr,name,near)=>{const k=reg(arr,name);if(near)L[k].near=1;return arr.map((s,i)=>rowH(s,k,i)).join('')};
 const cards=(arr,name)=>{const k=reg(arr,name);return`<div class="hs">${arr.map((s,i)=>cardH(s,k,i)).join('')}</div>`};
 const errBox=()=>`<div class="empty"><b>Static on the line</b>Couldn’t reach the radio directory — check your connection.</div>`;
-const greet=()=>{const h=new Date().getHours();return h<5?'Still up?':h<12?'Good morning':h<18?'Good afternoon':'Good evening'};
+const greet=()=>{const h=TODAY().getHours();return h<5?'Still up?':h<12?'Good morning':h<18?'Good afternoon':'Good evening'};
 const isFav=st=>S.favs.some(x=>x.u===st.u);
 function presetsH(){return`<div class="presets">${S.presets.map((p,i)=>p?`<button class="pre${cur?.u===p.u&&(playing||buffering)?' live':''}" data-pre="${i}"><span class="n">${i+1}</span>${lgo(p,'ph')}<b>${esc(p.n)}</b></button>`
   :`<button class="pre vac" data-pre="${i}"><span class="n">${i+1}</span>${ic('plus')}<b>Empty</b></button>`).join('')}</div>`}
@@ -797,7 +810,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${''/*@TESTONLY*/+xdayH()/*@END*/}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -1228,7 +1241,7 @@ function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.
 /* Developer tools — only in Daniel's Test copy. Everything between these markers is cut out when publishing to Beta. */
 function devOpen(u){if(NAT&&NAT.openUrl)NAT.openUrl(u);else open(u,'_blank','noopener')}
 function devSet(v){devNow=v;LS.set('devNow',v);closeSheet();try{applyTheme()}catch{}render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'🛠 Back to today’s date',3000)}
-function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x.toISOString()};
+function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x.toISOString()},at=(d,h)=>{const x=new Date(d);x.setHours(h,0,0,0);return x.toISOString()};
   const ev=sportEvents(y,y+2).filter(e=>THEMES[e.id]&&THEMES[e.id].big&&dayN(e.st)+e.len>dayN(new Date())).sort((a,b)=>a.st-b.st).slice(0,10);
   const bd=S.bday&&/^\d{2}-\d{2}$/.test(S.bday)?S.bday:null,inbox=LS.get('devInbox','');
   const xm=new Date(new Date().getMonth()===0&&new Date().getDate()<7?y-1:y,11,25);
@@ -1236,7 +1249,9 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   <div class="fbql">Preview a theme (pretend today is…)</div>
   ${devNow?`<p class="dim" style="margin:4px 0 8px">Now previewing: <b>${new Date(devNow).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</b></p>`:''}
   <button class="mi${devNow?'':' on'}" data-dev="">📅 Real date (today)</button>
-  <button class="mi" data-dev="${iso(xm)}">🎄 Christmas Day</button>
+  <button class="mi" data-dev="${at(xm,9)}">🎄 Christmas morning <span class="dim">· 9am</span></button>
+  <button class="mi" data-dev="${at(xm,15)}">🎉 Christmas afternoon <span class="dim">· 3pm</span></button>
+  <button class="mi" data-dev="${at(xm,20)}">🕯️ Christmas evening <span class="dim">· 8pm</span></button>
   <button class="mi" data-dev="${iso(new Date(xm.getFullYear(),10,16))}">🎄 Christmas Radio starts</button>
   ${bd?`<button class="mi" data-dev="${iso(new Date(y,+bd.slice(0,2)-1,+bd.slice(3)))}">🎂 Your birthday</button>`:''}
   ${ev.map(e=>`<button class="mi" data-dev="${iso(new Date(e.st.getTime()+864e5))}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· day 2, ${e.st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></button>`).join('')}
@@ -1252,6 +1267,39 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
   $('#dev_save').onclick=()=>{const u=$('#dev_url').value.trim();if(u&&!/^https:\/\/(docs|drive)\.google\.com\//.test(u)){toast('That doesn’t look like a Google Sheets link');return}LS.set('devInbox',u);toast(u?'📬 Inbox link saved':'Inbox link removed');devSheet()}}
 document.addEventListener('click',e=>{if(e.target.closest('#s_dev'))devSheet()});
+/* Christmas Day on Home (Test only for now): a cosy tabletop scene with the radio, changing through the day. */
+function xdayH(){if(!LS.get('tester',false))return'';const d=TODAY();if(d.getMonth()!==11||d.getDate()!==25)return'';
+  const h=d.getHours(),ph=h<13?'m':h<18?'a':'e',W=380,H=230,nm=(cur&&cur.n||'Nightjar Radio').slice(0,16);
+  const bok=(cols,seed)=>{let s=seed;const r=()=>((s=s*9301+49297)%233280)/233280;return Array.from({length:20},()=>`<circle cx="${(r()*W)|0}" cy="${(8+r()*140)|0}" r="${(6+r()*16)|0}" fill="${cols[(r()*cols.length)|0]}" opacity="${(.18+r()*.4).toFixed(2)}"/>`).join('')};
+  const gift=(x,y,w,hh,c,rb)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="3" fill="${c}"/><rect x="${x+w/2-4}" y="${y}" width="8" height="${hh}" fill="${rb}"/><rect x="${x}" y="${y+hh/2-3}" width="${w}" height="6" fill="${rb}"/><ellipse cx="${x+w/2-7}" cy="${y-4}" rx="8" ry="5" fill="${rb}"/><ellipse cx="${x+w/2+7}" cy="${y-4}" rx="8" ry="5" fill="${rb}"/>`;
+  const ball=(cx,cy,r,f,g)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${f}"/><circle cx="${cx-r*.35}" cy="${cy-r*.35}" r="${r*.28}" fill="#fff" opacity=".35"/><rect x="${cx-4}" y="${cy-r-6}" width="8" height="7" rx="1" fill="${g}"/>`;
+  const candle=(x,y,hh,c)=>`<rect x="${x}" y="${y}" width="24" height="${hh}" rx="3" fill="${c}"/><g class="xflame"><ellipse cx="${x+12}" cy="${y-10}" rx="5" ry="10" fill="#ffd166"/><ellipse cx="${x+12}" cy="${y-6}" rx="2.5" ry="5" fill="#fff4d0"/></g><circle cx="${x+12}" cy="${y-8}" r="26" fill="#ffb347" opacity=".18"/>`;
+  const P={m:{bg:'#2d4a6a',bok:['#ffe9a8','#ffffff','#9fd3ff'],sd:3,tb:['#8a5a32','#a8784a'],body:'#a3262b',trim:'#ffd166',panel:'#e9d9b8',grille:'#c9b28a',dial:'#f6ecd2',ink:'#3a2a1a',live:'#2f8f5b',lv:'● Christmas morning',knob:'#3a2a1a',nc:'#ffe9a8',lab:'🎁 Christmas morning · presents time',
+      ex:`<rect x="250" y="0" width="130" height="140" fill="#bcd6f2" opacity=".35"/><path d="M-10 176 L40 14 L90 176 Z" fill="#1f5e3d"/><path d="M-10 130 L40 34 L90 130 Z" fill="#2f8f5b"/>${[[20,74,'#ff5a5f'],[52,104,'#ffd166'],[30,140,'#7fc3ff'],[60,150,'#ff5a5f']].map(([a,b,c])=>`<circle cx="${a}" cy="${b}" r="4" fill="${c}"/>`).join('')}`,
+      pr:gift(262,130,50,46,'#3f7fff','#ffd166')+gift(318,146,44,30,'#ff5a5f','#fff')+gift(290,104,36,26,'#3fbf7f','#ff5a5f'),hat:'<path d="M118 76 q12 -14 24 0 z" fill="#2f8f5b"/><circle cx="130" cy="66" r="6" fill="#ff5a5f"/>'},
+    a:{bg:'#5a1620',bok:['#ffd166','#ff5a5f','#3fbf7f','#ffffff'],sd:11,tb:['#f4ede0','#fffaf0'],body:'#7a1a26',trim:'#ffd166',panel:'#2a0a10',grille:'#5a1620',dial:'#ffd166',ink:'#5a1620',live:'#a0261c',lv:'● Party time',knob:'#ffd166',nc:'#ffd166',lab:'🎉 Christmas party · turn it up',
+      ex:Array.from({length:28},(_,i)=>`<rect class="xconf" x="${(i*53)%370}" y="${(i*37)%160}" width="5" height="9" fill="${['#ffd166','#3fbf7f','#7fc3ff','#ff9fcf'][i%4]}" transform="rotate(${i*23} ${(i*53)%370} ${(i*37)%160})"/>`).join(''),
+      pr:`<rect x="258" y="154" width="96" height="20" rx="10" fill="#3f7fff" transform="rotate(-8 306 164)"/><rect x="300" y="150" width="10" height="24" fill="#ffd166" transform="rotate(-8 306 164)"/><path d="M330 110 l10 0 l-3 50 l-4 0 z" fill="#fff" opacity=".8"/><ellipse cx="335" cy="110" rx="16" ry="8" fill="#ffe9a8" opacity=".85"/><rect x="333" y="160" width="4" height="14" fill="#fff" opacity=".8"/><ellipse cx="335" cy="174" rx="12" ry="3" fill="#fff" opacity=".8"/>`,
+      hat:'<path d="M60 82 L76 34 L92 82 Z" fill="#3fbf7f"/><circle cx="76" cy="34" r="5" fill="#ffd166"/><path d="M60 82 L76 34 L92 82 Z" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="4 5"/>'},
+    e:{bg:'#1c120c',bok:['#ffb347','#ffd166','#ff8a5a'],sd:7,tb:['#6a3e22','#8a5a32'],body:'#8a1c1c',trim:'#c9a24a',panel:'#d9c19a',grille:'#b89a6a',dial:'#f0dfb8',ink:'#3a2a1a',live:'#8a4a1c',lv:'● Cosy night',knob:'#2a1a10',nc:'#ffcf8a',lab:'🕯️ Cosy Christmas night',
+      ex:`<path d="M-10 176 L60 0 L130 176 Z" fill="#14281a" opacity=".9"/>${[[30,56],[70,94],[40,122],[90,140]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="4" fill="#ffd166"/><circle cx="${a}" cy="${b}" r="10" fill="#ffd166" opacity=".2"/>`).join('')}`,
+      pr:candle(262,112,64,'#ff8a6a')+ball(320,160,16,'#b3121e','#c9a24a')+ball(352,162,13,'#c9a24a','#888')+ball(296,166,11,'#c9a24a','#888'),hat:''}}[ph];
+  const x=42,y=80,w=200,hh=100,o=P;
+  const radio=`<line x1="${x+150}" y1="${y}" x2="${x+176}" y2="${y-54}" stroke="#bbb" stroke-width="2"/><circle cx="${x+176}" cy="${y-54}" r="3" fill="#ddd"/>${o.hat}
+<rect x="${x+8}" y="${y+hh}" width="10" height="8" fill="#3a2a1a"/><rect x="${x+w-18}" y="${y+hh}" width="10" height="8" fill="#3a2a1a"/>
+<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="12" fill="${o.body}"/><rect x="${x}" y="${y}" width="${w}" height="10" rx="5" fill="${o.trim}" opacity=".9"/>
+<rect x="${x+10}" y="${y+16}" width="${w-20}" height="${hh-26}" rx="7" fill="${o.panel}"/><rect x="${x+18}" y="${y+24}" width="54" height="${hh-42}" rx="4" fill="${o.grille}"/>
+${Array.from({length:8},(_,i)=>`<line x1="${x+22}" y1="${y+30+i*7}" x2="${x+68}" y2="${y+30+i*7}" stroke="#000" stroke-opacity=".45" stroke-width="2"/>`).join('')}
+<rect x="${x+80}" y="${y+24}" width="76" height="44" rx="4" fill="${o.dial}"/>${Array.from({length:12},(_,i)=>`<line x1="${x+85+i*6}" y1="${y+28}" x2="${x+85+i*6}" y2="${y+(i%3?33:36)}" stroke="${o.ink}" stroke-width="1"/>`).join('')}
+<line x1="${x+112}" y1="${y+27}" x2="${x+112}" y2="${y+64}" stroke="#d33" stroke-width="1.5"/>
+<text x="${x+118}" y="${y+50}" text-anchor="middle" font-family="Fraunces,serif" font-style="italic" font-size="11" fill="${o.ink}">${esc(nm)}</text>
+<text x="${x+118}" y="${y+63}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="${o.live}">${o.lv}</text>
+<circle cx="${x+172}" cy="${y+38}" r="11" fill="${o.knob}"/><circle cx="${x+172}" cy="${y+38}" r="4" fill="#000" opacity=".35"/><circle cx="${x+172}" cy="${y+66}" r="9" fill="${o.knob}"/><circle cx="${x+172}" cy="${y+66}" r="3" fill="#000" opacity=".35"/>
+<rect x="${x+4}" y="${y+hh+10}" width="${w-8}" height="20" rx="8" fill="${o.body}" opacity=".18"/>`;
+  const notes=['♪','♫','♪','♫'].map((n,i)=>`<text class="xnote" style="animation-delay:${i*.75}s" x="${78+i*28}" y="72" font-size="${15+i*2}" fill="${o.nc}">${n}</text>`).join('');
+  return`<div class="xday" data-act="xday"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Christmas radio scene"><rect width="${W}" height="${H}" fill="${o.bg}"/>${bok(o.bok,o.sd)}${o.ex}<rect x="0" y="176" width="${W}" height="54" fill="${o.tb[0]}"/><rect x="0" y="176" width="${W}" height="4" fill="${o.tb[1]}"/>${radio}${notes}${o.pr}</svg><div class="xdlab">${o.lab}<span>Christmas Radio ›</span></div></div>`}
+document.addEventListener('click',e=>{if(e.target.closest('.xday')){const x=$('.xc');if(x)x.scrollIntoView({behavior:'smooth',block:'start'})}});
+
 if(devNow)setTimeout(()=>toast('🛠 Previewing as '+new Date(devNow).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' — Settings → Developer tools to change',4500),1200);
 /*@END*/
 /* Plays started in Android Auto (or the lock screen / widget) — native keeps a log; add them to Recent and stats. */
