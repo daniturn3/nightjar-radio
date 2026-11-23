@@ -476,29 +476,25 @@ body.ldim #car{color:#5e554b}body.ldim .carbtns button{background:#0b090b;color:
 body.ldim #nl{color:rgba(255,179,71,.12)}
 @media (prefers-reduced-motion:reduce){.aur{animation:none}}
 
-/* More Christmas: snow on the cards, a Santa hat on the logo and Santa's sleigh across the sky. */
-.th-christmas .hcard::before{content:'';position:absolute;left:0;right:0;top:0;height:13px;z-index:2;pointer-events:none;opacity:.9;
+/* Event dressing: snow or bunting on the cards, a hat or sticker on the logo, a visitor across the sky, Christmas Day phases. */
+.th-snowcap .hcard::before{content:'';position:absolute;left:0;right:0;top:0;height:13px;z-index:2;pointer-events:none;opacity:.9;
   background:radial-gradient(circle at 11px 0,#fff 0 8px,transparent 9px) 0 0/22px 13px repeat-x,linear-gradient(#fff,#fff) 0 0/100% 3px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.th-bunt .hcard::before{content:'';position:absolute;left:10px;right:10px;top:2px;height:13px;z-index:2;pointer-events:none;opacity:.92;
+  background:repeating-linear-gradient(90deg,var(--acc) 0 24px,var(--acc2) 24px 48px,var(--cor) 48px 72px);
+  -webkit-mask:conic-gradient(from -45deg at 50% 100%,#000 90deg,#0000 0) 0 0/24px 13px repeat-x;mask:conic-gradient(from -45deg at 50% 100%,#000 90deg,#0000 0) 0 0/24px 13px repeat-x}
+.xd-a .hcard::before{background:radial-gradient(circle,#ffd166 0 2px,transparent 3px) 0 2px/14px 10px,radial-gradient(circle,#ff5a5f 0 2px,transparent 3px) 7px 7px/14px 10px,radial-gradient(circle,#3fbf7f 0 2px,transparent 3px) 3px 4px/18px 12px;filter:none;height:12px}
 .brand{position:relative}
 #xhat{position:absolute;left:-7px;top:-11px;transform:rotate(-14deg);pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
-#sleigh{position:fixed;top:calc(env(safe-area-inset-top) + 64px);left:100%;z-index:3;pointer-events:none;display:flex;gap:2px;font-size:20px;white-space:nowrap;animation:sleigh 45s linear infinite;animation-delay:4s;opacity:0}
-#sleigh b{font-size:13px;align-self:flex-end;opacity:.8}
-@keyframes sleigh{0%{transform:translate(0,0);opacity:0}1%{opacity:.95}12%{transform:translate(calc(-100vw - 160px),-26px);opacity:.95}12.1%,100%{opacity:0;transform:translate(calc(-100vw - 160px),-26px)}}
-body.calm #sleigh,body.calm #xhat{animation:none}
-@media (prefers-reduced-motion:reduce){#sleigh{display:none}}
+#thstk{position:absolute;left:18px;top:16px;font-size:12px;line-height:1;font-style:normal;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+#thfly{position:fixed;top:calc(env(safe-area-inset-top) + 64px);left:100%;z-index:3;pointer-events:none;font-size:20px;white-space:nowrap;letter-spacing:2px;animation:thfly 45s linear infinite;animation-delay:4s;opacity:0}
+@keyframes thfly{0%{transform:translate(0,0);opacity:0}1%{opacity:.95}12%{transform:translate(calc(-100vw - 180px),-26px);opacity:.95}12.1%,100%{opacity:0;transform:translate(calc(-100vw - 180px),-26px)}}
+#thfly.rise{left:12%;top:auto;bottom:-40px;animation-name:thrisefly;animation-duration:30s}
+@keyframes thrisefly{0%{transform:translateY(0);opacity:0}2%{opacity:.95}20%{transform:translateY(-110vh);opacity:.95}20.1%,100%{opacity:0;transform:translateY(-110vh)}}
+#xglow{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 60% at 50% 105%,rgba(255,150,60,.22),transparent 70%)}
+.xd-e #thlights i{animation-duration:3.2s}
+body.calm #thfly{display:none}
+@media (prefers-reduced-motion:reduce){#thfly{display:none}}
 
-/*@TESTONLY*/
-.xday{margin:16px 0 4px;border-radius:22px;overflow:hidden;position:relative;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.35)}
-.xday svg{display:block;width:100%;height:auto}
-.xdlab{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:#fff;background:#1a1410;padding:10px 14px}
-.xdlab span{font-size:12px;opacity:.85;white-space:nowrap}
-.xnote{opacity:0}
-body.playing .xnote{animation:xnote 3s ease-in infinite}
-@keyframes xnote{0%{opacity:0;transform:translateY(0)}15%{opacity:.95}100%{opacity:0;transform:translateY(-60px)}}
-.xflame{transform-origin:center bottom;transform-box:fill-box;animation:xfl 1.2s ease-in-out infinite alternate}
-@keyframes xfl{from{transform:scale(1,1)}to{transform:scale(.88,1.12)}}
-body.calm .xnote,body.calm .xflame{animation:none}
-/*@END*/
 </style>
 </head>
 <body>
@@ -810,7 +806,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${''/*@TESTONLY*/+xdayH()/*@END*/}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${TODAY().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -1267,38 +1263,6 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
   $('#dev_save').onclick=()=>{const u=$('#dev_url').value.trim();if(u&&!/^https:\/\/(docs|drive)\.google\.com\//.test(u)){toast('That doesn’t look like a Google Sheets link');return}LS.set('devInbox',u);toast(u?'📬 Inbox link saved':'Inbox link removed');devSheet()}}
 document.addEventListener('click',e=>{if(e.target.closest('#s_dev'))devSheet()});
-/* Christmas Day on Home (Test only for now): a cosy tabletop scene with the radio, changing through the day. */
-function xdayH(){if(!LS.get('tester',false))return'';const d=TODAY();if(d.getMonth()!==11||d.getDate()!==25)return'';
-  const h=d.getHours(),ph=h<13?'m':h<18?'a':'e',W=380,H=230,nm=(cur&&cur.n||'Nightjar Radio').slice(0,16);
-  const bok=(cols,seed)=>{let s=seed;const r=()=>((s=s*9301+49297)%233280)/233280;return Array.from({length:20},()=>`<circle cx="${(r()*W)|0}" cy="${(8+r()*140)|0}" r="${(6+r()*16)|0}" fill="${cols[(r()*cols.length)|0]}" opacity="${(.18+r()*.4).toFixed(2)}"/>`).join('')};
-  const gift=(x,y,w,hh,c,rb)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="3" fill="${c}"/><rect x="${x+w/2-4}" y="${y}" width="8" height="${hh}" fill="${rb}"/><rect x="${x}" y="${y+hh/2-3}" width="${w}" height="6" fill="${rb}"/><ellipse cx="${x+w/2-7}" cy="${y-4}" rx="8" ry="5" fill="${rb}"/><ellipse cx="${x+w/2+7}" cy="${y-4}" rx="8" ry="5" fill="${rb}"/>`;
-  const ball=(cx,cy,r,f,g)=>`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${f}"/><circle cx="${cx-r*.35}" cy="${cy-r*.35}" r="${r*.28}" fill="#fff" opacity=".35"/><rect x="${cx-4}" y="${cy-r-6}" width="8" height="7" rx="1" fill="${g}"/>`;
-  const candle=(x,y,hh,c)=>`<rect x="${x}" y="${y}" width="24" height="${hh}" rx="3" fill="${c}"/><g class="xflame"><ellipse cx="${x+12}" cy="${y-10}" rx="5" ry="10" fill="#ffd166"/><ellipse cx="${x+12}" cy="${y-6}" rx="2.5" ry="5" fill="#fff4d0"/></g><circle cx="${x+12}" cy="${y-8}" r="26" fill="#ffb347" opacity=".18"/>`;
-  const P={m:{bg:'#2d4a6a',bok:['#ffe9a8','#ffffff','#9fd3ff'],sd:3,tb:['#8a5a32','#a8784a'],body:'#a3262b',trim:'#ffd166',panel:'#e9d9b8',grille:'#c9b28a',dial:'#f6ecd2',ink:'#3a2a1a',live:'#2f8f5b',lv:'● Christmas morning',knob:'#3a2a1a',nc:'#ffe9a8',lab:'🎁 Christmas morning · presents time',
-      ex:`<rect x="250" y="0" width="130" height="140" fill="#bcd6f2" opacity=".35"/><path d="M-10 176 L40 14 L90 176 Z" fill="#1f5e3d"/><path d="M-10 130 L40 34 L90 130 Z" fill="#2f8f5b"/>${[[20,74,'#ff5a5f'],[52,104,'#ffd166'],[30,140,'#7fc3ff'],[60,150,'#ff5a5f']].map(([a,b,c])=>`<circle cx="${a}" cy="${b}" r="4" fill="${c}"/>`).join('')}`,
-      pr:gift(262,130,50,46,'#3f7fff','#ffd166')+gift(318,146,44,30,'#ff5a5f','#fff')+gift(290,104,36,26,'#3fbf7f','#ff5a5f'),hat:'<path d="M118 76 q12 -14 24 0 z" fill="#2f8f5b"/><circle cx="130" cy="66" r="6" fill="#ff5a5f"/>'},
-    a:{bg:'#5a1620',bok:['#ffd166','#ff5a5f','#3fbf7f','#ffffff'],sd:11,tb:['#f4ede0','#fffaf0'],body:'#7a1a26',trim:'#ffd166',panel:'#2a0a10',grille:'#5a1620',dial:'#ffd166',ink:'#5a1620',live:'#a0261c',lv:'● Party time',knob:'#ffd166',nc:'#ffd166',lab:'🎉 Christmas party · turn it up',
-      ex:Array.from({length:28},(_,i)=>`<rect class="xconf" x="${(i*53)%370}" y="${(i*37)%160}" width="5" height="9" fill="${['#ffd166','#3fbf7f','#7fc3ff','#ff9fcf'][i%4]}" transform="rotate(${i*23} ${(i*53)%370} ${(i*37)%160})"/>`).join(''),
-      pr:`<rect x="258" y="154" width="96" height="20" rx="10" fill="#3f7fff" transform="rotate(-8 306 164)"/><rect x="300" y="150" width="10" height="24" fill="#ffd166" transform="rotate(-8 306 164)"/><path d="M330 110 l10 0 l-3 50 l-4 0 z" fill="#fff" opacity=".8"/><ellipse cx="335" cy="110" rx="16" ry="8" fill="#ffe9a8" opacity=".85"/><rect x="333" y="160" width="4" height="14" fill="#fff" opacity=".8"/><ellipse cx="335" cy="174" rx="12" ry="3" fill="#fff" opacity=".8"/>`,
-      hat:'<path d="M60 82 L76 34 L92 82 Z" fill="#3fbf7f"/><circle cx="76" cy="34" r="5" fill="#ffd166"/><path d="M60 82 L76 34 L92 82 Z" fill="none" stroke="#ffd166" stroke-width="2" stroke-dasharray="4 5"/>'},
-    e:{bg:'#1c120c',bok:['#ffb347','#ffd166','#ff8a5a'],sd:7,tb:['#6a3e22','#8a5a32'],body:'#8a1c1c',trim:'#c9a24a',panel:'#d9c19a',grille:'#b89a6a',dial:'#f0dfb8',ink:'#3a2a1a',live:'#8a4a1c',lv:'● Cosy night',knob:'#2a1a10',nc:'#ffcf8a',lab:'🕯️ Cosy Christmas night',
-      ex:`<path d="M-10 176 L60 0 L130 176 Z" fill="#14281a" opacity=".9"/>${[[30,56],[70,94],[40,122],[90,140]].map(([a,b])=>`<circle cx="${a}" cy="${b}" r="4" fill="#ffd166"/><circle cx="${a}" cy="${b}" r="10" fill="#ffd166" opacity=".2"/>`).join('')}`,
-      pr:candle(262,112,64,'#ff8a6a')+ball(320,160,16,'#b3121e','#c9a24a')+ball(352,162,13,'#c9a24a','#888')+ball(296,166,11,'#c9a24a','#888'),hat:''}}[ph];
-  const x=42,y=80,w=200,hh=100,o=P;
-  const radio=`<line x1="${x+150}" y1="${y}" x2="${x+176}" y2="${y-54}" stroke="#bbb" stroke-width="2"/><circle cx="${x+176}" cy="${y-54}" r="3" fill="#ddd"/>${o.hat}
-<rect x="${x+8}" y="${y+hh}" width="10" height="8" fill="#3a2a1a"/><rect x="${x+w-18}" y="${y+hh}" width="10" height="8" fill="#3a2a1a"/>
-<rect x="${x}" y="${y}" width="${w}" height="${hh}" rx="12" fill="${o.body}"/><rect x="${x}" y="${y}" width="${w}" height="10" rx="5" fill="${o.trim}" opacity=".9"/>
-<rect x="${x+10}" y="${y+16}" width="${w-20}" height="${hh-26}" rx="7" fill="${o.panel}"/><rect x="${x+18}" y="${y+24}" width="54" height="${hh-42}" rx="4" fill="${o.grille}"/>
-${Array.from({length:8},(_,i)=>`<line x1="${x+22}" y1="${y+30+i*7}" x2="${x+68}" y2="${y+30+i*7}" stroke="#000" stroke-opacity=".45" stroke-width="2"/>`).join('')}
-<rect x="${x+80}" y="${y+24}" width="76" height="44" rx="4" fill="${o.dial}"/>${Array.from({length:12},(_,i)=>`<line x1="${x+85+i*6}" y1="${y+28}" x2="${x+85+i*6}" y2="${y+(i%3?33:36)}" stroke="${o.ink}" stroke-width="1"/>`).join('')}
-<line x1="${x+112}" y1="${y+27}" x2="${x+112}" y2="${y+64}" stroke="#d33" stroke-width="1.5"/>
-<text x="${x+118}" y="${y+50}" text-anchor="middle" font-family="Fraunces,serif" font-style="italic" font-size="11" fill="${o.ink}">${esc(nm)}</text>
-<text x="${x+118}" y="${y+63}" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="${o.live}">${o.lv}</text>
-<circle cx="${x+172}" cy="${y+38}" r="11" fill="${o.knob}"/><circle cx="${x+172}" cy="${y+38}" r="4" fill="#000" opacity=".35"/><circle cx="${x+172}" cy="${y+66}" r="9" fill="${o.knob}"/><circle cx="${x+172}" cy="${y+66}" r="3" fill="#000" opacity=".35"/>
-<rect x="${x+4}" y="${y+hh+10}" width="${w-8}" height="20" rx="8" fill="${o.body}" opacity=".18"/>`;
-  const notes=['♪','♫','♪','♫'].map((n,i)=>`<text class="xnote" style="animation-delay:${i*.75}s" x="${78+i*28}" y="72" font-size="${15+i*2}" fill="${o.nc}">${n}</text>`).join('');
-  return`<div class="xday" data-act="xday"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Christmas radio scene"><rect width="${W}" height="${H}" fill="${o.bg}"/>${bok(o.bok,o.sd)}${o.ex}<rect x="0" y="176" width="${W}" height="54" fill="${o.tb[0]}"/><rect x="0" y="176" width="${W}" height="4" fill="${o.tb[1]}"/>${radio}${notes}${o.pr}</svg><div class="xdlab">${o.lab}<span>Christmas Radio ›</span></div></div>`}
-document.addEventListener('click',e=>{if(e.target.closest('.xday')){const x=$('.xc');if(x)x.scrollIntoView({behavior:'smooth',block:'start'})}});
 
 if(devNow)setTimeout(()=>toast('🛠 Previewing as '+new Date(devNow).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' — Settings → Developer tools to change',4500),1200);
 /*@END*/
@@ -1538,16 +1502,33 @@ function thOnce(id){const k='thOnce_'+id,today=new Date().toDateString();if(id==
     const start=()=>{document.body.classList.add('fool');const b=document.createElement('button');b.id='foolx';b.textContent='🃏';b.setAttribute('aria-label','Flip back');b.onclick=end;document.body.append(b);const ms=Math.max(1000,LS.get('foolUntil',0)-Date.now());setTimeout(end,ms)};
     LS.set('foolUntil',Date.now()+5*60e3+900);setTimeout(start,900)}
   if(id==='birthday'){LS.set(k,today);setTimeout(()=>{for(let i=0;i<4;i++)setTimeout(()=>burst(innerWidth*(.2+Math.random()*.6),innerHeight*(.25+Math.random()*.4),['🎉','🎈','✨','🎂'],['#ff9ccc','#ffd166','#86b4ff'],12),i*350);toast('🎂 Happy birthday! Have a brilliant day')},900)}}
+
+/* Event dressing on every page: something on the logo, bunting (or snow) along the cards, and a little visitor flying across.
+   Christmas Day changes through the day: presents in the morning, a party in the afternoon, a cosy glow in the evening. */
+const HATS={santa:'<path d="M4 22 C8 8 16 2 26 6 L24 14 C20 10 16 12 14 22 Z" fill="#e23b3b"/><rect x="2" y="20" width="16" height="6" rx="3" fill="#fff"/><circle cx="26" cy="7" r="4" fill="#fff"/>',
+  party:'<path d="M6 25 L15 1 L24 25 Z" fill="#3fbf7f"/><path d="M9 17 L21 17 M11 11 L19 11" stroke="#ffd166" stroke-width="2.5"/><circle cx="15" cy="2" r="3.5" fill="#ff5a5f"/>',
+  witch:'<path d="M2 23 L30 23 L28 27 L4 27 Z" fill="#3a2350" stroke="#c48aff" stroke-width="1.2"/><path d="M8 23 L14 2 L25 7 L20 23 Z" fill="#4a2c66" stroke="#c48aff" stroke-width="1.2"/><rect x="9" y="18" width="12" height="4" fill="#ff8a1f"/>'};
+const FLY={christmas:'🦌 🦌 🛷',halloween:'🧙 🦇 🦇',valentine:'💘',easter:'🐇',birthday:'🎈 🎈 🎈',newyear:'🎆',bonfire:'🚀',stpatrick:'🍀',mothers:'💐',fathers:'🎈',pancake:'🥞',burns:'🥃',hanukkah:'✨',diwali:'🪔',lny:'🏮',worldradio:'📻',eurovision:'🎤',eurosemi:'🎤',pride:'🌈',cin:'🧸',comicrelief:'🔴',stgeorge:'🐉',stdavid:'🐉',standrew:'🦄',kentucky:'🏇',gn:'🏇',cheltenham:'🏇',ascot:'🏇',melbcup:'🏇',boatrace:'🚣',tdf:'🚴',giro:'🚴'};
+function xdPhase(){const d=TODAY();if(d.getMonth()!==11||d.getDate()!==25)return'';const h=d.getHours();return h<13?'m':h<18?'a':'e'}
+function dress(id){if(['spring','summer','autumn','winter'].includes(id))return;const t=THEMES[id];if(!t)return;
+  const ph=id==='christmas'?xdPhase():'';if(ph)document.body.classList.add('xd-'+ph);
+  document.body.classList.add(id==='christmas'||id==='winterolympics'||id==='winterparalympics'?'th-snowcap':'th-bunt');
+  const hat=id==='christmas'?(ph==='a'?'party':'santa'):id==='newyear'||id==='birthday'?'party':id==='halloween'?'witch':'';
+  if(hat){const h=document.createElement('i');h.id='xhat';h.setAttribute('aria-hidden','true');h.innerHTML=`<svg viewBox="0 0 32 28" width="22" height="19">${HATS[hat]}</svg>`;$('#brand').append(h)}
+  else{const k=document.createElement('i');k.id='thstk';k.setAttribute('aria-hidden','true');k.textContent=t.badge;$('#brand').append(k)}
+  if(ph==='e'){const g=document.createElement('div');g.id='xglow';document.body.append(g)}
+  if(!playful()||ph==='e')return;
+  const fly=ph==='a'?'🎉 🎊 🥂':ph==='m'?'🦌 🦌 🛷 🎁':FLY[id]||(t.sport||t.big?t.badge:'');if(!fly)return;
+  const f=document.createElement('div');f.id='thfly';f.setAttribute('aria-hidden','true');f.className=(id==='birthday'||ph==='a')?'rise':'';f.textContent=fly;document.body.append(f)}
+let xdLast=xdPhase();setInterval(()=>{const p=xdPhase();if(p!==xdLast){xdLast=p;try{applyTheme();render()}catch{}}},300000);
 function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;
-  document.body.className=document.body.className.replace(/\bth-\S+/g,'').trim();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
+  document.body.className=document.body.className.replace(/\b(th|xd)-\S+/g,'').trim();$('#xhat')?.remove();$('#thfly')?.remove();$('#thstk')?.remove();$('#xglow')?.remove();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
   if(!TH){['--acc','--acc2','--cor'].forEach(v=>document.documentElement.style.removeProperty(v));$('#thbadge')?.remove();return}
   document.body.classList.add('th-'+id);if(TH.rainbow)document.body.classList.add('th-rainbow');thOnce(id);const r=document.documentElement.style;
   if(!['spring','summer','autumn','winter'].includes(id)){r.setProperty('--acc',TH.c[0]);r.setProperty('--acc2',TH.c[1]);r.setProperty('--cor',TH.c[2])}else['--acc','--acc2','--cor'].forEach(v=>r.removeProperty(v));
   sky.style.setProperty('--t1',TH.c[0]);sky.style.setProperty('--t2',TH.c[2]);
   let bd=$('#thbadge');if(!bd){bd=document.createElement('span');bd.id='thbadge';$('#brand').append(bd)}bd.innerHTML=TH.badge;bd.title=TH.name;
-  $('#xhat')?.remove();$('#sleigh')?.remove();
-  if(id==='christmas'){const h=document.createElement('i');h.id='xhat';h.setAttribute('aria-hidden','true');h.innerHTML='<svg viewBox="0 0 32 28" width="22" height="19"><path d="M4 22 C8 8 16 2 26 6 L24 14 C20 10 16 12 14 22 Z" fill="#e23b3b"/><rect x="2" y="20" width="16" height="6" rx="3" fill="#fff"/><circle cx="26" cy="7" r="4" fill="#fff"/></svg>';$('#brand').append(h);
-    if(playful()){const sl=document.createElement('div');sl.id='sleigh';sl.setAttribute('aria-hidden','true');sl.innerHTML='<span>🦌</span><span>🦌</span><span>🛷</span><b>✨</b>';document.body.append(sl)}}
+  dress(id);
   if(TH.lights){const l=document.createElement('div');l.id='thlights';l.innerHTML=Array.from({length:22},(_,i)=>`<i style="--c:${TH.c[i%3]};--d:${(i%4)*.4}s"></i>`).join('');document.body.append(l)}
   if(!playful()||TH.fx==='none')return;const fx=document.createElement('div');fx.id='thfx';fx.className='fx-'+TH.fx;
   if(TH.fx==='fireworks'){sky.append(fx);const boom=()=>{if(document.hidden||!$('#thfx'))return;const x=10+Math.random()*80,y=8+Math.random()*40,col=TH.c[Math.random()*3|0];for(let i=0;i<16;i++){const s=document.createElement('i');const a=Math.PI*2*i/16,rr=40+Math.random()*30;s.style.cssText=`left:${x}%;top:${y}%;--dx:${Math.cos(a)*rr}px;--dy:${Math.sin(a)*rr}px;background:${col};box-shadow:0 0 6px ${col}`;fx.append(s);setTimeout(()=>s.remove(),1600)}};boom();thFw=setInterval(boom,2600);return}
