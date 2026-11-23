@@ -475,6 +475,29 @@ body.ldim img{filter:brightness(.8)}
 body.ldim #car{color:#5e554b}body.ldim .carbtns button{background:#0b090b;color:#7c6f60}body.ldim #carpp{background:#1c140a;color:#a87a40}
 body.ldim #nl{color:rgba(255,179,71,.12)}
 @media (prefers-reduced-motion:reduce){.aur{animation:none}}
+/* Event dressing: snow or bunting on the cards, a hat or sticker on the logo, a visitor across the sky, Christmas Day phases. */
+.th-snowcap .hcard::before{content:'';position:absolute;left:0;right:0;top:0;height:13px;z-index:2;pointer-events:none;opacity:.9;
+  background:radial-gradient(circle at 11px 0,#fff 0 8px,transparent 9px) 0 0/22px 13px repeat-x,linear-gradient(#fff,#fff) 0 0/100% 3px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.th-bunt .hcard::before{content:'';position:absolute;left:10px;right:10px;top:2px;height:13px;z-index:2;pointer-events:none;opacity:.92;
+  background:repeating-linear-gradient(90deg,var(--acc) 0 24px,var(--acc2) 24px 48px,var(--cor) 48px 72px);
+  -webkit-mask:conic-gradient(from -45deg at 50% 100%,#000 90deg,#0000 0) 0 0/24px 13px repeat-x;mask:conic-gradient(from -45deg at 50% 100%,#000 90deg,#0000 0) 0 0/24px 13px repeat-x}
+.xd-a .hcard::before{background:radial-gradient(circle,#ffd166 0 2px,transparent 3px) 0 2px/14px 10px,radial-gradient(circle,#ff5a5f 0 2px,transparent 3px) 7px 7px/14px 10px,radial-gradient(circle,#3fbf7f 0 2px,transparent 3px) 3px 4px/18px 12px;filter:none;height:12px}
+.brand{position:relative}
+#xhat{position:absolute;left:-7px;top:-11px;transform:rotate(-14deg);pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+#thstk{position:absolute;left:18px;top:16px;font-size:12px;line-height:1;font-style:normal;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+#thfly{position:fixed;top:calc(env(safe-area-inset-top) + 64px);left:100%;z-index:3;pointer-events:none;font-size:20px;white-space:nowrap;letter-spacing:2px;animation:thfly 45s linear infinite;animation-delay:4s;opacity:0}
+@keyframes thfly{0%{transform:translate(0,0);opacity:0}1%{opacity:.95}12%{transform:translate(calc(-100vw - 180px),-26px);opacity:.95}12.1%,100%{opacity:0;transform:translate(calc(-100vw - 180px),-26px)}}
+#thfly.rise{left:12%;top:auto;bottom:-40px;animation-name:thrisefly;animation-duration:30s}
+@keyframes thrisefly{0%{transform:translateY(0);opacity:0}2%{opacity:.95}20%{transform:translateY(-110vh);opacity:.95}20.1%,100%{opacity:0;transform:translateY(-110vh)}}
+#xglow{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 60% at 50% 105%,rgba(255,150,60,.22),transparent 70%)}
+.xd-e #thlights i{animation-duration:3.2s}
+body.calm #thfly{display:none}
+@media (prefers-reduced-motion:reduce){#thfly{display:none}}
+.xcd{position:relative;display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:10px 0 4px}
+.xcd span{display:flex;flex-direction:column;align-items:center;min-width:52px;padding:7px 6px 5px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.xcd b{font-family:'JetBrains Mono',monospace;font-size:22px;line-height:1;color:#ffd166}
+.xcd i{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-top:3px}
+.xcd small{align-self:center;font-size:12px;opacity:.75;line-height:1.3;max-width:70px}
 </style>
 </head>
 <body>
@@ -502,6 +525,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const KEEP=['tester','chan','songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
 try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])});njrRoute()}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
+let devNow=null;const TODAY=()=>devNow?new Date(devNow):new Date();
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
 const P={ball:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.4 2.5-1.3 4h-4.2l-1.3-4zM12 3v4.5M15.4 10l5-1.5M14.1 14l3 4M9.9 14l-3 4M8.6 10l-5-1.5',home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  play:'M8 5.5v13l10.5-6.5z',pause:'M7.5 5h3v14h-3zM13.5 5h3v14h-3z',prev:'M6 5v14M19 5.5v13L8.5 12z',next:'M18 5v14M5 5.5v13L15.5 12z',star:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
@@ -719,9 +743,16 @@ async function globeSpin(){if(globeBusy)return;globeBusy=true;const out=$('#gres
 function globeH(){return`<div class="gcard"><div class="gwrap"><canvas id="globe" aria-label="Globe — drag to turn it"></canvas></div><div class="chips gch">${PERS.map(([k,l,c])=>`<button class="chip${S.gper===k?' on':''}" style="--c:${c}" data-gper="${k}">${l}</button>`).join('')}</div>
   <button class="pill amb" data-act="globe">${ic('globe')}Spin the globe</button></div><div id="gres"></div>`}
 function sotdDay(){return new Date().toLocaleDateString('en-CA')}
-async function sotd(){const all=(await rb('/json/stations/topvote/500',864e5)).filter(good).map(mk);const seen=new Set(),uniq=all.filter(s=>{const k=s.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true});
+
+/* In the Christmas season the station of the day is a Christmas station, from a different country each day. */
+async function xmSotd(){const [a,b]=await Promise.all([stations({tag:'christmas'},150,864e5).catch(()=>[]),stations({tag:'xmas'},80,864e5).catch(()=>[])]);
+  const seen=new Set(),pool=a.concat(b).filter(x=>{const k=x.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true});if(!pool.length)return null;
+  const by={};pool.forEach(x=>{const c=x.cc||'??';(by[c]=by[c]||[]).push(x)});const cs=Object.keys(by).sort((p,q)=>by[q].length-by[p].length);
+  const mix=[];for(let r=0;mix.length<pool.length;r++){let any=false;for(const c of cs)if(by[c][r]){mix.push(by[c][r]);any=true}if(!any)break}
+  const d=TODAY(),y=d.getMonth()===0?d.getFullYear()-1:d.getFullYear(),n=Math.max(0,Math.floor((d-new Date(y,10,15))/864e5));return{...mix[n%mix.length],xm:1}}
+async function sotd(){if(xmasOn()){try{const x=await xmSotd();if(x)return x}catch{}}const all=(await rb('/json/stations/topvote/500',864e5)).filter(good).map(mk);const seen=new Set(),uniq=all.filter(s=>{const k=s.n.toLowerCase();if(seen.has(k))return false;seen.add(k);return true});
   let h=7;for(const c of sotdDay())h=(h*131+c.charCodeAt(0))%1000003;return uniq[h%uniq.length]}
-function sotdH(st){const k=reg([st],'Station of the day');return`<div class="sotd" style="--hue:${hueOf(st.n)}" data-st="${k}" data-i="0"><div class="mono" style="color:hsl(var(--hue) 80% 78%)">✦ Station of the day · ${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
+function sotdH(st){const k=reg([st],'Station of the day');return`<div class="sotd" style="--hue:${hueOf(st.n)}" data-st="${k}" data-i="0"><div class="mono" style="color:hsl(var(--hue) 80% 78%)">${st.xm?'🎄 Christmas station of the day':'✦ Station of the day'} · ${new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
   <div class="sotdin">${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc(st.c||'')}</span><div class="tags" style="justify-content:flex-start;margin-top:8px">${st.tags.slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')}</div></div><span class="sotdplay">${icf('play')}</span></div></div>`}
 const getPos=()=>new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('nogeo'));navigator.geolocation.getCurrentPosition(p=>res({la:+p.coords.latitude.toFixed(2),lo:+p.coords.longitude.toFixed(2)}),rej,{timeout:15000,maximumAge:36e5})});
 const km=(a,b,c,d)=>{const R=6371,r=x=>x*Math.PI/180,x=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
@@ -732,7 +763,7 @@ function nearH(){return S.geo?`<div id="hnear">${skRows(4)}</div>`:`<div class="
 async function fillNear(tok){const el=$('#hnear');if(!el)return;try{const r=await nearList();if(tok!==renderTok||!$('#hnear'))return;$('#hnear').innerHTML=r.length?rows(r,'Near you',1):'<div class="empty"><b>Quiet round here</b>No stations listed near you — try Popular in your country below.</div>';mark()}catch{if(tok===renderTok&&$('#hnear'))$('#hnear').innerHTML=errBox()}}
 async function askNear(){const b=$('[data-act=near]');if(b)b.innerHTML=`${ic('globe')}Finding you…`;try{S.geo=await getPos();save('geo');render()}catch(e){if(b)b.innerHTML=`${ic('globe')}Find stations near me`;toast(e&&e.code===1?'Location is blocked — allow it in Chrome’s site settings':'Couldn’t get your location — try again outside or with GPS on')}}
 /* ---------- Windows Down Radio — limited-time collection of sunny-drive stations. Switches itself off at midnight on 19 Dec 2026 (local time). ---------- */
-const VC_END=new Date(2026,11,19,0,0,0).getTime(),vcOn=()=>Date.now()<VC_END;
+const VC_END=new Date(2026,11,19,0,0,0).getTime(),vcOn=()=>Date.now()<VC_END&&!xmasOn();
 const VC=[['🌴','Miami & Florida',{state:'Florida',countrycode:'US'}],['📼','80s Neon',{tag:'80s'}],['✨','Pop',{tag:'pop',countrycode:'US'}],['🎤','Southern hip-hop',{tag:'hip hop',countrycode:'US'}],
  ['💃','Reggaeton & Latin',{tag:'reggaeton'}],['🎸','Metal',{tag:'metal'}],['🤠','Country',{tag:'country',countrycode:'US'}],['🌍','Amapiano & Afro',{tag:'amapiano'},{tag:'afrobeats'}]];
 let vcSel=LS.get('vcSel',0);
@@ -752,9 +783,17 @@ const XC=[['🎄','All Christmas',[{tag:'christmas'},{tag:'xmas'}]],['🏠','Nea
  ['🎸','Rockin’ Christmas',[{tag:'christmas rock'},{tag:'heavy christmas'},{name:'christmas rock'}]],
  ['🌍','Around the world',[{tag:'weihnacht'},{tag:'navidad'},{tag:'noel'},{tag:'natale'},{tag:'kerst'}]]];
 let xcSel=LS.get('xcSel',0);
+
+/* Live countdown to Christmas in the Christmas Radio section. Follows the Developer tools preview date too. */
+const xcdBase=[TODAY().getTime(),Date.now()];
+function xcdNow(){return devNow?new Date(new Date(devNow).getTime()+(Date.now()-xcdBase[1])):new Date()}
+function xcdH(){const n=xcdNow(),y=n.getMonth()===0?n.getFullYear()-1:n.getFullYear(),ms=new Date(y,11,25)-n;if(ms<=0)return'';
+  const d=Math.floor(ms/864e5),h=Math.floor(ms/36e5)%24,m=Math.floor(ms/6e4)%60,sc=Math.floor(ms/1e3)%60,b=(v,l)=>`<span><b>${String(v).padStart(2,'0')}</b><i>${l}</i></span>`;
+  return`${b(d,d===1?'day':'days')}${b(h,'hrs')}${b(m,'mins')}${b(sc,'secs')}<small>till Christmas Day</small>`}
+setInterval(()=>{const e=$('#xcd');if(e&&!document.hidden)e.innerHTML=xcdH()},1000);
 function xcH(){const d=new Date(),dd=new Date(d.getFullYear()+(d.getMonth()===0?-1:0),11,25),left=Math.ceil((dd-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
   const sub=left>1?`Carols, classics and Christmas hits — ${left} sleeps to go`:left===1?'It’s Christmas Eve — the big day is tomorrow 🎅':left===0?'Merry Christmas! 🎁':'Christmas tunes until Twelfth Night';
-  return`<div class="vc xc"><div class="xcsnow">${'❄✦❅✧❄✦'.split('').map((g,i)=>`<i style="--x:${6+i*16}%;--d:${i*.9}s">${g}</i>`).join('')}</div><div class="vctop"><b>Christmas Radio 🎄</b><span>${sub}</span></div>
+  return`<div class="vc xc"><div class="xcsnow">${'❄✦❅✧❄✦'.split('').map((g,i)=>`<i style="--x:${6+i*16}%;--d:${i*.9}s">${g}</i>`).join('')}</div><div class="vctop"><b>Christmas Radio 🎄</b><span>${sub}</span></div>${left>=1?`<div class="xcd" id="xcd">${xcdH()}</div>`:''}
   <div class="chips vcchips">${XC.map(([e,l],i)=>`<button class="chip${i===xcSel?' on':''}" data-xc="${i}">${e} ${l}</button>`).join('')}</div>
   <div id="xclist">${skCards()}</div></div>`}
 async function xcFill(tok){const el=$('#xclist');if(!el)return;el.innerHTML=skCards();const [,l,qq]=XC[xcSel]||XC[0],qs=typeof qq==='function'?qq():qq;
@@ -768,7 +807,7 @@ const HSEC=[['sotd','Station of the day','✦','A new pick every day','#ffb36b',
  ['recent','Tune back in','↺','Stations you played lately','#b8a2ff','#7b5cff'],['country','Popular in your country','🏠','Top stations where you live','#ffad6b','#e5533d'],['world','Most loved worldwide','❤','The world’s most-played','#ff8a8a','#e0435f'],['night','Late-night picks','🌙','Mellow stations for after dark','#7f8cff','#3a3f9e']];
 function homeAll(){const def=HSEC.map(h=>h[0]).filter(id=>(id!=='vc'||vcOn())&&(id!=='xmas'||xmasOn())),saved=LS.get('homeOrder',[]).filter(id=>def.includes(id));
   def.forEach((id,i)=>{if(!saved.includes(id)){const prev=def.slice(0,i).reverse().find(x=>saved.includes(x));saved.splice(prev?saved.indexOf(prev)+1:0,0,id)}});return saved}
-const homeOrder=()=>{const hid=LS.get('homeHide',[]);return homeAll().filter(id=>!hid.includes(id))};
+const homeOrder=()=>{const hid=LS.get('homeHide',[]);let o=homeAll().filter(id=>!hid.includes(id));if(xmasOn()&&o.includes('xmas'))o=['xmas',...o.filter(x=>x!=='xmas')];return o};
 function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
   sheet(`<h3>Customise Home</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Move sections up or down, and switch off the ones you don’t use.</p>
   <div class="hcl">${ord.map((id,i)=>{const h=HSEC.find(x=>x[0]===id),on=!hid.includes(id);return`<div class="hcr${on?'':' off'}" style="--a:${h[4]};--b:${h[5]}"><span class="hcn">${String(i+1).padStart(2,'0')}</span><span class="hce">${h[2]}</span><div class="hct"><b>${esc(h[1])}</b><small>${on?esc(h[3]):'Hidden'}</small></div>
@@ -784,7 +823,7 @@ function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
 function hcard(id,html){const h=HSEC.find(x=>x[0]===id);if(!h||!html.startsWith('<section class="sec">'))return html;
   return html.replace('<section class="sec">',`<section class="sec hcard" style="--a:${h[4]};--b:${h[5]};--hc:${h[4]}">`).replace(/<h2><i>(\d+)<\/i>/,`<h2><span class="hico">${h[2]}</span>`)}
 VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.country,cName(S.country)])[1];let n=0;const N=()=>String(++n).padStart(2,'0');
-  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||(TH&&TH.greet?(TH.sport?`<button class="thchip" data-mood="sports">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)} · find sport stations ›</button>`:`<div class="thchip">${TH.badge} ${esc(typeof TH.greet==='function'?TH.greet():TH.greet)}</div>`):'')}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
+  el.innerHTML=`<div class="hero"><div class="oarow"><span class="onair"><i></i>On air</span><span class="mono oadate">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</span></div><h1>${greet()}<b>.</b></h1>${bigH()||evCard()}${(()=>{const h=new Date().getHours();return h>=19||h<4})()?`<button class="pill bedp" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button>`:''}</div>
   ${homeOrder().map(id=>{const P={
     sotd:()=>'<div id="hsotd"><div class="sk" style="height:150px;border-radius:22px;margin-top:14px"></div></div>',
     presets:()=>sec('Your presets',presetsH(),S.presets.some(Boolean)?'Tap to tune in · long-press a preset to change it':'Tap an empty preset while a station is playing to save it there',N()),
@@ -860,6 +899,23 @@ VIEWS.search=async(el,tok)=>{const sug=SSUG[S.country]||SSUG._;el.innerHTML=`<di
 function bigEv(){if(S.theme==='off')return null;const n0=dayN(new Date()),y=new Date().getFullYear();let best=null;
   for(const e of sportEvents(y-1,y+1)){const t=THEMES[e.id];if(!t||!t.big)continue;const s0=dayN(e.st),day=n0-s0+1;
     if(day>=1&&day<=e.len){if(!best||best.pre)best={id:e.id,t,day,len:e.len}}else if(day<=0&&day>-14&&!best)best={id:e.id,t,pre:1-day,len:e.len}}return best}
+
+/* An event card on Home for every event (like the big-tournament card): badge, name, how far through, a line about it and a button. */
+var THID=null;
+const EVQ={christmas:'christmas',newyear:'party',burns:'scottish',valentine:'love songs',pancake:'pop',stdavid:'welsh',mothers:'love songs',stpatrick:'irish',easter:'easy listening',stgeorge:'english',fathers:'classic rock',halloween:'halloween',bonfire:'rock',remembrance:'classical',birthday:'party',aprilfools:'comedy',worldradio:'talk',standrew:'scottish',solstice:'chill',clocksfwd:'breakfast',clocksback:'chill',bank:'hits',eurovision:'eurovision',eurosemi:'eurovision',cin:'pop',comicrelief:'comedy',lny:'chinese',diwali:'bollywood',eidfitr:'arabic',eidadha:'arabic',hanukkah:'jewish',pride:'dance'};
+const EVT={christmas:'Carols, classics and Christmas hits on the radio',newyear:'Party stations to see the new year in',burns:'Ceilidh, folk and a wee dram of Scottish radio',valentine:'Love songs and slow jams for the one you love',pancake:'Flip, toss and turn up the radio',stdavid:'Dydd Gŵyl Dewi Hapus — Welsh radio to celebrate',mothers:'Something lovely to listen to with Mum',stpatrick:'Irish radio, trad and craic all day',easter:'Easy listening for a long weekend',stgeorge:'A day for English radio',fathers:'Classic rock and favourites for Dad',halloween:'Spooky sounds and creepy classics',bonfire:'Bangers on the radio while the sky lights up',remembrance:'A moment of quiet, then music to remember',birthday:'It’s your day — turn the party up',aprilfools:'Comedy and silly stations (honest)',worldradio:'A day to celebrate radio around the world',standrew:'Scottish radio for St Andrew’s Day',solstice:'The longest day — plenty of time to listen',clocksfwd:'An hour less sleep — wake up with breakfast radio',clocksback:'An extra hour — spend it with the radio',bank:'A long weekend of radio',eurovision:'Douze points for Eurovision radio',eurosemi:'Warming up for the Eurovision final',cin:'Pudsey’s back — tune in and help out',comicrelief:'Get your red nose on',lny:'Lanterns, celebrations and music for the new year',diwali:'Lights, sweets and festive music',eidfitr:'Celebrations and music for Eid',eidadha:'Celebrations and music for Eid',hanukkah:'Eight nights of light and music',pride:'Proud, loud and dancing all month'};
+function evCard(){const t=TH,id=THID;if(!t||!id||!t.greet||['spring','summer','autumn','winter'].includes(id))return'';
+  const d=TODAY(),gr=typeof t.greet==='function'?t.greet():t.greet;let line=gr,pct=null,p=EVT[id]||'';
+  if(id==='christmas'){const D=d.getDate();if(D<=24){pct=D/25;line=D===24?'Christmas Eve · Santa’s on his way':`${25-D} sleeps till Christmas`}
+    else if(D===25){const ph=xdPhase();line=ph==='m'?'Christmas morning · presents time':ph==='a'?'Christmas afternoon · party time':'Christmas night · cosy by the fire';pct=1;p=ph==='a'?'Party hits and festive bangers':ph==='e'?'Cosy classics for a quiet night in':'Christmas songs while the presents get opened'}
+    else line='Merry Christmas & happy holidays'}
+  else if(t.sport){const n0=dayN(d),y=d.getFullYear(),e=sportEvents(y-1,y+1).find(e=>e.id===id&&n0>=dayN(e.st)&&n0<dayN(e.st)+e.len);
+    if(e){const day=n0-dayN(e.st)+1;pct=day/e.len;line=e.len===1?'It’s today':`Day ${day} of ${e.len}`+(e.len-day?` · ${e.len-day} day${e.len-day>1?'s':''} to go`:' · final day!')}p=gr}
+  const btn=t.sport?`${t.fxs?`<button data-bigfx="${t.fxs}">📊 Live scores</button>`:''}<button data-sgo="${esc(t.q||'sport')}">📻 Find coverage</button>`:`<button data-sgo="${esc(EVQ[id]||t.name)}">🎵 Play ${esc(t.name.replace(/^Your /,''))} radio</button>`;
+  const pp=(t.p&&t.p.length?t.p:[t.badge]);
+  return`<div class="bigev evc" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${pp.concat(pp).concat(pp).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
+    <div class="bgtop"><span class="bgem">${t.badge}</span><div><b>${esc(t.name)}</b><span>${esc(line)}</span></div></div>${p&&p!==line?`<p>${esc(p)}</p>`:''}
+    ${pct!=null?`<div class="bgbar"><i style="width:${Math.round(pct*100)}%"></i></div>`:''}<div class="bgbt">${btn}</div></div>`}
 function bigH(){const b=bigEv();if(!b)return'';const t=b.t,left=b.len-(b.day||0);
   const line=b.pre?(b.pre===1?'Starts tomorrow':`Starts in ${b.pre} days`):b.day===1?`Day 1 of ${b.len} · it starts today`:left===0?'Final day!':`Day ${b.day} of ${b.len} · ${left} day${left>1?'s':''} to go`;
   return`<div class="bigev" style="--ba:${t.c[0]};--bb:${t.c[2]}"><div class="bgsky">${(t.p||[t.badge]).concat(t.p||[]).slice(0,8).map((g,i)=>`<i style="--x:${8+i*12}%;--d:${i*.6}s">${g}</i>`).join('')}</div>
@@ -1294,7 +1350,7 @@ function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=
 const dayN=d=>Math.round(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);
 const nthSun=(y,m,n)=>{const d=new Date(y,m,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
 const THEMES={
-  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=new Date().getDate();return d===21?'The longest night of the year — perfect for radio':d===24?'Happy Christmas Eve':d===25?'Merry Christmas':d===26?'Happy Boxing Day':'Merry Christmas'},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
+  christmas:{name:'Christmas',badge:'🎄',greet:()=>{const d=TODAY().getDate(),n=25-d;return d===24?'Happy Christmas Eve — Santa’s on his way':d===25?'Merry Christmas!':d===26?'Happy Boxing Day':d>26?'Merry Christmas & happy holidays':(d===21?'The longest night · ':'')+(n===1?'1 sleep till Christmas':n+' sleeps till Christmas')},fx:'snow',p:['❄','❅','❆'],c:['#ff5a5f','#ffd166','#3fbf7f'],lights:1},
   newyear:{name:'New Year',badge:'🎆',greet:()=>new Date().getMonth()===11?'Happy Hogmanay & New Year’s Eve':'Happy New Year',fx:'fireworks',p:['✦','✧','★'],c:['#ffd166','#f3ecdf','#86b4ff']},
   burns:{name:'Burns Night',badge:'🏴',greet:'Happy Burns Night',fx:'none',c:['#5b8def','#ffffff','#5b8def']},
   valentine:{name:'Valentine’s',badge:'💗',greet:()=>new Date().getDate()===14?'Happy Valentine’s Day':'Love is in the air',fx:'float',p:['💗','💕','❤'],c:['#ff7aa8','#ffc2d6','#ff4f7b']},
@@ -1436,13 +1492,33 @@ function thOnce(id){const k='thOnce_'+id,today=new Date().toDateString();if(id==
     const start=()=>{document.body.classList.add('fool');const b=document.createElement('button');b.id='foolx';b.textContent='🃏';b.setAttribute('aria-label','Flip back');b.onclick=end;document.body.append(b);const ms=Math.max(1000,LS.get('foolUntil',0)-Date.now());setTimeout(end,ms)};
     LS.set('foolUntil',Date.now()+5*60e3+900);setTimeout(start,900)}
   if(id==='birthday'){LS.set(k,today);setTimeout(()=>{for(let i=0;i<4;i++)setTimeout(()=>burst(innerWidth*(.2+Math.random()*.6),innerHeight*(.25+Math.random()*.4),['🎉','🎈','✨','🎂'],['#ff9ccc','#ffd166','#86b4ff'],12),i*350);toast('🎂 Happy birthday! Have a brilliant day')},900)}}
-function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;
-  document.body.className=document.body.className.replace(/\bth-\S+/g,'').trim();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
+
+/* Event dressing on every page: something on the logo, bunting (or snow) along the cards, and a little visitor flying across.
+   Christmas Day changes through the day: presents in the morning, a party in the afternoon, a cosy glow in the evening. */
+const HATS={santa:'<path d="M4 22 C8 8 16 2 26 6 L24 14 C20 10 16 12 14 22 Z" fill="#e23b3b"/><rect x="2" y="20" width="16" height="6" rx="3" fill="#fff"/><circle cx="26" cy="7" r="4" fill="#fff"/>',
+  party:'<path d="M6 25 L15 1 L24 25 Z" fill="#3fbf7f"/><path d="M9 17 L21 17 M11 11 L19 11" stroke="#ffd166" stroke-width="2.5"/><circle cx="15" cy="2" r="3.5" fill="#ff5a5f"/>',
+  witch:'<path d="M2 23 L30 23 L28 27 L4 27 Z" fill="#3a2350" stroke="#c48aff" stroke-width="1.2"/><path d="M8 23 L14 2 L25 7 L20 23 Z" fill="#4a2c66" stroke="#c48aff" stroke-width="1.2"/><rect x="9" y="18" width="12" height="4" fill="#ff8a1f"/>'};
+const FLY={christmas:'🦌 🦌 🛷',halloween:'🧙 🦇 🦇',valentine:'💘',easter:'🐇',birthday:'🎈 🎈 🎈',newyear:'🎆',bonfire:'🚀',stpatrick:'🍀',mothers:'💐',fathers:'🎈',pancake:'🥞',burns:'🥃',hanukkah:'✨',diwali:'🪔',lny:'🏮',worldradio:'📻',eurovision:'🎤',eurosemi:'🎤',pride:'🌈',cin:'🧸',comicrelief:'🔴',stgeorge:'🐉',stdavid:'🐉',standrew:'🦄',kentucky:'🏇',gn:'🏇',cheltenham:'🏇',ascot:'🏇',melbcup:'🏇',boatrace:'🚣',tdf:'🚴',giro:'🚴'};
+function xdPhase(){const d=TODAY();if(d.getMonth()!==11||d.getDate()!==25)return'';const h=d.getHours();return h<13?'m':h<18?'a':'e'}
+function dress(id){if(['spring','summer','autumn','winter'].includes(id))return;const t=THEMES[id];if(!t)return;
+  const ph=id==='christmas'?xdPhase():'';if(ph)document.body.classList.add('xd-'+ph);
+  document.body.classList.add(id==='christmas'||id==='winterolympics'||id==='winterparalympics'?'th-snowcap':'th-bunt');
+  const hat=id==='christmas'?(ph==='a'?'party':'santa'):id==='newyear'||id==='birthday'?'party':id==='halloween'?'witch':'';
+  if(hat){const h=document.createElement('i');h.id='xhat';h.setAttribute('aria-hidden','true');h.innerHTML=`<svg viewBox="0 0 32 28" width="22" height="19">${HATS[hat]}</svg>`;$('#brand').append(h)}
+  else{const k=document.createElement('i');k.id='thstk';k.setAttribute('aria-hidden','true');k.textContent=t.badge;$('#brand').append(k)}
+  if(ph==='e'){const g=document.createElement('div');g.id='xglow';document.body.append(g)}
+  if(!playful()||ph==='e')return;
+  const fly=ph==='a'?'🎉 🎊 🥂':ph==='m'?'🦌 🦌 🛷 🎁':FLY[id]||(t.sport||t.big?t.badge:'');if(!fly)return;
+  const f=document.createElement('div');f.id='thfly';f.setAttribute('aria-hidden','true');f.className=(id==='birthday'||ph==='a')?'rise':'';f.textContent=fly;document.body.append(f)}
+let xdLast=xdPhase();setInterval(()=>{const p=xdPhase();if(p!==xdLast){xdLast=p;try{applyTheme();render()}catch{}}},300000);
+function applyTheme(){const id=S.theme==='off'?null:S.theme==='auto'?themeId():S.theme;TH=id?THEMES[id]:null;THID=id;
+  document.body.className=document.body.className.replace(/\b(th|xd)-\S+/g,'').trim();$('#xhat')?.remove();$('#thfly')?.remove();$('#thstk')?.remove();$('#xglow')?.remove();const sky=$('.sky');$('#thfx')?.remove();clearInterval(thFw);$('#thlights')?.remove();
   if(!TH){['--acc','--acc2','--cor'].forEach(v=>document.documentElement.style.removeProperty(v));$('#thbadge')?.remove();return}
   document.body.classList.add('th-'+id);if(TH.rainbow)document.body.classList.add('th-rainbow');thOnce(id);const r=document.documentElement.style;
   if(!['spring','summer','autumn','winter'].includes(id)){r.setProperty('--acc',TH.c[0]);r.setProperty('--acc2',TH.c[1]);r.setProperty('--cor',TH.c[2])}else['--acc','--acc2','--cor'].forEach(v=>r.removeProperty(v));
   sky.style.setProperty('--t1',TH.c[0]);sky.style.setProperty('--t2',TH.c[2]);
   let bd=$('#thbadge');if(!bd){bd=document.createElement('span');bd.id='thbadge';$('#brand').append(bd)}bd.innerHTML=TH.badge;bd.title=TH.name;
+dress(id);
   if(TH.lights){const l=document.createElement('div');l.id='thlights';l.innerHTML=Array.from({length:22},(_,i)=>`<i style="--c:${TH.c[i%3]};--d:${(i%4)*.4}s"></i>`).join('');document.body.append(l)}
   if(!playful()||TH.fx==='none')return;const fx=document.createElement('div');fx.id='thfx';fx.className='fx-'+TH.fx;
   if(TH.fx==='fireworks'){sky.append(fx);const boom=()=>{if(document.hidden||!$('#thfx'))return;const x=10+Math.random()*80,y=8+Math.random()*40,col=TH.c[Math.random()*3|0];for(let i=0;i<16;i++){const s=document.createElement('i');const a=Math.PI*2*i/16,rr=40+Math.random()*30;s.style.cssText=`left:${x}%;top:${y}%;--dx:${Math.cos(a)*rr}px;--dy:${Math.sin(a)*rr}px;background:${col};box-shadow:0 0 6px ${col}`;fx.append(s);setTimeout(()=>s.remove(),1600)}};boom();thFw=setInterval(boom,2600);return}
