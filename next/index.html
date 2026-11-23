@@ -1090,7 +1090,7 @@ function renderNPctl(){if(!npOpen)return;const b=$('#npbig');if(b)b.innerHTML=pl
 window.knobTurn=d=>{const k=$('#k2');if(!k)return;const r=(parseFloat(k.style.getPropertyValue('--kr'))||40)+d*55;k.style.setProperty('--kr',r+'deg')};
 function openNP(){if(!cur)return;npOpen=true;renderNP();$('#np').classList.add('on');history.pushState({np:1},'')}
 function closeNP(pop){if(!npOpen)return;npOpen=false;$('#np').classList.remove('on');if(!pop)history.back()}
-addEventListener('popstate',()=>{if(modalOpen)return closeModal(true);if(!$('#wrap').hidden)return wrapClose(true);if(carOn)return carExit(true);if(nlOn)return nlExit(true);if(sheetOpen)return closeSheet(true);if(npOpen)return closeNP(true)});
+let skipPop=0;addEventListener('popstate',()=>{if(skipPop>0){skipPop--;return}if(modalOpen)return closeModal(true);if(!$('#wrap').hidden)return wrapClose(true);if(carOn)return carExit(true);if(nlOn)return nlExit(true);if(sheetOpen)return closeSheet(true);if(npOpen)return closeNP(true)});
 
 /* Estimated data used this month, from each session's length × the station's stream quality. */
 function dataUse(){const m0=new Date();m0.setDate(1);m0.setHours(0,0,0,0);let all=0,mob=0;
@@ -1224,7 +1224,7 @@ if(LS.get('country',null)==null&&S.country)save('country');
 setTimeout(pullCarFavs,1500);setTimeout(()=>{try{betaBadge()}catch{}},300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullCarFavs()});setInterval(()=>{if(!document.hidden)pullCarFavs()},8000);
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
-function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop)history.back()}
+function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop){skipPop++;history.back()}}
 $('#sheetbg').onclick=()=>{if(Date.now()-lpDone>900)closeSheet()};
 function presetPicker(st){sheet(`<h3>Save to a preset</h3><p class="dim" style="margin-top:-6px">${esc(st.n)}</p>${S.presets.map((p,i)=>`<button class="mi" data-setpre="${i}"><b style="font:600 13px var(--mono);width:22px;color:var(--acc)">${i+1}</b>${p?esc(p.n):'<span class="dim">Empty</span>'}</button>`).join('')}`);
   $$('[data-setpre]').forEach(b=>b.onclick=()=>{const i=+b.dataset.setpre;S.presets[i]={...st};save('presets');closeSheet();toast(`Saved to preset ${i+1}`);burst(innerWidth/2,innerHeight/2,['✦','♪'],['#ffd08a','#86b4ff'],10);renderAll()})}
