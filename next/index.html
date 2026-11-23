@@ -767,7 +767,7 @@ function nearH(){return S.geo?`<div id="hnear">${skRows(4)}</div>`:`<div class="
 async function fillNear(tok){const el=$('#hnear');if(!el)return;try{const r=await nearList();if(tok!==renderTok||!$('#hnear'))return;$('#hnear').innerHTML=r.length?rows(r,'Near you',1):'<div class="empty"><b>Quiet round here</b>No stations listed near you — try Popular in your country below.</div>';mark()}catch{if(tok===renderTok&&$('#hnear'))$('#hnear').innerHTML=errBox()}}
 async function askNear(){const b=$('[data-act=near]');if(b)b.innerHTML=`${ic('globe')}Finding you…`;try{S.geo=await getPos();save('geo');render()}catch(e){if(b)b.innerHTML=`${ic('globe')}Find stations near me`;toast(e&&e.code===1?'Location is blocked — allow it in Chrome’s site settings':'Couldn’t get your location — try again outside or with GPS on')}}
 /* ---------- Windows Down Radio — limited-time collection of sunny-drive stations. Switches itself off at midnight on 19 Dec 2026 (local time). ---------- */
-const VC_END=new Date(2026,11,19,0,0,0).getTime(),vcOn=()=>Date.now()<VC_END;
+const VC_END=new Date(2026,11,19,0,0,0).getTime(),vcOn=()=>Date.now()<VC_END&&!xmasOn();
 const VC=[['🌴','Miami & Florida',{state:'Florida',countrycode:'US'}],['📼','80s Neon',{tag:'80s'}],['✨','Pop',{tag:'pop',countrycode:'US'}],['🎤','Southern hip-hop',{tag:'hip hop',countrycode:'US'}],
  ['💃','Reggaeton & Latin',{tag:'reggaeton'}],['🎸','Metal',{tag:'metal'}],['🤠','Country',{tag:'country',countrycode:'US'}],['🌍','Amapiano & Afro',{tag:'amapiano'},{tag:'afrobeats'}]];
 let vcSel=LS.get('vcSel',0);
