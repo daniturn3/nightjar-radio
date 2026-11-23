@@ -533,8 +533,8 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const KEEP=['tester','chan','songs','eq','bday','country','presets','favs','homeOrder','homeHide','npMode','theme','skin','svol','alarmTag'];
 try{const N=window.NJR;if(N&&N.kept){const k=JSON.parse(N.kept()||'{}');Object.keys(k).forEach(x=>{if(KEEP.includes(x)&&localStorage.getItem('njr_'+x)==null&&k[x]!=null)localStorage.setItem('njr_'+x,k[x])});njrRoute()}}catch{}
 const LS={get(k,d){try{const v=localStorage.getItem('njr_'+k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{const j=JSON.stringify(v);localStorage.setItem('njr_'+k,j);if(KEEP.includes(k)&&window.NJR&&window.NJR.keep)window.NJR.keep(k,j)}catch{}}};
-let devNow=null;const TODAY=()=>devNow?new Date(devNow):new Date();
-/*@TESTONLY*/try{if(LS.get('tester',false))devNow=LS.get('devNow',null)}catch{}/*@END*/
+let devNow=null,devCC=null,devAllCC=false;const TODAY=()=>devNow?new Date(devNow):new Date();
+/*@TESTONLY*/try{if(LS.get('tester',false)){devNow=LS.get('devNow',null);devCC=devNow?LS.get('devCC',null):null}}catch{}/*@END*/
 setTimeout(()=>{try{if(window.NJR&&window.NJR.keep)KEEP.forEach(k=>{const v=localStorage.getItem('njr_'+k);if(v!=null)window.NJR.keep(k,v)})}catch{}},3000);
 const P={ball:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 7.5l3.4 2.5-1.3 4h-4.2l-1.3-4zM12 3v4.5M15.4 10l5-1.5M14.1 14l3 4M9.9 14l-3 4M8.6 10l-5-1.5',home:'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5v-5.5h-5V21H5a1 1 0 0 1-1-1z',dial:'M3 9h18v11H3zM7 9l8-5M7 14.5h4M15 14.5a1.5 1.5 0 1 0 0 .01',search:'M10.5 4a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM15.5 15.5 20 20',lib:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
  play:'M8 5.5v13l10.5-6.5z',pause:'M7.5 5h3v14h-3zM13.5 5h3v14h-3z',prev:'M6 5v14M19 5.5v13L8.5 12z',next:'M18 5v14M5 5.5v13L15.5 12z',star:'M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.7 1-5.8-4.3-4.1 5.9-.8z',
@@ -1289,7 +1289,7 @@ function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.
 /*@TESTONLY*/
 /* Developer tools — only in Daniel's Test copy. Everything between these markers is cut out when publishing to Beta. */
 function devOpen(u){if(NAT&&NAT.openUrl)NAT.openUrl(u);else open(u,'_blank','noopener')}
-function devSet(v){devNow=v;LS.set('devNow',v);closeSheet();try{applyTheme()}catch{}render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'🛠 Back to today’s date',3000)}
+function devSet(v,cc=null){devNow=v;LS.set('devNow',v);devCC=v?cc:null;LS.set('devCC',devCC);closeSheet();try{applyTheme()}catch{}render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+(devCC?' in '+cName(devCC):''):'🛠 Back to today’s date',3000)}
 function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x.toISOString()},at=(d,h)=>{const x=new Date(d);x.setHours(h,0,0,0);return x.toISOString()};
   const ev=sportEvents(y,y+2).filter(e=>THEMES[e.id]&&THEMES[e.id].big&&dayN(e.st)+e.len>dayN(new Date())).sort((a,b)=>a.st-b.st).slice(0,10);
   const bd=S.bday&&/^\d{2}-\d{2}$/.test(S.bday)?S.bday:null,inbox=LS.get('devInbox','');
@@ -1303,7 +1303,8 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   <button class="mi" data-dev="${at(xm,20)}">🕯️ Christmas evening <span class="dim">· 8pm</span></button>
   <button class="mi" data-dev="${iso(new Date(xm.getFullYear(),10,16))}">🎄 Christmas Radio starts</button>
   ${bd?`<button class="mi" data-dev="${iso(new Date(y,+bd.slice(0,2)-1,+bd.slice(3)))}">🎂 Your birthday</button>`:''}
-  ${ev.map(e=>`<button class="mi" data-dev="${iso(new Date(e.st.getTime()+864e5))}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· day 2, ${e.st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></button>`).join('')}
+  <button class="mi" id="dev_all">📅 Every event — pick any to preview <span class="dim">›</span></button>
+  ${ev.slice(0,4).map(e=>`<button class="mi" data-dev="${iso(new Date(e.st.getTime()+864e5))}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· day 2, ${e.st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></button>`).join('')}
   ${ev.length?`<button class="mi" data-dev="${iso(new Date(ev[0].st.getTime()-5*864e5))}">⏳ Countdown to ${esc(THEMES[ev[0].id].name)}</button>`:''}
   <div style="display:flex;gap:8px;margin:8px 0 14px"><input type="date" id="dev_d" style="flex:1"><button class="pill" id="dev_go">Go</button></div>
   <div class="fbql">Problem reports</div>
@@ -1311,10 +1312,27 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   <div id="dev_set" ${inbox?'hidden':''} style="margin-top:6px"><input id="dev_url" placeholder="Paste your report spreadsheet link" value="${esc(inbox)}" style="width:100%"><button class="pill" id="dev_save" style="margin-top:8px">Save link</button>${inbox?'':'<p class="dim" style="margin:6px 0 0">Open your responses spreadsheet, tap Share → Copy link, and paste it here. It’s saved on this phone only.</p>'}</div>
   ${inbox?'<button class="mi" id="dev_chg"><span class="dim">Change inbox link</span></button>':''}`);
   $$('#sheet [data-dev]').forEach(b=>b.onclick=()=>devSet(b.dataset.dev||null));
+  $('#dev_all').onclick=()=>devAllSheet();
   $('#dev_go').onclick=()=>{const v=$('#dev_d').value;if(v)devSet(iso(v+'T12:00:00'))};
   $('#dev_inbox').onclick=()=>{const u=LS.get('devInbox','');if(u)devOpen(u);else{$('#dev_set').hidden=false;$('#dev_url').focus()}};
   const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
   $('#dev_save').onclick=()=>{const u=$('#dev_url').value.trim();if(u&&!/^https:\/\/(docs|drive)\.google\.com\//.test(u)){toast('That doesn’t look like a Google Sheets link');return}LS.set('devInbox',u);toast(u?'📬 Inbox link saved':'Inbox link removed');devSheet()}}
+
+/* Every event in one list (all countries), so each can be previewed. Events for other countries preview as that country. */
+function devEvents(){const t0=new Date();t0.setHours(0,0,0,0);const n0=dayN(t0),y=t0.getFullYear(),m={};
+  const keep=(id,st,len,cc)=>{if(!THEMES[id]||['spring','summer','autumn','winter'].includes(id))return;const end=dayN(st)+(len||1);if(end<=n0)return;
+    if(!m[id]||st<m[id].st)m[id]={id,st,len:len||1,cc:cc||null}};
+  devAllCC=true;try{for(const e of sportEvents(y,y+4))keep(e.id,e.st,e.len,e.cc)}finally{devAllCC=false}
+  const sv=devNow;try{for(let i=0;i<731;i++){const d=new Date(t0.getTime()+i*864e5);d.setHours(12);const id=themeId(d);if(id&&!m[id])keep(id,new Date(d.getFullYear(),d.getMonth(),d.getDate()),1,null)}}finally{devNow=sv}
+  return Object.values(m).sort((a,b)=>a.st-b.st)}
+function devAllSheet(){const L=devEvents(),f=d=>d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});let mo='';
+  const rows=L.map(e=>{const k=e.st.toLocaleDateString('en-GB',{month:'long',year:'numeric'}),hd=k!==mo?(mo=k,`<div class="fbql" style="margin-top:12px">${k}</div>`):'';
+    const away=e.cc&&!e.cc.includes(S.country),pv=new Date(e.st.getTime()+(e.len>1?864e5:0));pv.setHours(12,0,0,0);
+    return hd+`<button class="mi devev" data-pv="${pv.toISOString()}" data-cc="${away?e.cc[0]:''}" data-q="${esc((THEMES[e.id].name+' '+k).toLowerCase())}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· ${f(e.st)}${e.len>1?` · ${e.len} days`:''}${away?` · ${flag(e.cc[0])} only`:''}</span></button>`}).join('');
+  sheet(`<h3>📅 Every event (${L.length})</h3><p class="dim" style="margin:0 0 8px">Tap one to see the app as it looks on that day. Events for other countries preview as that country.</p>
+  <input id="dev_q" placeholder="Search, e.g. golf, Christmas, July" style="width:100%;margin-bottom:6px">${rows}`);
+  $$('#sheet .devev').forEach(b=>b.onclick=()=>devSet(b.dataset.pv,b.dataset.cc||null));
+  $('#dev_q').oninput=e=>{const q=e.target.value.trim().toLowerCase();$$('#sheet .devev').forEach(b=>b.hidden=!!q&&!b.dataset.q.includes(q));$$('#sheet .fbql').forEach(h=>{let n=h.nextElementSibling,any=false;while(n&&!n.classList.contains('fbql')){if(n.classList.contains('devev')&&!n.hidden)any=true;n=n.nextElementSibling}h.hidden=!any})}}
 document.addEventListener('click',e=>{if(e.target.closest('#s_dev'))devSheet()});
 
 if(devNow)setTimeout(()=>toast('🛠 Previewing as '+new Date(devNow).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+' — Settings → Developer tools to change',4500),1200);
@@ -1562,7 +1580,7 @@ function sportRules(y){const add=(id,st,len,cc)=>({id,st,len,cc});const w=new Da
         add('dubaiwc',dw,1,UKI.concat(['AE','SA','QA','KW','BH','OM','US'])),add('nbafinals',nthDay(y,5,4,1),17,['US','CA']),add('stanley',nthDay(y,5,2,1),17,['US','CA']),
         add('worldseries',nthDay(y,9,5,4),9,['US','CA','JP','DO','PR','VE','MX'])]})()]}
 function sportEvents(y0,y1){const out=[];for(const[id,iso,len,wk,cc]of SPORT){const[a,b,c]=iso.split('-').map(Number),st=new Date(a,b-1,c);if(a>=y0-1&&a<=y1)out.push({id,st,len,wk,cc})}
-  for(let y=y0;y<=y1;y++)out.push(...sportRules(y));return out.filter(e=>!e.cc||e.cc.includes(S.country))}
+  for(let y=y0;y<=y1;y++)out.push(...sportRules(y));return out.filter(e=>devAllCC||!e.cc||e.cc.includes(devCC||S.country))}
 function sportOn(d){const n=dayN(d),wd=d.getDay(),ev=sportEvents(d.getFullYear(),d.getFullYear());const order=['gn','boatrace','facup','wfacup','hurling','gaafootball','superbowl','kentucky','indy500','nflthanks','melbcup','afl','nrl','uclfinal','darts','wimbledon'];
   const on=ev.filter(e=>{const s=dayN(e.st);return n>=s&&n<s+e.len&&(!e.wk||wd===5||wd===6||wd===0)});on.sort((a,b)=>{const ia=order.indexOf(a.id),ib=order.indexOf(b.id);return(ia<0?99:ia)-(ib<0?99:ib)||a.len-b.len});return on[0]?.id||null}
 const ZOD=['Monkey','Rooster','Dog','Pig','Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat'];
