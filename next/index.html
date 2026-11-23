@@ -1211,6 +1211,16 @@ function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px
 function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.favEdits()||'[]');if(!e.length)return;let n=0;
   e.forEach(x=>{if(x.op==='add'&&x.st&&x.st.u&&!S.favs.some(f=>f.u===x.st.u)){S.favs.unshift({tags:[],...x.st});n++}else if(x.op==='del'){const i=S.favs.findIndex(f=>f.u===x.u);if(i>=0){S.favs.splice(i,1);n++}}});
   if(n){save('favs');if(view==='library'||view==='home')render();mark&&mark()}}catch{}}
+/* Plays started in Android Auto (or the lock screen / widget) — native keeps a log; add them to Recent and stats. */
+function pullPlays(){try{if(!NAT||!NAT.plays)return;const a=JSON.parse(NAT.plays()||'[]');if(!a.length)return;let rec=0;
+  a.sort((x,y)=>x.t-y.t).forEach(p=>{const st=p.st;if(!st||!st.u||!st.n)return;const s=Math.max(0,Math.round(p.s||0));
+    const dup=S.log.find(e=>e.u===st.u&&Math.abs(e.t-p.t)<6e5);if(dup){if(s>dup.s)dup.s=s}
+    else{S.log.push({u:st.u,n:st.n,tg:(st.tags||[])[0]||'',cc:st.cc||'',t:p.t,s,b:st.br||0,m:p.m?1:0})}
+    const k=[...S.presets.filter(Boolean),...S.favs,...S.recent].find(x=>x.u===st.u)||{tags:[],...st};
+    if(S.recent[0]?.u!==st.u){S.recent=[k,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);rec=1}});
+  S.log.sort((x,y)=>x.t-y.t);if(S.log.length>4000)S.log=S.log.slice(-4000);save('log');if(rec){save('recent');if(view==='library'||view==='home')render()}}catch{}}
+setTimeout(pullPlays,1700);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullPlays()});
+if(LS.get('country',null)==null&&S.country)save('country');
 setTimeout(pullCarFavs,1500);setTimeout(()=>{try{betaBadge()}catch{}},300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullCarFavs()});setInterval(()=>{if(!document.hidden)pullCarFavs()},8000);
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
