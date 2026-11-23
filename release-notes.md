@@ -1,6 +1,6 @@
 ## 📻 Nightjar Radio — live radio after dark
 
-Free live radio from over 40,000 stations worldwide. No adverts, no sign-up. Made in the UK 🇬🇧
+Free live radio from over 50,000 stations worldwide. No adverts, no sign-up. Made in the UK 🇬🇧
 
 ### ⬇️ Download
 Tap **nightjar-radio.apk** under **Assets** below.
@@ -24,6 +24,13 @@ Tap **nightjar-radio.apk** under **Assets** below.
 - Song titles, when the station shares them
 - Wake-up radio alarm and bedtime mode
 - Home-screen widgets and Android Auto
+
+### ✨ What's new
+- 🎄 **Christmas Radio** at the top of Home, with a live countdown to Christmas Day
+- 🌍 **Christmas station of the day** — a different one from around the world each day
+- 🎉 **Event themes** for 100+ events through the year, from big sports tournaments to festivals — with their own card, decorations and visitors
+- 🎲 **Truly random** — the Dial, Globe and Bedtime now give every station the same chance, from every country
+- 🎵 Tidier song titles (no more odd symbols like `&#8212;`)
 
 **iPhone or computer?** Use it in your browser instead: https://daniturn3.github.io/nightjar-radio/
 

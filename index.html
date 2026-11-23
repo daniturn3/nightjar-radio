@@ -901,7 +901,7 @@ VIEWS.search=async(el,tok)=>{const sug=SSUG[S.country]||SSUG._;el.innerHTML=`<di
     <div class="sccw"><span>🌐</span><select class="sel" id="scc"><option value="">Any country</option>${COUNTRIES.map(([c,n])=>`<option value="${c}" ${c===scc?'selected':''}>${flag(c)} ${n}</option>`).join('')}</select></div>
     ${shist.length?`<div class="slab">Recent</div><div class="schips">${shist.map(q=>`<button class="schip rec" data-sq="${esc(q)}">↺ ${esc(q)}</button>`).join('')}</div>`:''}
     ${sq||scc?'':`<div class="slab">Try</div><div class="schips">${sug.map(q=>`<button class="schip" data-sq="${esc(q)}">${esc(q)}</button>`).join('')}</div>`}</div>
-  <div id="sres" style="margin-top:6px">${sq||scc?scard(sec(sq?`“${esc(sq)}”`:`${flag(scc)} ${esc(cName(scc))}`,skRows(6),'Searching…','01'),'🔎','#b8a2ff','#7b5cff'):`<div class="sempty"><div class="semo">📻</div><b>Over 40,000 stations</b><span>Type a name above, tap a suggestion, or pick a country to browse.</span></div>`}</div>`;
+  <div id="sres" style="margin-top:6px">${sq||scc?scard(sec(sq?`“${esc(sq)}”`:`${flag(scc)} ${esc(cName(scc))}`,skRows(6),'Searching…','01'),'🔎','#b8a2ff','#7b5cff'):`<div class="sempty"><div class="semo">📻</div><b>Over 50,000 stations</b><span>Type a name above, tap a suggestion, or pick a country to browse.</span></div>`}</div>`;
   $('#sform').onsubmit=e=>{e.preventDefault();$('#sq').blur();sDo($('#sq').value)};
   if($('#sx'))$('#sx').onclick=()=>{sq='';LS.set('sq','');render()};
   $$('[data-sq]').forEach(b=>b.onclick=()=>sDo(b.dataset.sq));
@@ -1199,7 +1199,7 @@ document.addEventListener('click',e=>{const l=e.target.closest('.lsong,#rsong');
 const FAQ=[
  ['Getting started',[
   ['Is Nightjar Radio free?','Yes — completely free, with no ads and no account. If you enjoy it, there’s an optional “Buy me a coffee” link at the bottom of Settings.'],
-  ['Where do the stations come from?','From radio-browser.info, a free community directory of over 40,000 stations worldwide. Nightjar Radio doesn’t run any stations itself — it tunes you in to the stations’ own streams.'],
+  ['Where do the stations come from?','From radio-browser.info, a free community directory of over 50,000 stations worldwide. Nightjar Radio doesn’t run any stations itself — it tunes you in to the stations’ own streams.'],
   ['A station is missing or the details are wrong','Stations are added and edited on radio-browser.info, so anyone can add a missing one or fix its details there. Changes show up in the app shortly after.'],
   ['How do I change my home country?','Settings → Home country. It changes “Popular in…”, the Sport tab, football fixtures and seasonal themes.'],
   ['Can I see the tour again?','Yes — Settings → Show the tour. “What’s new” shows the latest changes.']]],
@@ -1674,7 +1674,7 @@ function modal(html,acts={},cls=''){modalActs=acts;let m=$('#modal');if(!m){m=do
   const was=modalOpen&&m.classList.contains('on');m.className='modal '+cls+(was?' on':'');m.innerHTML=`<div class="mcard${was?' swap':''}">${html}</div>`;if(!was)requestAnimationFrame(()=>m.classList.add('on'));if(!modalOpen){modalOpen=true;history.pushState({m:1},'')}return m}
 function closeModal(pop){const m=$('#modal');if(!modalOpen)return;modalOpen=false;if(m){m.classList.remove('on');setTimeout(()=>{if(!modalOpen)m.remove()},260)}if(!pop)history.back();if(MQ.length)setTimeout(()=>MQ.shift()(),pop?350:450)}
 const TOUR=[
-  {i:'logo',c:'var(--acc)',t:'Welcome to Nightjar Radio',d:'Live radio from over 40,000 stations around the world — free, and it keeps playing with the screen off.'},
+  {i:'logo',c:'var(--acc)',t:'Welcome to Nightjar Radio',d:'Live radio from over 50,000 stations around the world — free, and it keeps playing with the screen off.'},
   {i:'home',c:'var(--h-orange)',t:'Your six presets',d:'Like the buttons on a real radio. While a station plays, tap an empty preset on Home to save it. Long-press one to change or clear it.'},
   {i:'dial',c:'var(--h-blue)',t:'Turn the dial',d:'Pick a mood, then slide the dial to tune between stations — static and all. Or tap Spin the dial for a surprise.'},
   {i:'globe',c:'var(--h-green)',t:'Around the world now',d:'Choose night-time, morning or anywhere, then spin the globe. It lands somewhere it’s that time right now and plays a local station.'},
