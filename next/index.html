@@ -746,8 +746,15 @@ au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=fal
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
 au.addEventListener('error',()=>{if(!cur)return;logErr('stream error: '+cur.n);if(webPlayed===cur.u&&wantPlay&&reconnN<10){if(!reconn)toast('📶 Signal dropped — reconnecting…');reconn=true;buffering=true;playing=false;setState();clearTimeout(reconnT);reconnT=setTimeout(webRetry,[2,3,5,8,12,15,20,30,30,30][reconnN++]*1e3);return}reconn=false;buffering=false;playing=false;staticOff();setState();toast('Couldn’t tune in to '+cur.n+' — try another station');trouble('play')});
-function meta(){if(NAT||!('mediaSession' in navigator)||!cur)return;try{navigator.mediaSession.metadata=new MediaMetadata({title:cur.n,artist:[flag(cur.cc),cur.c,...cur.tags.slice(0,2)].filter(Boolean).join(' · '),album:'Nightjar Radio',artwork:cur.fav?[{src:cur.fav,sizes:'256x256'}]:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}catch{}
-  const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch{}};h('play',()=>toggle());h('pause',()=>au.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>au.pause())}
+function meta(){if(NAT||!('mediaSession' in navigator)||!cur)return;
+  /* iPhone lock screen, CarPlay "Now Playing", Bluetooth and smart watches: station name, where it's from, its logo (https only, with the app icon as a fallback) */
+  try{const fav=/^https:\/\//.test(cur.fav||'')?cur.fav:'',icon=[{src:'icon-512.png',sizes:'512x512',type:'image/png'},{src:'icon-192.png',sizes:'192x192',type:'image/png'}];
+    navigator.mediaSession.metadata=new MediaMetadata({title:cur.n,artist:['● Live',[flag(cur.cc),cur.c].filter(Boolean).join(' ')].filter(Boolean).join(' · '),album:cur.tags.slice(0,2).join(' · ')||'Nightjar Radio',
+      artwork:fav?[{src:fav,sizes:'512x512'},{src:fav,sizes:'256x256'},...icon]:icon})}catch{}
+  const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch{}};h('play',()=>toggle());h('pause',()=>au.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>au.pause());
+  /* Live radio can't be skipped through: no ±15s buttons or time bar */
+  h('seekbackward',null);h('seekforward',null);h('seekto',null)}
+if(!NAT&&typeof au!=='undefined')au.addEventListener('playing',()=>meta());
 /* static between stations */
 let actx,noise,ng;function staticOn(){if(!S.staticfx)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();if(noise)return;
   const b=actx.createBuffer(1,actx.sampleRate*2,actx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(Math.random()<.002?3:1);
