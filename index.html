@@ -1793,6 +1793,10 @@ window.njrAction=a=>{if(modalOpen)closeModal();if(npOpen)closeNP();if(sheetOpen)
 document.addEventListener('click',e=>{const a=e.target.closest('a.bmc');if(a&&NAT){e.preventDefault();NAT.openUrl(a.href)}});
 /* ---------- start ---------- */
 go('home');renderMini();if(cur)meta();poke();setTimeout(onboard,700);
+/* Shortcuts from the installed app's icon (right-click on Windows/Mac, long-press on Android home screen): ?do=... */
+(()=>{const d=new URLSearchParams(location.search).get('do');if(!d)return;history.replaceState(null,'',location.pathname);
+  setTimeout(()=>{if(d==='bedtime')bedtime();else if(d==='globe'){go('home');setTimeout(()=>{$('#gres')?.scrollIntoView({block:'center',behavior:'smooth'});globeSpin()},350)}else if(d==='dial')go('dial');else if(d==='favs')go('library')},450)})();
+
 if(!NAT&&'serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(NAT){natSync('presets');natSync('favs');natSync('recent');NAT.setVolume(S.vol);document.body.classList.add('native')}
 </script>
