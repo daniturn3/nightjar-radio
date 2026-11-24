@@ -555,14 +555,14 @@ body.calm #thfly{display:none}
   #np>.volnote{margin-bottom:auto}
 }
 @media (min-width:1024px) and (orientation:landscape){
-  #tabs{left:20px;right:auto;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;width:74px;max-width:none;margin:0;padding:8px;gap:4px;border-radius:26px}
+  #tabs{left:max(20px,calc((100vw - 1320px) / 2 + 20px));right:auto;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;width:74px;max-width:none;margin:0;padding:8px;gap:4px;border-radius:26px}
   #tabs button{flex:none;padding:17px 0;border-radius:18px}
   #tabs button.on::after{bottom:auto;top:50%;left:5px;transform:translateY(-50%)}
   #app{max-width:1320px;padding-left:132px;padding-right:44px;padding-bottom:calc(120px + env(safe-area-inset-bottom))}
   header{margin:0 -44px 0 -132px;padding:16px 44px 16px 132px}
   .hs,.chips{margin-right:-44px;padding-right:44px}
   .vc .hs,.vc .chips{margin-right:0;padding-right:16px}
-  #mini{left:132px;right:44px;bottom:calc(18px + env(safe-area-inset-bottom));max-width:1144px}
+  #mini{left:max(132px,calc((100vw - 1320px) / 2 + 132px));right:max(44px,calc((100vw - 1320px) / 2 + 44px));bottom:calc(18px + env(safe-area-inset-bottom));max-width:1144px}
   #toast{bottom:110px}
   body[data-view=home] #view{columns:2;column-gap:26px}
   body[data-view=home] #view>*{break-inside:avoid;-webkit-column-break-inside:avoid}
