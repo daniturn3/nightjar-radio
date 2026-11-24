@@ -7,10 +7,10 @@ Tap **nightjar-radio.apk** under **Assets** below.
 
 ### 📸 Take a look
 <p>
-<img src="https://daniturn3.github.io/nightjar-radio/get/shots/home.webp" width="200" alt="Home"> <img src="https://daniturn3.github.io/nightjar-radio/get/shots/player.webp" width="200" alt="The radio"> <img src="https://daniturn3.github.io/nightjar-radio/get/shots/globe.webp" width="200" alt="Spin the globe"> <img src="https://daniturn3.github.io/nightjar-radio/get/shots/dial.webp" width="200" alt="Turn the dial">
+<img src="https://radio.churr.co.uk/get/shots/home.webp" width="200" alt="Home"> <img src="https://radio.churr.co.uk/get/shots/player.webp" width="200" alt="The radio"> <img src="https://radio.churr.co.uk/get/shots/globe.webp" width="200" alt="Spin the globe"> <img src="https://radio.churr.co.uk/get/shots/dial.webp" width="200" alt="Turn the dial">
 </p>
 <p>
-<img src="https://daniturn3.github.io/nightjar-radio/get/shots/wooden.webp" width="200" alt="Wooden radio skin"> <img src="https://daniturn3.github.io/nightjar-radio/get/shots/carstereo.webp" width="200" alt="Car stereo skin"> <img src="https://daniturn3.github.io/nightjar-radio/get/shots/alarm.webp" width="200" alt="Wake-up radio"> <img src="https://daniturn3.github.io/nightjar-radio/get/shots/wrapped.webp" width="200" alt="Radio Wrapped">
+<img src="https://radio.churr.co.uk/get/shots/wooden.webp" width="200" alt="Wooden radio skin"> <img src="https://radio.churr.co.uk/get/shots/carstereo.webp" width="200" alt="Car stereo skin"> <img src="https://radio.churr.co.uk/get/shots/alarm.webp" width="200" alt="Wake-up radio"> <img src="https://radio.churr.co.uk/get/shots/wrapped.webp" width="200" alt="Radio Wrapped">
 </p>
 
 ### Installing on Android
@@ -32,8 +32,8 @@ Tap **nightjar-radio.apk** under **Assets** below.
 - 🎲 **Truly random** — the Dial, Globe and Bedtime now give every station the same chance, from every country
 - 🎵 Tidier song titles (no more odd symbols like `&#8212;`)
 
-**iPhone or computer?** Use it in your browser instead: https://daniturn3.github.io/nightjar-radio/
+**iPhone or computer?** Use it in your browser instead: https://radio.churr.co.uk/
 
 ☕ Enjoying it? [Buy me a coffee](https://buymeacoffee.com/Daniturn3)
 
-Nicer download page: https://daniturn3.github.io/nightjar-radio/get/
+Nicer download page: https://radio.churr.co.uk/get/
