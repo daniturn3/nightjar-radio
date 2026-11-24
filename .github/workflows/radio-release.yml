@@ -13,6 +13,10 @@ on:
         description: "Website only (no app update for Beta users)"
         type: boolean
         default: false
+      app_only:
+        description: "App only (leave the Beta/Stable websites as they are)"
+        type: boolean
+        default: false
 permissions:
   contents: write
   pages: write
@@ -24,4 +28,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Publish
         env: { GH_TOKEN: '${{ github.token }}' }
-        run: python3 .github/scripts/channels.py publish ${{ inputs.stable_now && '--stable-now' || '' }} ${{ inputs.web_only && '--web-only' || '' }}
+        run: python3 .github/scripts/channels.py publish ${{ inputs.stable_now && '--stable-now' || '' }} ${{ inputs.web_only && '--web-only' || '' }} ${{ inputs.app_only && '--app-only' || '' }}

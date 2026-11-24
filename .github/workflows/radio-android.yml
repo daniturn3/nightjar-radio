@@ -4,6 +4,10 @@ name: Nightjar Radio Android app
 # TEST build to this repo's releases. Run it by hand (Actions → Run workflow) after changing the Android code.
 on:
   workflow_dispatch:
+    inputs:
+      src_ref:
+        description: "Source branch to build (normally main)"
+        default: main
 permissions:
   contents: write
 concurrency: radio-android
@@ -12,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { repository: daniturn3/nightjar-radio-src, token: '${{ secrets.SRC_TOKEN }}', ref: main }
+        with: { repository: daniturn3/nightjar-radio-src, token: '${{ secrets.SRC_TOKEN }}', ref: "${{ inputs.src_ref || 'main' }}" }
       - uses: actions/checkout@v4
         with: { path: pub, sparse-checkout: release-notes.md, sparse-checkout-cone-mode: false }
       - uses: actions/setup-java@v4

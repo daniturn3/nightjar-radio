@@ -12,7 +12,7 @@ Every build published to beta is also kept in release radio-builds as nightjar-r
 so stable can later take exactly that build even if beta has moved on.
 History lives in stats/channels.json.
 
-Usage: channels.py publish [--stable-now]   |   channels.py auto-stable
+Usage: channels.py publish [--stable-now] [--web-only | --app-only]   |   channels.py auto-stable
 """
 import json, os, re, subprocess, sys, datetime, pathlib, hashlib, shutil
 
@@ -77,7 +77,7 @@ def now(): return datetime.datetime.now(datetime.timezone.utc).replace(microseco
 def to_beta(d):
     """Copy the test web app and (if newer) the test APK to beta. Returns (build, changed)."""
     n, last = build_of(TAGS["test"]), build_of(TAGS["beta"])
-    web = webcopy("test", "beta")
+    web = False if "--app-only" in sys.argv else webcopy("test", "beta")  # --app-only: leave the websites alone
     native = bool(n) and n > last and "--web-only" not in sys.argv
     if native:
         sh("gh", "release", "download", TAGS["test"], "-p", "nightjar-radio-beta.apk", "-O", "nightjar-radio.apk", "--clobber")
@@ -101,7 +101,7 @@ def to_beta(d):
 
 def to_stable(d, n, why):
     cur = build_of(TAGS["stable"])
-    web = webcopy("beta", "stable")
+    web = False if "--app-only" in sys.argv else webcopy("beta", "stable")
     if cur >= n:
         if web: d["stable"] = {"build": cur, "web": webid("stable"), "at": now().isoformat(), "how": why}; print(f"Stable website updated ({why})")
         else: print(f"Stable already has build {cur} and the latest website")
