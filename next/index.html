@@ -1346,13 +1346,27 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   <div class="fbql">Problem reports</div>
   <button class="mi" id="dev_inbox">📬 ${inbox?'Open report inbox':'Set up report inbox link'}</button>
   <div id="dev_set" ${inbox?'hidden':''} style="margin-top:6px"><input id="dev_url" placeholder="Paste your report spreadsheet link" value="${esc(inbox)}" style="width:100%"><button class="pill" id="dev_save" style="margin-top:8px">Save link</button>${inbox?'':'<p class="dim" style="margin:6px 0 0">Open your responses spreadsheet, tap Share → Copy link, and paste it here. It’s saved on this phone only.</p>'}</div>
-  ${inbox?'<button class="mi" id="dev_chg"><span class="dim">Change inbox link</span></button>':''}`);
+  ${inbox?'<button class="mi" id="dev_chg"><span class="dim">Change inbox link</span></button>':''}
+  <div class="fbql" style="margin-top:14px">My Wrapped</div>
+  <p class="dim" style="margin:0 0 6px">${LS.get('wrapUrl','')?'Sending your plays to your private Wrapped'+(LS.get('wrapAt',0)?' · last sent '+new Date(LS.get('wrapAt',0)).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''):'Paste your private Wrapped link to send your plays to it. Saved on this phone only.'}</p>
+  <input id="dev_wurl" placeholder="Paste your Wrapped link" value="${esc(LS.get('wrapUrl',''))}" style="width:100%"><div style="display:flex;gap:8px;margin-top:8px"><button class="pill" id="dev_wsave">Save</button><button class="pill" id="dev_wnow">Send now</button></div>`);
+  $('#dev_wsave').onclick=()=>{const u=$('#dev_wurl').value.trim();if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec\?key=\w+/.test(u)){toast('That doesn’t look like your Wrapped link');return}LS.set('wrapUrl',u);toast(u?'🎁 Wrapped link saved':'Wrapped link removed');if(u)wrapSync(true);devSheet()};
+  $('#dev_wnow').onclick=()=>wrapSync(true);
   $$('#sheet [data-dev]').forEach(b=>b.onclick=()=>devSet(b.dataset.dev||null));
   $('#dev_all').onclick=()=>devAllSheet();
   $('#dev_go').onclick=()=>{const v=$('#dev_d').value;if(v)devSet(iso(v+'T12:00:00'))};
   $('#dev_inbox').onclick=()=>{const u=LS.get('devInbox','');if(u)devOpen(u);else{$('#dev_set').hidden=false;$('#dev_url').focus()}};
   const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
   $('#dev_save').onclick=()=>{const u=$('#dev_url').value.trim();if(u&&!/^https:\/\/(docs|drive)\.google\.com\//.test(u)){toast('That doesn’t look like a Google Sheets link');return}LS.set('devInbox',u);toast(u?'📬 Inbox link saved':'Inbox link removed');devSheet()}}
+
+/* Sends Daniel's own plays to his private Wrapped (link saved on his phone only). Upserts, so re-sending is safe. */
+async function wrapSync(show){const u=LS.get('wrapUrl','');if(!u||!LS.get('tester',false))return;
+  const since=Math.min(LS.get('wrapAt',0)||0,Date.now()-2*864e5)-36e5;
+  const plays=S.log.filter(e=>e.t>=since&&e.s>=30).map(e=>({u:e.u,n:e.n,tg:e.tg||'',cc:e.cc||'',t:e.t,s:Math.round(e.s)}));
+  if(!plays.length){if(show)toast('Nothing new to send');return}
+  try{const r=await fetch(u,{method:'POST',body:JSON.stringify({src:'radio',plays})});const j=await r.json();if(!j.ok)throw 0;
+    LS.set('wrapAt',Date.now());if(show)toast('🎁 Sent '+plays.length+' plays to your Wrapped')}catch{if(show)toast('Couldn’t reach your Wrapped — check the link')}}
+setTimeout(()=>wrapSync(false),15e3);setInterval(()=>wrapSync(false),15*6e4);document.addEventListener('visibilitychange',()=>{if(document.hidden)wrapSync(false)});
 
 /* Every event in one list (all countries), so each can be previewed. Events for other countries preview as that country. */
 function devEvents(){const t0=new Date();t0.setHours(0,0,0,0);const n0=dayN(t0),y=t0.getFullYear(),m={};
