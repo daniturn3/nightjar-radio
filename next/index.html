@@ -5,9 +5,38 @@
 <base href="/nightjar-radio/">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src * data: blob:; media-src * data: blob:; connect-src *; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<script>/* Moving home: daniturn3.github.io/nightjar-radio → radio.churr.co.uk. Saved data is copied (never deleted) from the old address to the new one.
+   Old app builds (before MOVE_APP) can't open the new address, so they stay on the old one. Strings are split so the address-rewriter leaves them alone. */
+(function(){try{
+  var NEWH='radio.churr.co.uk',OLDH='daniturn3'+'.github'+'.io',OLDP='/nightjar'+'-radio',MOVE_APP=134,L=localStorage,ok=!window.NJR||(window.NJR.version&&window.NJR.version()>=MOVE_APP);
+  var keys=function(){var o={};for(var i=0;i<L.length;i++){var k=L.key(i);if(k&&k.indexOf('njr_')===0&&k!=='njr_movedOut')o[k]=L.getItem(k)}return o};
+  var b64=function(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+  var unb64=function(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)))};
+  var stop=function(){document.documentElement.style.visibility='hidden';window.njrMoving=true;setTimeout(function(){document.documentElement.style.visibility=''},5000)};
+  if(location.hostname===OLDH&&ok){
+    // Old address: hand everything to the new one (only once unless the new one asks again)
+    var ask=/[?&]njrpull=1/.test(location.search),search=location.search.replace(/[?&]njrpull=1/,'').replace(/^&/,'?');
+    var path=location.pathname.indexOf(OLDP)===0?location.pathname.slice(OLDP.length)||'/':location.pathname;
+    var data=(ask||!L.getItem('njr_movedOut'))?keys():null,pay=data&&Object.keys(data).length?b64(JSON.stringify(data)):'-';
+    if(pay.length>1500000){delete data.njr_log;pay=b64(JSON.stringify(data))}
+    L.setItem('njr_movedOut',String(Date.now()));stop();
+    location.replace('https://'+NEWH+path+search+'#njrmove='+pay);
+  }else if(location.hostname===NEWH){
+    var m=location.hash.match(/^#njrmove=([^&]*)/);
+    if(m){
+      if(!L.getItem('njr_movedAt')&&m[1]&&m[1]!=='-'){var d=JSON.parse(unb64(m[1]));for(var k in d)if(k.indexOf('njr_')===0&&L.getItem(k)==null)L.setItem(k,d[k])}
+      L.setItem('njr_movedAt',String(Date.now()));
+      history.replaceState(null,'',location.pathname+location.search);
+    }else if(!L.getItem('njr_movedAt')&&!sessionStorage.getItem('njr_pulled')){
+      // First visit here: ask the old address once for anything saved there
+      sessionStorage.setItem('njr_pulled','1');stop();
+      location.replace('https://'+OLDH+OLDP+location.pathname+(location.search?location.search+'&':'?')+'njrpull=1');
+    }
+  }
+}catch(e){document.documentElement.style.visibility=''}})();</script>
 <script>/* Web channels: the app shows Stable (this folder's root), Beta (beta/) or Test (next/) — see CLAUDE.md */
 window.ROOT='https://daniturn3.github.io/nightjar-radio/';window.WEBCH=/\/nightjar-radio\/next\//.test(location.pathname)?'test':/\/nightjar-radio\/beta\//.test(location.pathname)?'beta':'stable';if(WEBCH!=='stable'){const m=document.createElement('meta');m.name='robots';m.content='noindex,nofollow';document.head.append(m)}
-window.njrRoute=function(){try{if(!window.NJR)return;var L=localStorage,want=L.getItem('njr_tester')==='true'?'test':L.getItem('njr_chan')==='"beta"'?'beta':'stable';
+window.njrRoute=function(){try{if(!window.NJR||window.njrMoving)return;var L=localStorage,want=L.getItem('njr_tester')==='true'?'test':L.getItem('njr_chan')==='"beta"'?'beta':'stable';
   if(want!==WEBCH)location.replace('/nightjar-radio/'+({test:'next/',beta:'beta/',stable:''})[want]+location.search+location.hash)}catch(e){}};njrRoute();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#000000">
