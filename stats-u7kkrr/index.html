@@ -9,15 +9,21 @@ table{width:100%;border-collapse:collapse;margin-top:8px}td,th{padding:10px 6px;
 td:last-child,th:last-child{text-align:right}.bar{height:6px;border-radius:3px;background:linear-gradient(90deg,#ffb347,#ff6b4a);margin-top:4px}p.note{color:#a3a7b8;font-size:13px}button{margin-top:10px;border:1px solid rgba(234,242,255,.15);background:rgba(255,255,255,.05);color:inherit;border-radius:999px;padding:10px 18px;font:inherit}.c i{display:block;font-style:normal;font-size:13px;color:#a3a7b8;margin-bottom:2px}.c.st{border-color:rgba(134,217,168,.35)}.c.bt{border-color:rgba(255,209,102,.35)}
 .split{display:flex;height:12px;border-radius:8px;overflow:hidden;margin:18px 0 0;background:rgba(255,255,255,.06)}.split i{display:block;height:100%}.split .s{background:linear-gradient(90deg,#3fbf7f,#86d9a8)}.split .b{background:linear-gradient(90deg,#ffd166,#ffb347)}
 .chs{display:grid;gap:8px;margin:-8px 0 18px;font-size:13.5px;color:#a3a7b8}.chs div{padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.03)}.chs b{color:#f3ecdf;font-weight:600}
-.tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:11px;vertical-align:1px}.tag.s{background:rgba(134,217,168,.16);color:#86d9a8}.tag.b{background:rgba(255,209,102,.16);color:#ffd166}.bar.b{background:linear-gradient(90deg,#ffd166,#ffb347)}.bar.s{background:linear-gradient(90deg,#3fbf7f,#86d9a8)}</style></head>
+.tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:11px;vertical-align:1px}.tag.s{background:rgba(134,217,168,.16);color:#86d9a8}.tag.b{background:rgba(255,209,102,.16);color:#ffd166}.bar.b{background:linear-gradient(90deg,#ffd166,#ffb347)}.bar.s{background:linear-gradient(90deg,#3fbf7f,#86d9a8)}.vchart{display:flex;align-items:flex-end;gap:4px;height:110px;margin:26px 0 30px}.vchart div{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#86b4ff,#3f6fe0);position:relative;min-height:2px}.vchart div span{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:#676c80;white-space:nowrap}.vchart div b{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:#a3a7b8;font-weight:500}</style></head>
 <body><main><div class="mono">Private · Nightjar Radio</div><h1>Downloads</h1>
 <div class="big" id="total">…</div><div style="color:#a3a7b8">all-time Android app downloads</div>
 <div class="split" id="split"></div>
 <div class="cards"><div class="c st"><i>🛡️ Stable</i><b id="stt">…</b><span id="stl">downloads</span></div><div class="c bt"><i>⚡ Beta</i><b id="btt">…</b><span id="btl">downloads</span></div></div>
 <div class="chs" id="chs"></div>
 <table><thead><tr><th>Version</th><th>Until</th><th>Downloads</th></tr></thead><tbody id="rows"></tbody></table>
-<button onclick="load()">↻ Refresh</button>
-<p class="note">Counts include repeat downloads and your own. Beta vs Stable is worked out from downloads — people who switch channel inside the app aren’t counted again, and the app never reports who uses which. Versions before build 105 weren't recorded. Browser users aren't counted. This page isn't linked anywhere, but it isn't password-protected either.</p></main>
+<h1 style="margin-top:34px">Website views</h1>
+<div class="big" id="vw7">…</div><div style="color:#a3a7b8" id="vw7l">page opens in the last 7 days</div>
+<div class="cards"><div class="c"><i>📅 Today</i><b id="vwd">…</b><span id="vwdl">so far</span></div><div class="c"><i>🗓️ Last 30 days</i><b id="vw30">…</b><span id="vw30l">page opens</span></div>
+<div class="c"><i>🌐 In a browser</i><b id="vwb">…</b><span>last 30 days</span></div><div class="c"><i>📱 In the Android app</i><b id="vwa">…</b><span>last 30 days</span></div></div>
+<div class="vchart" id="vchart"></div>
+<table><thead><tr><th>Page</th><th>7 days</th><th>30 days</th></tr></thead><tbody id="vrows"></tbody></table>
+<button onclick="load();views()">↻ Refresh</button>
+<p class="note">Counts include repeat downloads and your own. Beta vs Stable is worked out from downloads — people who switch channel inside the app aren’t counted again, and the app never reports who uses which. Versions before build 105 weren't recorded. Website views count page opens on radio.churr.co.uk (not the old address), including yours; bots are left out. This page isn't linked anywhere, but it isn't password-protected either.</p></main>
 <script>
 const GH='https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/',fmt=n=>n.toLocaleString('en-GB'),day=d=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
 const rel=t=>fetch(GH+t,{cache:'no-store'}).then(x=>x.ok?x.json():{}).catch(()=>({}));
@@ -36,4 +42,18 @@ async function load(){try{const[h,ch,ra,rb]=await Promise.all([fetch('../stats/d
  rows.innerHTML=all.map(x=>{const b=cn(x)==='beta';return`<tr><td>Build ${x.build}<span class="tag ${b?'b':'s'}">${b?'Beta':'Stable'}</span>${x.until==='now'?' · current':''}<div class="bar ${b?'b':'s'}" style="width:${Math.max(3,x.downloads/mx*100)}%"></div></td><td>${x.until==='now'?'—':new Date(x.until).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td><td>${fmt(x.downloads)}</td></tr>`}).join('')}
  catch(e){total.textContent='—';rows.innerHTML='<tr><td colspan=3>Couldn’t load the numbers — try again in a minute.</td></tr>'}}
 load();
+/* Website views — daily totals counted by the radio.churr.co.uk program (no cookies, no personal data) */
+async function views(){try{const d=await fetch('https://radio.churr.co.uk/__views',{cache:'no-store'}).then(x=>x.json());
+ const iso=n=>{const t=new Date();t.setUTCDate(t.getUTCDate()-n);return t.toISOString().slice(0,10)};
+ const sum=(days,f=()=>true)=>days.reduce((a,k)=>a+Object.entries(d[k]||{}).filter(([n])=>f(n)).reduce((b,[,v])=>b+v,0),0);
+ const D7=[...Array(7)].map((_,i)=>iso(i)),D30=[...Array(30)].map((_,i)=>iso(i)),D14=[...Array(14)].map((_,i)=>iso(13-i));
+ vwd.textContent=fmt(sum([iso(0)]));vw7.textContent=fmt(sum(D7));vw30.textContent=fmt(sum(D30));
+ vwb.textContent=fmt(sum(D30,n=>n.endsWith('_web')));vwa.textContent=fmt(sum(D30,n=>n.endsWith('_app')));
+ const mx=Math.max(1,...D14.map(k=>sum([k])));
+ vchart.innerHTML=D14.map((k,i)=>{const v=sum([k]);return`<div style="height:${Math.max(2,v/mx*100)}%" title="${day(k)}: ${v}">${v?`<b>${v}</b>`:''}${i%2?'':`<span>${day(k)}</span>`}</div>`}).join('');
+ const pg=[['stable','🛡️ Stable app & site'],['beta','⚡ Beta'],['test','🧪 Test (you)'],['get','⬇️ Download page']];
+ vrows.innerHTML=pg.map(([p,l])=>`<tr><td>${l}</td><td>${fmt(sum(D7,n=>n.startsWith(p+'_')))}</td><td>${fmt(sum(D30,n=>n.startsWith(p+'_')))}</td></tr>`).join('');
+ const first=Object.keys(d).sort()[0];vw30l.textContent=first?'page opens · counting since '+day(first):'page opens';
+}catch(e){vw7.textContent='—';vrows.innerHTML='<tr><td colspan=3>Website views aren’t switched on yet.</td></tr>'}}
+views();
 </script></body></html>
