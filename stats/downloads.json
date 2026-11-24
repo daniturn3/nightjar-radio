@@ -59,5 +59,17 @@
   "downloads": 3,
   "until": "2026-11-22",
   "channel": "beta"
+ },
+ {
+  "build": 126,
+  "downloads": 1,
+  "until": "2026-11-24",
+  "channel": "beta"
+ },
+ {
+  "build": 117,
+  "downloads": 47,
+  "until": "2026-11-24",
+  "channel": "stable"
  }
 ]
