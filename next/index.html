@@ -1308,11 +1308,19 @@ const SJUNK=/^(advert(isement)?s?|ad ?break|commercials?|jingle|news|traffic( ne
 const sKey=t=>[...new Set(sNorm(String(t).replace(/[\(\[][^\)\]]*[\)\]]/g,' ').replace(/\b(radio edit|edit|remaster(ed)?|feat|ft|official|version|mix)\b/gi,' ')).split(' ').filter(w=>w.length>1))].sort().join(' ');
 /* Tidy any duplicates saved before this check existed. */
 (()=>{try{const h=LS.get('songs',[]);if(!h.length)return;const out=[];h.forEach(x=>{const k=sKey(x.s);if(!out.some(y=>sKey(y.s)===k&&Math.abs(y.t-x.t)<3*36e5))out.push(x)});if(out.length!==h.length)LS.set('songs',out)}catch{}})();
-function logSong(){if(!song||!cur)return;const t=song.trim();if(t.length<3||SJUNK.test(t)||t.toLowerCase()===String(cur.n).toLowerCase())return;
-  const h=LS.get('songs',[]),k=sKey(t);if(!k)return;
-  // Same song (ignoring case, punctuation, "(Radio Edit)" etc. and artist/title order) heard in the last 3 hours on any station? Just refresh its time.
-  const i=h.findIndex(x=>sKey(x.s)===k&&Date.now()-x.t<3*36e5);if(i>=0){if(i===0)return;h.splice(i,1)}
-  h.unshift({s:t,n:cur.n,u:cur.u,f:cur.fav||'',t:Date.now()});LS.set('songs',h.slice(0,300));if(view==='library'&&$('#songsec'))$('#songsec').outerHTML=songsH()}
+/* Add one song to the list (at the time it was heard). Same song within 3 hours on any station = keep one, with the latest time. */
+function addSong(t,st,when,h){t=String(t||'').trim();if(t.length<3||SJUNK.test(t)||t.toLowerCase()===String(st.n||'').toLowerCase())return false;
+  const k=sKey(t);if(!k)return false;
+  const i=h.findIndex(x=>sKey(x.s)===k&&Math.abs(when-x.t)<3*36e5);if(i>=0){if(h[i].t>=when)return false;h.splice(i,1)}
+  h.push({s:t,n:st.n||'',u:st.u||'',f:st.fav||'',t:when});return true}
+function saveSongs(h){h.sort((a,b)=>b.t-a.t);LS.set('songs',h.slice(0,300));if(view==='library'&&$('#songsec'))$('#songsec').outerHTML=songsH()}
+/* The app (build 137+) notes every song itself, even with the screen off or the app closed — collect those. */
+function pullSongs(){if(!(NAT&&NAT.takeSongs))return false;let q;try{q=JSON.parse(NAT.takeSongs()||'[]')}catch{return true}if(!q.length)return true;
+  const h=LS.get('songs',[]),known=[...S.presets.filter(Boolean),...S.favs,...S.recent];let ch=false,top=0;
+  q.forEach(x=>{const st=known.find(y=>y.u===x.u)||{n:x.n,u:x.u};if(addSong(unent(x.s),st,x.t,h))ch=true;top=Math.max(top,x.t)});
+  if(ch)saveSongs(h);try{NAT.songsSaved(top)}catch{}return true}
+function logSong(){if(pullSongs())return;if(!song||!cur)return;const h=LS.get('songs',[]);if(addSong(song,cur,Date.now(),h))saveSongs(h)}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullSongs()});setTimeout(pullSongs,1500);
 const sOpen=u=>{if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
 const sYT=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q),sSP=q=>'https://open.spotify.com/search/'+encodeURIComponent(q);
 function sWhen(t){const d=new Date(t),now=new Date(),tm=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});const day=Math.round((new Date(now.toDateString())-new Date(d.toDateString()))/864e5);
