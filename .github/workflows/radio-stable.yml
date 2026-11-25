@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: '17 6 * * *'
   workflow_dispatch:
+    inputs:
+      now:
+        description: 'Put the current Beta on Stable now (instead of waiting)'
+        type: boolean
+        default: false
+      app_only:
+        description: 'With "now": app only (leave the Stable website as it is)'
+        type: boolean
+        default: false
 permissions:
   contents: write
   pages: write
@@ -15,4 +24,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Promote to stable if due
         env: { GH_TOKEN: '${{ github.token }}', STABLE_AFTER_DAYS: '10' }
-        run: python3 .github/scripts/channels.py auto-stable
+        run: |
+          if [ "${{ inputs.now }}" = "true" ]; then
+            python3 .github/scripts/channels.py promote ${{ inputs.app_only && '--app-only' || '' }}
+          else
+            python3 .github/scripts/channels.py auto-stable
+          fi

@@ -129,6 +129,10 @@ def main():
         if "--stable-now" in sys.argv:
             if to_stable(d, n, "straight to stable"): changed = True; msg = f"Publish: build {n} + website to Beta and Stable"
         if changed: save(d, msg)
+    elif cmd == "promote":
+        # Daniel asked for Stable to get the current Beta now (use --app-only to leave the Stable website alone).
+        n = max([x["build"] for x in d["beta"]] + [build_of(TAGS["beta"])])
+        if to_stable(d, n, "Daniel asked"): save(d, f"Stable now has build {n}" + (" (app only)" if "--app-only" in sys.argv else ""))
     elif cmd == "auto-stable":
         cutoff = now() - datetime.timedelta(days=DAYS)
         since = datetime.datetime.fromisoformat(d["stable"]["at"]) if d.get("stable") else datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
