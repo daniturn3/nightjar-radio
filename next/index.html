@@ -311,6 +311,7 @@ body.playing:not(.calm) .bspk i{animation:cone .46s ease-in-out infinite alterna
 .volnote{text-align:center;font-size:12px;color:var(--acc2);height:16px;margin-top:6px;opacity:0;transition:opacity .3s}.volnote.on{opacity:1}
 .bedp{margin-top:14px;font-size:13.5px;background:linear-gradient(135deg,rgba(184,162,255,.18),rgba(134,180,255,.1));border-color:rgba(184,162,255,.35)}
 /* wrapped */
+.npmark{text-align:center;font-size:10px;letter-spacing:2px;color:var(--dim);opacity:.6;margin:14px 0 4px}.wmark{position:absolute;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;font-size:10px;letter-spacing:2px;color:#fff;opacity:.45;pointer-events:none}
 #wrap{position:fixed;inset:0;z-index:92;background:radial-gradient(120% 80% at 30% 0%,var(--c1),var(--c2));transition:background .8s;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 22px 30px;overflow:hidden}
 .wbars{display:flex;gap:4px}.wbars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.22);overflow:hidden}.wbars i.done b,.wbars i.now b{display:block;height:100%;background:#fff}.wbars i.now b{animation:wbar 7s linear forwards}@keyframes wbar{from{width:0}to{width:100%}}
 .wx{position:absolute;right:14px;top:calc(max(14px,env(safe-area-inset-top)) + 12px);width:40px;height:40px;display:grid;place-items:center;color:#fff;opacity:.8}
@@ -1275,7 +1276,7 @@ function renderNP(){if(!npOpen||!cur)return;const pi=S.presets.findIndex(p=>p&&p
   ${S.skin==='modern'?'':`<div class="npt"><div class="npinfo"><h2>${esc(cur.n)}</h2><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div></div>`}
   <div class="ctrls"><button class="ib" data-act="prev" aria-label="Previous station">${ic('prev')}</button><button class="bigplay" data-act="toggle" id="npbig" aria-label="Play or pause">${playing||buffering?icf('pause'):icf('play')}</button><button class="ib" data-act="next" aria-label="Next station">${ic('next')}</button></div>
   <div class="npx"><button data-act="favcur" class="${isFav(cur)?'on':''}">${isFav(cur)?icf('star'):ic('star')}<span>Favourite</span></button><button data-act="topreset">${ic('plus')}<span>Preset</span></button><button data-act="sleep" class="${sleepAt?'on':''}" id="bsleep">${ic('timer')}<span>${sleepAt?Math.ceil((sleepAt-Date.now())/6e4)+' min':'Sleep'}</span></button><button data-act="npmore" class="${cast.on?'on':''}"><b class="dots">•••</b><span>More</span></button></div>
-  <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div>
+  <div class="vol">${ic('vol')}<input type="range" min="0" max="1" step="0.01" value="${stVol(cur)}" id="volr"></div><div class="volnote" id="volnote"></div><div class="npmark mono">radio.churr.co.uk</div>
 `;
   $('#volr').oninput=e=>{const v=+e.target.value;applyVol(v);S.vol=v;save('vol');if(cur){S.svol[cur.u]=v;const k=Object.keys(S.svol);if(k.length>300)delete S.svol[k[0]];LS.set('svol',S.svol);const n=$('#volnote');if(n){n.textContent='Volume remembered for '+cur.n;n.classList.add('on');clearTimeout(window.vnT);window.vnT=setTimeout(()=>n.classList.remove('on'),2200)}}};
   requestAnimationFrame(npFit);setTimeout(npFit,350)}
@@ -1819,7 +1820,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
       favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),bug:()=>fbSheet(),style:styleSheet,npmore:()=>sheet(`<h3>More</h3><button class="mi" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button><button class="mi" data-act="share">${ic('share')}Share this station</button>${eqOK()?`<button class="mi" data-act="eq">🎚 Sound: ${esc(eqName())}</button>`:''}${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button class="mi" data-act="cast">${ic('cast')}${cast.on?'Casting — change device':'Cast to a speaker or TV'}</button>`:''}<button class="mi" data-act="style">🎨 Change radio style</button>`),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
-      share:async()=>{const u=cur.home||ROOT;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
+      share:async()=>{const u=cur.home||ROOT;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio (radio.churr.co.uk) ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio (radio.churr.co.uk)`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
   if(t.closest('#mini'))return openNP()});
@@ -2035,9 +2036,9 @@ let wrapT=0;
 function wrapPlay(){const d=wrapData();if(d.secs<60)return toast('Listen a little more first — Wrapped needs a few minutes of radio');const sl=wrapSlides(d),w=$('#wrap');let k=0;
   w.hidden=false;history.pushState({w:1},'');
   const show=()=>{clearTimeout(wrapT);const[c1,c2,h]=sl[k];w.style.setProperty('--c1',c1);w.style.setProperty('--c2',c2);
-    w.innerHTML=`<div class="wbars">${sl.map((_,j)=>`<i class="${j<k?'done':j===k?'now':''}"><b></b></i>`).join('')}</div><button class="wx" data-w="close" aria-label="Close">${ic('x')}</button><div class="wslide">${h}</div>`;
+    w.innerHTML=`<div class="wbars">${sl.map((_,j)=>`<i class="${j<k?'done':j===k?'now':''}"><b></b></i>`).join('')}</div><button class="wx" data-w="close" aria-label="Close">${ic('x')}</button><div class="wslide">${h}</div><div class="wmark mono">radio.churr.co.uk</div>`;
     if(k<sl.length-1)wrapT=setTimeout(()=>{k++;show()},7000)};
-  w.onclick=e=>{const b=e.target.closest('[data-w]');if(b){if(b.dataset.w==='close')return wrapClose();if(b.dataset.w==='share'){const txt=`My ${d.y} on Nightjar Radio: ${fmtH(d.secs)} of radio, ${d.top.length} stations${d.ctry.length?`, ${d.ctry.length} countries`:''}. Top station: ${d.top[0].n}.`;if(NAT)NAT.share('My Radio Wrapped',txt);else navigator.share?.({text:txt}).catch(()=>{});return}}
+  w.onclick=e=>{const b=e.target.closest('[data-w]');if(b){if(b.dataset.w==='close')return wrapClose();if(b.dataset.w==='share'){const txt=`My ${d.y} on Nightjar Radio: ${fmtH(d.secs)} of radio, ${d.top.length} stations${d.ctry.length?`, ${d.ctry.length} countries`:''}. Top station: ${d.top[0].n}. Make your own at radio.churr.co.uk`;if(NAT)NAT.share('My Radio Wrapped',txt);else navigator.share?.({text:txt}).catch(()=>{});return}}
     if(e.clientX<innerWidth*.3){if(k>0){k--;show()}}else if(k<sl.length-1){k++;show()}};
   show()}
 function wrapClose(pop){const w=$('#wrap');if(w.hidden)return;clearTimeout(wrapT);w.hidden=true;w.innerHTML='';if(!pop)history.back()}
