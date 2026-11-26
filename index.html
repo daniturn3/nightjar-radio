@@ -521,6 +521,53 @@ body.calm #thfly{display:none}
 .xcd b{font-family:'JetBrains Mono',monospace;font-size:22px;line-height:1;color:#ffd166}
 .xcd i{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-top:3px}
 .xcd small{display:block;width:100%;text-align:center;font-size:12px;opacity:.75;margin-top:2px}
+/* ---------- Tablets & iPad: use the whole screen with a proper layout, not a stretched phone ---------- */
+@media (min-width:768px){
+  #app{max-width:1080px;padding-left:32px;padding-right:32px}
+  header{margin:0 -32px;padding:16px 32px}
+  .hs,.chips{margin-left:-32px;margin-right:-32px;padding-left:32px;padding-right:32px}
+  .hcard .hs,.hcard .chips{margin-left:-14px;margin-right:-14px;padding-left:14px;padding-right:14px}
+  .vc .hs,.vc .chips{margin-left:0;margin-right:0;padding-left:16px;padding-right:16px}
+  .card{width:148px}.card .lg{width:148px;height:148px}
+  .hero h1{font-size:62px}
+  #mini,#tabs{max-width:1016px}
+  #sheet{max-width:620px;bottom:20px;border-radius:26px;max-height:80vh;transform:translateY(calc(100% + 40px))}
+  #sheet.on{transform:none}
+  body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
+  #np{display:flex;flex-direction:column;padding-left:40px;padding-right:40px}
+  #np>.radio{width:min(70vw,520px);margin-top:auto}
+  #np>.npq,#np>.ctrls,#np>.npx,#np>.vol,#np>.volnote{width:100%;max-width:560px;margin-left:auto;margin-right:auto}
+  #np>.volnote{margin-bottom:auto}
+}
+@media (min-width:1024px) and (orientation:landscape){
+  #tabs{left:max(20px,calc((100vw - 1320px) / 2 + 20px));right:auto;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;width:74px;max-width:none;margin:0;padding:8px;gap:4px;border-radius:26px}
+  #tabs button{flex:none;padding:17px 0;border-radius:18px}
+  #tabs button.on::after{bottom:auto;top:50%;left:5px;transform:translateY(-50%)}
+  #app{max-width:1320px;padding-left:132px;padding-right:44px;padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  header{margin:0 -44px 0 -132px;padding:16px 44px 16px 132px}
+  .hs,.chips{margin-right:-44px;padding-right:44px}
+  .vc .hs,.vc .chips{margin-right:0;padding-right:16px}
+  #mini{left:max(132px,calc((100vw - 1320px) / 2 + 132px));right:max(44px,calc((100vw - 1320px) / 2 + 44px));bottom:calc(18px + env(safe-area-inset-bottom));max-width:1144px}
+  #toast{bottom:110px}
+  body[data-view=home] #view{columns:2;column-gap:26px}
+  body[data-view=home] #view>*{break-inside:avoid;-webkit-column-break-inside:avoid}
+  body[data-view=home] #view>.sec{display:inline-block;width:100%;vertical-align:top}
+  body[data-view=home] #view>.hero,body[data-view=home] #view>.vc,body[data-view=home] #view>#hsotd,body[data-view=home] #view>.chips,body[data-view=home] #view>:last-child{column-span:all;-webkit-column-span:all}
+  body[data-view=home] #view>.sec .hs{margin-right:-14px;padding-right:14px}
+  body[data-view=home] #view>.sec:has(.presets){column-span:all;-webkit-column-span:all;display:block}
+  body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
+  body:not([data-view=home]) #view{max-width:900px;margin:0 auto}
+  #np{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 1fr auto auto auto auto auto 1fr;column-gap:56px;padding:0 max(48px,calc((100vw - 1160px)/2)) calc(20px + env(safe-area-inset-bottom))}
+  #np>.nph{grid-column:1/-1;grid-row:1}
+  #np>.radio{grid-column:1;grid-row:2/9;align-self:center;justify-self:center;margin:0;width:min(42vw,calc((100dvh - 110px)/1.22),520px)}
+  #np>.npq{grid-column:2;grid-row:3;justify-content:flex-start}
+  #np>.ctrls{grid-column:2;grid-row:4;margin:18px 0}
+  #np>.npx{grid-column:2;grid-row:5}
+  #np>.vol{grid-column:2;grid-row:6}
+  #np>.volnote{grid-column:2;grid-row:7}
+  #np>.npmark{grid-column:2;grid-row:8;align-self:end;justify-self:start}
+  #np>.npq,#np>.ctrls,#np>.npx,#np>.vol,#np>.volnote{max-width:480px;width:100%;margin-left:0;margin-right:0}
+}
 /* ---------- iPhone / iPad edge to edge ---------- */
 html.ios header{padding-top:calc(10px + env(safe-area-inset-top))!important}
 html.ios #np>.nph{padding-top:calc(10px + env(safe-area-inset-top))}
@@ -568,6 +615,21 @@ html.ios #sheet{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
   header{margin:0 -26px;padding:14px 26px}
   body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
   .card{width:140px}.card .lg{width:140px;height:140px}
+}
+@media (min-width:1700px) and (orientation:landscape){
+  #view,.foot{zoom:1.12}
+  .brand,#setbtn{zoom:1.12}
+  #tabs{left:max(20px,calc((100vw - 1500px) / 2 + 20px))}
+  #app{max-width:1500px}
+  #mini{left:max(132px,calc((100vw - 1500px) / 2 + 132px));right:max(44px,calc((100vw - 1500px) / 2 + 44px));max-width:1324px}
+}
+@media (min-width:2200px) and (orientation:landscape){
+  #view,.foot{zoom:1.3}
+  #tabs{left:max(20px,calc((100vw - 1900px) / 2 + 20px))}
+  #tabs button{padding:20px 0}#tabs button .i{width:28px;height:28px}
+  .brand,#setbtn,header>*{zoom:1.3}
+  #app{max-width:1900px}
+  #mini{left:max(132px,calc((100vw - 1900px) / 2 + 132px));right:max(44px,calc((100vw - 1900px) / 2 + 44px));max-width:1700px}
 }
 </style>
 </head>
