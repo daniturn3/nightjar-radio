@@ -35,16 +35,16 @@ h2{font:italic 400 28px 'Fraunces',serif;margin:0 0 14px;text-align:center}
 section{margin-top:46px}
 .gal{margin-top:46px}
 .cfw{position:relative;margin:0 -20px}
-.cf{position:relative;height:calc(var(--w) * 1169 / 540 + 84px);overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;perspective:1200px;outline:none;--w:210px}
+.cf{position:relative;height:calc(var(--w) * 1280 / 720 + 70px);overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;perspective:1200px;outline:none;--w:250px}
 .cf.drag{cursor:grabbing}
-.cf figure{position:absolute;left:50%;top:30px;width:var(--w);margin:0 0 0 calc(var(--w) / -2);transform-style:preserve-3d;will-change:transform,opacity;backface-visibility:hidden}
+.cf figure{position:absolute;left:50%;top:24px;width:var(--w);margin:0 0 0 calc(var(--w) / -2);transform-style:preserve-3d;will-change:transform,opacity;backface-visibility:hidden}
 .phone{position:relative;border-radius:32px;padding:7px;background:linear-gradient(160deg,#454b61,#14161f);box-shadow:0 30px 60px -24px #000,inset 0 0 0 1px rgba(255,255,255,.14)}
 .phone::after{content:'';position:absolute;inset:0;border-radius:32px;background:linear-gradient(115deg,rgba(255,255,255,.18),transparent 32%);pointer-events:none}
 .phone img{display:block;width:100%;aspect-ratio:540/1169;border-radius:26px;background:#0c0e16;pointer-events:none}
-.cf figure .phone{transition:box-shadow .35s}.cf figure.on .phone{box-shadow:0 30px 70px -20px #000,0 0 70px -6px rgba(255,170,90,.45),inset 0 0 0 1px rgba(255,255,255,.2)}
+.cf figure img{display:block;width:100%;aspect-ratio:720/1280;border-radius:30px;pointer-events:none;box-shadow:0 30px 60px -24px #000,0 0 0 1px rgba(255,255,255,.1);transition:box-shadow .35s}.cf figure.on img{box-shadow:0 34px 70px -20px #000,0 0 80px -10px rgba(255,170,90,.4),0 0 0 1px rgba(255,255,255,.16)}.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .cfa{display:none;position:absolute;top:50%;transform:translateY(-50%);z-index:30;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(20,22,40,.8);color:var(--cream);font-size:28px;line-height:1;cursor:pointer;backdrop-filter:blur(6px)}
 .cfa.prev{left:6px}.cfa.next{right:6px}
-@media(min-width:700px){.cfa{display:block}.cfw{margin:0}.cf{--w:230px}}
+@media(min-width:700px){.cfa{display:block}.cfw{margin:0}.cf{--w:290px}}
 @media(min-width:1040px){.cfw{margin:0 -200px}.cfa.prev{left:150px}.cfa.next{right:150px}.cf{-webkit-mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent)}}
 .cfcap{text-align:center;margin:0;font:italic 400 19px 'Fraunces',serif;min-height:1.5em;transition:opacity .25s}
 .dots{display:flex;justify-content:center;gap:7px;margin-top:12px}.dots button{width:8px;height:8px;padding:0;border:0;border-radius:4px;background:rgba(255,255,255,.22);cursor:pointer;transition:width .25s,background .25s}.dots button.on{width:22px;background:var(--acc)}
@@ -91,10 +91,10 @@ footer nav a{text-decoration:none;color:var(--cream);opacity:.85}footer nav a+a:
     <h2>Take a look</h2>
     <div class="cfw">
       <button class="cfa prev" type="button" aria-label="Previous screenshot">‹</button>
-      <div class="cf" id="cf" tabindex="0" aria-label="Screenshots — swipe to see more"><figure data-cap="Home — Christmas Radio, presets &amp; more"><div class="phone"><img src="shots/home.webp" alt="Home — Christmas Radio, presets &amp; more" draggable="false"></div></figure><figure data-cap="Now playing, with song titles"><div class="phone"><img src="shots/player.webp" alt="Now playing, with song titles" draggable="false"></div></figure><figure data-cap="Spin the globe"><div class="phone"><img src="shots/globe.webp" alt="Spin the globe" draggable="false"></div></figure><figure data-cap="Turn the dial"><div class="phone"><img src="shots/dial.webp" alt="Turn the dial" loading="lazy" draggable="false"></div></figure><figure data-cap="Wooden radio skin"><div class="phone"><img src="shots/wooden.webp" alt="Wooden radio skin" loading="lazy" draggable="false"></div></figure><figure data-cap="Boombox skin"><div class="phone"><img src="shots/boombox.webp" alt="Boombox skin" loading="lazy" draggable="false"></div></figure><figure data-cap="Car stereo skin"><div class="phone"><img src="shots/carstereo.webp" alt="Car stereo skin" loading="lazy" draggable="false"></div></figure><figure data-cap="Your Radio Wrapped"><div class="phone"><img src="shots/wrapped.webp" alt="Your Radio Wrapped" loading="lazy" draggable="false"></div></figure></div>
+      <div class="cf" id="cf" tabindex="0" aria-label="Screenshots — swipe to see more"><figure data-cap="Live radio after dark — Home with Christmas Radio and presets"><img src="shots/home.webp" alt="Live radio after dark — Home with Christmas Radio and presets" draggable="false"></figure><figure data-cap="See what’s playing — song titles on the radio"><img src="shots/player.webp" alt="See what’s playing — song titles on the radio" draggable="false"></figure><figure data-cap="Spin the globe — land somewhere it’s night"><img src="shots/globe.webp" alt="Spin the globe — land somewhere it’s night" draggable="false"></figure><figure data-cap="Turn the dial — pick a style and tune in"><img src="shots/dial.webp" alt="Turn the dial — pick a style and tune in" loading="lazy" draggable="false"></figure><figure data-cap="Pick your radio — the wooden radio skin"><img src="shots/wooden.webp" alt="Pick your radio — the wooden radio skin" loading="lazy" draggable="false"></figure><figure data-cap="What was that song? — your song history"><img src="shots/songs.webp" alt="What was that song? — your song history" loading="lazy" draggable="false"></figure><figure data-cap="Your Radio Wrapped — your year on the radio"><img src="shots/wrapped.webp" alt="Your Radio Wrapped — your year on the radio" loading="lazy" draggable="false"></figure></div>
       <button class="cfa next" type="button" aria-label="Next screenshot">›</button>
     </div>
-    <p class="cfcap" id="cfcap" aria-live="polite">Home — Christmas Radio, presets &amp; more</p>
+    <p class="cfcap vh" id="cfcap" aria-live="polite"></p>
     <div class="dots" id="dots"></div>
     <p class="note c">Station names are examples</p>
   </div>
