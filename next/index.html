@@ -581,7 +581,64 @@ body.calm #thfly{display:none}
   #np>.npx{grid-column:2;grid-row:5}
   #np>.vol{grid-column:2;grid-row:6}
   #np>.volnote{grid-column:2;grid-row:7}
+  #np>.npmark{grid-column:2;grid-row:8;align-self:end;justify-self:start}
   #np>.npq,#np>.ctrls,#np>.npx,#np>.vol,#np>.volnote{max-width:480px;width:100%;margin-left:0;margin-right:0}
+}
+/* ---------- Every screen size: small phones, phones on their side, foldables and big monitors ---------- */
+@media (max-width:374px){
+  .brand{gap:7px}.brand img{width:26px;height:26px}.brand span{font-size:19px;white-space:nowrap}
+  .hero h1{font-size:clamp(32px,11vw,44px)}
+}
+@media (max-width:330px){.brand small{display:none}}
+@media (orientation:landscape) and (max-height:500px){
+  #tabs{left:calc(8px + env(safe-area-inset-left));right:auto;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;width:58px;max-width:none;margin:0;padding:5px;gap:2px;border-radius:22px}
+  #tabs button{flex:none;padding:9px 0;border-radius:14px}
+  #tabs button.on::after{bottom:auto;top:50%;left:4px;transform:translateY(-50%)}
+  #app{max-width:none;padding-left:calc(82px + env(safe-area-inset-left));padding-right:calc(20px + env(safe-area-inset-right));padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+  header{margin:0 calc(-20px - env(safe-area-inset-right)) 0 calc(-82px - env(safe-area-inset-left));padding:8px calc(20px + env(safe-area-inset-right)) 8px calc(82px + env(safe-area-inset-left))}
+  .hs,.chips{margin-right:-20px;padding-right:20px}
+  .hero{padding-top:10px}.hero h1{font-size:40px}
+  #mini{left:calc(82px + env(safe-area-inset-left));right:calc(20px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));max-width:none}
+  #toast{bottom:84px}
+  body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
+  #np{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 1fr auto auto auto auto auto 1fr;column-gap:32px;padding:0 calc(24px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left))}
+  #np>.nph{grid-column:1/-1;grid-row:1}
+  #np>.radio{grid-column:1;grid-row:2/9;align-self:center;justify-self:center;margin:0;width:min(44vw,calc((100vh - 70px)/1.22))}
+  #np>.npq{grid-column:2;grid-row:3;justify-content:flex-start}
+  #np>.ctrls{grid-column:2;grid-row:4;margin:10px 0}
+  #np>.npx{grid-column:2;grid-row:5}
+  #np>.vol{grid-column:2;grid-row:6}
+  #np>.volnote{grid-column:2;grid-row:7}
+  #np>.npmark{grid-column:2;grid-row:8;align-self:end;justify-self:start}
+  #np>.npq,#np>.ctrls,#np>.npx,#np>.vol,#np>.volnote{max-width:440px;width:100%;margin-left:0;margin-right:0}
+}
+@media (orientation:landscape) and (max-height:500px) and (min-width:700px){
+  body[data-view=home] #view{columns:2;column-gap:20px}
+  body[data-view=home] #view>*{break-inside:avoid;-webkit-column-break-inside:avoid}
+  body[data-view=home] #view>.sec{display:inline-block;width:100%;vertical-align:top}
+  body[data-view=home] #view>.hero,body[data-view=home] #view>.vc,body[data-view=home] #view>#hsotd,body[data-view=home] #view>.chips,body[data-view=home] #view>:last-child,body[data-view=home] #view>.sec:has(.presets){column-span:all;-webkit-column-span:all}
+  body[data-view=home] #view>.sec:has(.presets){display:block}
+}
+@media (min-width:600px) and (max-width:767px) and (orientation:portrait){
+  #app{max-width:none;padding-left:26px;padding-right:26px}
+  header{margin:0 -26px;padding:14px 26px}
+  body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
+  .card{width:140px}.card .lg{width:140px;height:140px}
+}
+@media (min-width:1700px) and (orientation:landscape){
+  #view,.foot{zoom:1.12}
+  .brand,#setbtn{zoom:1.12}
+  #tabs{left:max(20px,calc((100vw - 1500px) / 2 + 20px))}
+  #app{max-width:1500px}
+  #mini{left:max(132px,calc((100vw - 1500px) / 2 + 132px));right:max(44px,calc((100vw - 1500px) / 2 + 44px));max-width:1324px}
+}
+@media (min-width:2200px) and (orientation:landscape){
+  #view,.foot{zoom:1.3}
+  #tabs{left:max(20px,calc((100vw - 1900px) / 2 + 20px))}
+  #tabs button{padding:20px 0}#tabs button .i{width:28px;height:28px}
+  .brand,#setbtn,header>*{zoom:1.3}
+  #app{max-width:1900px}
+  #mini{left:max(132px,calc((100vw - 1900px) / 2 + 132px));right:max(44px,calc((100vw - 1900px) / 2 + 44px));max-width:1700px}
 }
 </style>
 </head>
