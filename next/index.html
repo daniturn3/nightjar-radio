@@ -1918,7 +1918,7 @@ function npPeek(sts,force){if(!npOK())return 0;const m=npMode();if(!force&&(m===
   const now=Date.now(),seen=new Set(),need=sts.filter(st=>st&&st.u&&/^https?:/i.test(st.url||'')&&!st.hls&&!seen.has(st.u)&&seen.add(st.u)).filter(st=>{const c=NPC[st.u];if(force&&c)c.ask=1;if(!c)return true;if(c.pending&&now-c.pending<15e3)return false;return now-c.at>NPFRESH}).slice(0,30);
   if(!need.length){npPaint();return 0}need.forEach(st=>{NPU[st.url]=st.u;NPC[st.u]=Object.assign(NPC[st.u]||{t:'',at:0},{pending:now},force?{ask:1}:{})});
   try{NAT.peek(JSON.stringify(need.map(st=>st.url)))}catch{}return need.length}
-window.njrPeek=e=>{if(!e||!e.u)return;const id=NPU[e.u];if(!id)return;const o=NPC[id]||{};NPC[id]={t:String(e.t||''),at:Date.now(),pending:0,ask:o.ask};npPaint()};
+window.njrPeek=e=>{if(!e||!e.u)return;const id=NPU[e.u];if(!id)return;const o=NPC[id]||{};NPC[id]={t:unent(String(e.t||'')),at:Date.now(),pending:0,ask:o.ask};npPaint()};
 const npAuto=()=>S.presets.filter(Boolean).concat(S.favs);
 function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.querySelector('.npbtn')||!sc.querySelector('[data-st]'))return;const h=sc.querySelector('.sh');if(!h)return;
   const b=document.createElement('button');b.className='npbtn';b.textContent='♪ What’s on?';b.onclick=ev=>{ev.stopPropagation();const sts=[...sc.querySelectorAll('[data-st]')].map(npSt);
