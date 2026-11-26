@@ -200,7 +200,7 @@ body.calm .eq i{animation:none!important;transform:scaleY(.25)}
 .mi{display:flex;align-items:center;gap:14px;width:100%;padding:14px 4px;font-size:16px;text-align:left}
 .mi .i{color:var(--mut)}
 .tog{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:14.5px}.tog input{width:22px;height:22px;accent-color:var(--acc)}
-#toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom));z-index:90;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#efe6d6;color:#1b1820;padding:11px 18px;border-radius:14px;font-weight:500;font-size:14px;transition:.25s;max-width:86vw;text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(160px + env(safe-area-inset-bottom));z-index:90;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#efe6d6;color:#1b1820;padding:11px 18px;border-radius:14px;font-weight:500;font-size:14px;transition:.25s;max-width:86vw;text-align:center}#toast.on{pointer-events:auto;cursor:pointer}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 /* car & night */
 #car,#nl{position:fixed;inset:0;z-index:80;background:#000;display:flex;flex-direction:column}
@@ -718,7 +718,8 @@ function testerPin(){if(tpinTries>=5)return toast('Too many tries — restart th
   sheet(`<h3>🧪 Tester code</h3><p class="dim" style="margin:0 0 10px">This is for testing new versions before release.</p><input id="tpin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" style="width:100%;box-sizing:border-box;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:inherit;font-size:20px;letter-spacing:.3em;text-align:center"><button class="pill amb" id="tpgo" style="width:100%;justify-content:center;margin-top:12px">Unlock</button>`);
   const go=async()=>{const v=$('#tpin').value.trim();if(!v)return;$('#tpgo').disabled=true;const ok=await pinOK(v);if(ok){closeSheet();setTester(true)}else{tpinTries++;$('#tpgo').disabled=false;$('#tpin').value='';toast('That code isn’t right')}};
   $('#tpgo').onclick=go;$('#tpin').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>$('#tpin')?.focus(),300)}
-let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
+let toastT;function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);t.onclick=()=>{clearTimeout(toastT);t.classList.remove('on')};
+  toastT=setTimeout(()=>t.classList.remove('on'),ms||Math.min(8000,Math.max(3000,1500+55*String(m).length)))}
 const flag=cc=>cc&&cc.length===2?String.fromCodePoint(...[...cc.toUpperCase()].map(c=>127397+c.charCodeAt(0))):'🌐';
 const initials=n=>esc((n||'?').replace(/[^\p{L}\p{N} ]/gu,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'♪');
 const GLYPH=[['jazz','🎷'],['blues','🎷'],['classic rock','🎸'],['rock','🎸'],['metal','🤘'],['classical','🎻'],['piano','🎹'],['opera','🎭'],['sport','⚽'],['news','📰'],['talk','🎙️'],['dance','🪩'],['house','🪩'],['techno','🎛️'],['electronic','🎛️'],['chill','🌙'],['lounge','🍸'],['ambient','✨'],['sleep','😴'],['lofi','☕'],['lo-fi','☕'],['country','🤠'],['folk','🪕'],['80s','📼'],['70s','🕺'],['60s','🌼'],['90s','💿'],['oldies','📻'],['hip hop','🎤'],['hiphop','🎤'],['rap','🎤'],['reggae','🌴'],['latin','💃'],['salsa','💃'],['soul','💜'],['r&b','💜'],['christian','🕊️'],['gospel','🕊️'],['kids','🧸'],['children','🧸'],['christmas','🎄'],['pop','⭐'],['indie','🎧'],['world','🌍']];
@@ -786,7 +787,7 @@ function play(st,from){if(!st)return;if(LS.get('saver',false)&&!st.lite&&!(from&
     lighter(st).then(a=>{play0(a||st,{...(from||{}),sv:1});if(a)toast(`📉 Data saver: lighter ${a.br}k stream`)});return}play0(st,from)}
 function play0(st,from){if(!st)return;if(miniHidden){miniHidden=false;LS.set('miniHidden',false)}if(cur?.u!==st.u)logEnd();cur=st;S.last=st;save('last');if(from){list=from.list||list;listName=from.name||listName}
   S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');
-  buffering=true;playing=false;setState();staticOn();song='';applyVol(stVol(st));wantPlay=true;reconnN=0;if(NAT&&cast.on){NAT.castPlay(JSON.stringify(slim(st)))}else if(NAT){let L=(from?.list||(list.length?list:S.presets.filter(Boolean))).filter(Boolean),i=L.findIndex(x=>x.u===st.u);if(i<0){L=[st];i=0}else if(st.lite){L=[...L];L[i]=st}natList=L;natLoaded=true;natErr='';NAT.playList(JSON.stringify(L.map(slim)),i)}else{au.src=st.url;au.play().catch(e=>{buffering=false;staticOff();setState();if(e.name==='NotAllowedError')toast('Tap play to start');else toast(webFail(st))})}
+  buffering=true;playing=false;setState();staticOn();song='';applyVol(stVol(st));wantPlay=true;reconnN=0;if(NAT&&cast.on){NAT.castPlay(JSON.stringify(slim(st)))}else if(NAT){let L=(from?.list||(list.length?list:S.presets.filter(Boolean))).filter(Boolean),i=L.findIndex(x=>x.u===st.u);if(i<0){L=[st];i=0}else if(st.lite){L=[...L];L[i]=st}natList=L;natLoaded=true;natErr='';NAT.playList(JSON.stringify(L.map(slim)),i)}else{au.src=st.url;au.play().catch(e=>{buffering=false;staticOff();setState();if(e.name==='NotAllowedError')toast('Tap play to start');else toast(webFail(st),7000)})}
   click(st);meta();renderAll();firstFly()}
 /* Why a station didn't play, in plain words. The app knows the station server's reply (http); a browser doesn't. */
 function failMsg(code,http,st){const n=st?.n||'That station';code=code||'';
@@ -813,7 +814,7 @@ window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true
   if(e.u&&e.u!==cur?.u){const st=[...natList,...S.presets.filter(Boolean),...S.favs,...S.recent].find(x=>x.u===e.u);if(st){logEnd();cur=st;S.last=st;save('last');S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');renderAll();if(carOn)carTick()}}
   const wasRc=reconn;reconn=e.s==='reconnecting';playing=e.s==='playing';buffering=e.s==='buffering'||reconn;if(!buffering)staticOff();
   if(reconn&&!wasRc)toast('📶 Signal dropped — reconnecting…');if(wasRc&&playing)toast('✓ Back on air');
-  if(e.err&&e.err!==natErr){buffering=false;const st=cur,code=e.err;setTimeout(()=>{let h=0;try{h=NAT.errHttp?+NAT.errHttp():0}catch{}logErr('player: '+code+(h?' '+h:'')+' · '+(st?.n||''));toast(failMsg(code,h,st))},250);trouble('play')}natErr=e.err||'';
+  if(e.err&&e.err!==natErr){buffering=false;const st=cur,code=e.err;setTimeout(()=>{let h=0;try{h=NAT.errHttp?+NAT.errHttp():0}catch{}logErr('player: '+code+(h?' '+h:'')+' · '+(st?.n||''));toast(failMsg(code,h,st),7000)},250);trouble('play')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
   if((e.song||'')!==song){song=unent(e.song||'');showSong()}setState()};
 /* Some stations send song titles with HTML codes in them (e.g. &#8212; for a dash) — turn them back into the real characters. */
