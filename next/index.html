@@ -786,8 +786,17 @@ function play(st,from){if(!st)return;if(LS.get('saver',false)&&!st.lite&&!(from&
     lighter(st).then(a=>{play0(a||st,{...(from||{}),sv:1});if(a)toast(`📉 Data saver: lighter ${a.br}k stream`)});return}play0(st,from)}
 function play0(st,from){if(!st)return;if(miniHidden){miniHidden=false;LS.set('miniHidden',false)}if(cur?.u!==st.u)logEnd();cur=st;S.last=st;save('last');if(from){list=from.list||list;listName=from.name||listName}
   S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');
-  buffering=true;playing=false;setState();staticOn();song='';applyVol(stVol(st));wantPlay=true;reconnN=0;if(NAT&&cast.on){NAT.castPlay(JSON.stringify(slim(st)))}else if(NAT){let L=(from?.list||(list.length?list:S.presets.filter(Boolean))).filter(Boolean),i=L.findIndex(x=>x.u===st.u);if(i<0){L=[st];i=0}else if(st.lite){L=[...L];L[i]=st}natList=L;natLoaded=true;natErr='';NAT.playList(JSON.stringify(L.map(slim)),i)}else{au.src=st.url;au.play().catch(e=>{buffering=false;staticOff();setState();if(e.name==='NotAllowedError')toast('Tap play to start');else toast('That station isn’t answering — try another')})}
+  buffering=true;playing=false;setState();staticOn();song='';applyVol(stVol(st));wantPlay=true;reconnN=0;if(NAT&&cast.on){NAT.castPlay(JSON.stringify(slim(st)))}else if(NAT){let L=(from?.list||(list.length?list:S.presets.filter(Boolean))).filter(Boolean),i=L.findIndex(x=>x.u===st.u);if(i<0){L=[st];i=0}else if(st.lite){L=[...L];L[i]=st}natList=L;natLoaded=true;natErr='';NAT.playList(JSON.stringify(L.map(slim)),i)}else{au.src=st.url;au.play().catch(e=>{buffering=false;staticOff();setState();if(e.name==='NotAllowedError')toast('Tap play to start');else toast(webFail(st))})}
   click(st);meta();renderAll();firstFly()}
+/* Why a station didn't play, in plain words. The app knows the station server's reply (http); a browser doesn't. */
+function failMsg(code,http,st){const n=st?.n||'That station';code=code||'';
+  if(http===401||http===403||http===451)return n+' only lets listeners in some countries — it might work with a VPN';
+  if(http===404||http===410)return 'The stream for '+n+' has moved or closed — try another station';
+  if(/UNSUPPORTED|PARSING|DECOD/.test(code))return n+' uses a format your phone can’t play';
+  if(/CLEARTEXT/.test(code))return n+' uses an insecure stream your phone won’t open';
+  if(http>=500||/TIMEOUT|CONNECTION_FAILED|NETWORK/.test(code))return n+' isn’t answering — try again later';
+  return 'Couldn’t tune in to '+n+' — try another station'}
+function webFail(st){return st&&location.protocol==='https:'&&/^http:/i.test(st.url||'')?'Your browser blocks '+st.n+'’s insecure stream — try it in the app':'That station isn’t answering — try another'}
 let wantPlay=false,reconn=false,reconnN=0,reconnT=0,webPlayed=null,cast={on:false,dev:'',s:'off'};
 function webRetry(){if(!cur||!wantPlay||NAT)return;try{au.src=cur.url;au.load();au.play().catch(()=>{})}catch{}}
 addEventListener('online',()=>{if(reconn&&!NAT){clearTimeout(reconnT);setTimeout(webRetry,800)}});
@@ -804,7 +813,7 @@ window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true
   if(e.u&&e.u!==cur?.u){const st=[...natList,...S.presets.filter(Boolean),...S.favs,...S.recent].find(x=>x.u===e.u);if(st){logEnd();cur=st;S.last=st;save('last');S.recent=[st,...S.recent.filter(x=>x.u!==st.u)].slice(0,30);save('recent');renderAll();if(carOn)carTick()}}
   const wasRc=reconn;reconn=e.s==='reconnecting';playing=e.s==='playing';buffering=e.s==='buffering'||reconn;if(!buffering)staticOff();
   if(reconn&&!wasRc)toast('📶 Signal dropped — reconnecting…');if(wasRc&&playing)toast('✓ Back on air');
-  if(e.err&&e.err!==natErr){buffering=false;logErr('player: '+e.err+' · '+(cur?.n||''));toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station');trouble('play')}natErr=e.err||'';
+  if(e.err&&e.err!==natErr){buffering=false;const st=cur,code=e.err;setTimeout(()=>{let h=0;try{h=NAT.errHttp?+NAT.errHttp():0}catch{}logErr('player: '+code+(h?' '+h:'')+' · '+(st?.n||''));toast(failMsg(code,h,st))},250);trouble('play')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
   if((e.song||'')!==song){song=unent(e.song||'');showSong()}setState()};
 /* Some stations send song titles with HTML codes in them (e.g. &#8212; for a dash) — turn them back into the real characters. */
