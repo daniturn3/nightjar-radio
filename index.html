@@ -1903,7 +1903,8 @@ function wrapClose(pop){const w=$('#wrap');if(w.hidden)return;clearTimeout(wrapT
 window.njrAction=a=>{if(modalOpen)closeModal();if(npOpen)closeNP();if(sheetOpen)closeSheet();if(nlOn)nlExit();
   if(a==='globe'){go('home');setTimeout(()=>{$('#globe')?.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(globeSpin,700)},500)}
   else if(a==='dial'){go('dial');const t=setInterval(()=>{if(window.dialSpin&&$('.tk.has')){clearInterval(t);setTimeout(()=>window.dialSpin(),400)}},200);setTimeout(()=>clearInterval(t),12000)}
-  else if(a==='bed')bedtime()};
+  else if(a==='bed')bedtime()
+  else if(a==='favs')go('library')};
 document.addEventListener('click',e=>{const a=e.target.closest('a.bmc');if(a&&NAT){e.preventDefault();NAT.openUrl(a.href)}});
 /* ---------- start ---------- */
 go('home');renderMini();if(cur)meta();poke();setTimeout(onboard,700);
