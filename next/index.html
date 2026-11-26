@@ -311,7 +311,7 @@ body.playing:not(.calm) .bspk i{animation:cone .46s ease-in-out infinite alterna
 .volnote{text-align:center;font-size:12px;color:var(--acc2);height:16px;margin-top:6px;opacity:0;transition:opacity .3s}.volnote.on{opacity:1}
 .bedp{margin-top:14px;font-size:13.5px;background:linear-gradient(135deg,rgba(184,162,255,.18),rgba(134,180,255,.1));border-color:rgba(184,162,255,.35)}
 /* wrapped */
-.npmark{text-align:center;font-size:10px;letter-spacing:2px;color:var(--dim);opacity:.6;margin:14px 0 4px}.wmark{position:absolute;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;font-size:10px;letter-spacing:2px;color:#fff;opacity:.45;pointer-events:none}
+.foot .fmark{display:block;margin-top:6px;opacity:.75}.npmark{text-align:center;font-size:10px;letter-spacing:2px;color:var(--dim);opacity:.6;margin:14px 0 4px}.wmark{position:absolute;left:0;right:0;bottom:max(10px,env(safe-area-inset-bottom));text-align:center;font-size:10px;letter-spacing:2px;color:#fff;opacity:.45;pointer-events:none}
 #wrap{position:fixed;inset:0;z-index:92;background:radial-gradient(120% 80% at 30% 0%,var(--c1),var(--c2));transition:background .8s;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 22px 30px;overflow:hidden}
 .wbars{display:flex;gap:4px}.wbars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.22);overflow:hidden}.wbars i.done b,.wbars i.now b{display:block;height:100%;background:#fff}.wbars i.now b{animation:wbar 7s linear forwards}@keyframes wbar{from{width:0}to{width:100%}}
 .wx{position:absolute;right:14px;top:calc(max(14px,env(safe-area-inset-top)) + 12px);width:40px;height:40px;display:grid;place-items:center;color:#fff;opacity:.8}
@@ -590,7 +590,7 @@ body.calm #thfly{display:none}
 <div id="app">
   <header><div class="brand" id="brand"><img src="icon-192.png" alt=""><span>Nightjar <em>Radio</em></span><small>beta</small></div><div class="sp"></div><button class="ib" data-act="settings" aria-label="Settings" id="setbtn"></button></header>
   <main id="view"></main>
-  <footer class="foot"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span>live radio after dark</span><br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><br><button class="footbug" data-act="bug">🐞 Report a problem</button></footer>
+  <footer class="foot"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span>live radio after dark</span><span class="fmark">radio.churr.co.uk</span><br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><br><button class="footbug" data-act="bug">🐞 Report a problem</button></footer>
 </div>
 <div id="mini" hidden></div>
 <nav id="tabs"></nav>
