@@ -39,6 +39,10 @@ window.ROOT='https://daniturn3.github.io/nightjar-radio/';window.WEBCH=/\/nightj
 window.njrRoute=function(){try{if(!window.NJR||window.njrMoving)return;var L=localStorage,want=L.getItem('njr_tester')==='true'?'test':L.getItem('njr_chan')==='"beta"'?'beta':'stable';
   if(want!==WEBCH)location.replace('/nightjar-radio/'+({test:'next/',beta:'beta/',stable:''})[want]+location.search+location.hash)}catch(e){}};njrRoute();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Nightjar Radio">
+<script>/* iPhone/iPad: draw edge to edge (behind the notch and status bar); the header pads itself with the safe area. */
+(function(){var i=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);if(!i)return;document.documentElement.classList.add('ios');var m=document.querySelector('meta[name=viewport]');if(m)m.content='width=device-width,initial-scale=1,viewport-fit=cover'})()</script>
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1290x2796.png"><link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1179x2556.png"><link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1170x2532.png"><link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1284x2778.png"><link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1125x2436.png"><link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-828x1792.png"><link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1242x2688.png"><link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-750x1334.png"><link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1206x2622.png"><link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1320x2868.png"><link rel="apple-touch-startup-image" media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1640x2360.png"><link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1668x2388.png"><link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-2048x2732.png"><link rel="apple-touch-startup-image" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1488x2266.png"><link rel="apple-touch-startup-image" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1620x2160.png"><link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-1668x2224.png">
 <meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
@@ -517,6 +521,54 @@ body.calm #thfly{display:none}
 .xcd b{font-family:'JetBrains Mono',monospace;font-size:22px;line-height:1;color:#ffd166}
 .xcd i{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-top:3px}
 .xcd small{display:block;width:100%;text-align:center;font-size:12px;opacity:.75;margin-top:2px}
+/* ---------- iPhone / iPad edge to edge ---------- */
+html.ios header{padding-top:calc(10px + env(safe-area-inset-top))!important}
+html.ios #np>.nph{padding-top:calc(10px + env(safe-area-inset-top))}
+html.ios #sheet{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+#a2hs{position:fixed;left:12px;right:12px;bottom:calc(158px + env(safe-area-inset-bottom));z-index:45;max-width:520px;margin:0 auto;display:flex;gap:12px;align-items:flex-start;padding:14px 14px 14px 16px;border-radius:20px;background:rgb(24,27,44);border:1px solid var(--line);box-shadow:0 16px 40px rgba(0,0,0,.55);color:var(--tx);font-size:14px;line-height:1.4;animation:a2in .4s ease}
+#a2hs b{display:block;font:600 16px var(--serif);margin-bottom:3px}#a2hs svg{vertical-align:-3px}#a2hs .x{flex:none;padding:8px 12px;border-radius:12px;background:color-mix(in srgb,var(--tx) 10%,transparent);font-weight:600;font-size:13px}
+@keyframes a2in{from{opacity:0;transform:translateY(12px)}}
+/* ---------- Every screen size: small phones, phones on their side, foldables and big monitors ---------- */
+@media (max-width:374px){
+  .brand{gap:7px}.brand img{width:26px;height:26px}.brand span{font-size:19px;white-space:nowrap}
+  .hero h1{font-size:clamp(32px,11vw,44px)}
+}
+@media (max-width:330px){.brand small{display:none}}
+@media (orientation:landscape) and (max-height:500px){
+  #tabs{left:calc(8px + env(safe-area-inset-left));right:auto;top:50%;bottom:auto;transform:translateY(-50%);flex-direction:column;width:58px;max-width:none;margin:0;padding:5px;gap:2px;border-radius:22px}
+  #tabs button{flex:none;padding:9px 0;border-radius:14px}
+  #tabs button.on::after{bottom:auto;top:50%;left:4px;transform:translateY(-50%)}
+  #app{max-width:none;padding-left:calc(82px + env(safe-area-inset-left));padding-right:calc(20px + env(safe-area-inset-right));padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+  header{margin:0 calc(-20px - env(safe-area-inset-right)) 0 calc(-82px - env(safe-area-inset-left));padding:8px calc(20px + env(safe-area-inset-right)) 8px calc(82px + env(safe-area-inset-left))}
+  .hs,.chips{margin-right:-20px;padding-right:20px}
+  .hero{padding-top:10px}.hero h1{font-size:40px}
+  #mini{left:calc(82px + env(safe-area-inset-left));right:calc(20px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));max-width:none}
+  #toast{bottom:84px}
+  body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
+  #np{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto 1fr auto auto auto auto auto 1fr;column-gap:32px;padding:0 calc(24px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left))}
+  #np>.nph{grid-column:1/-1;grid-row:1}
+  #np>.radio{grid-column:1;grid-row:2/9;align-self:center;justify-self:center;margin:0;width:min(44vw,calc((100dvh - 70px)/1.22))}
+  #np>.npq{grid-column:2;grid-row:3;justify-content:flex-start}
+  #np>.ctrls{grid-column:2;grid-row:4;margin:10px 0}
+  #np>.npx{grid-column:2;grid-row:5}
+  #np>.vol{grid-column:2;grid-row:6}
+  #np>.volnote{grid-column:2;grid-row:7}
+  #np>.npmark{grid-column:2;grid-row:8;align-self:end;justify-self:start}
+  #np>.npq,#np>.ctrls,#np>.npx,#np>.vol,#np>.volnote{max-width:440px;width:100%;margin-left:0;margin-right:0}
+}
+@media (orientation:landscape) and (max-height:500px) and (min-width:700px){
+  body[data-view=home] #view{columns:2;column-gap:20px}
+  body[data-view=home] #view>*{break-inside:avoid;-webkit-column-break-inside:avoid}
+  body[data-view=home] #view>.sec{display:inline-block;width:100%;vertical-align:top}
+  body[data-view=home] #view>.hero,body[data-view=home] #view>.vc,body[data-view=home] #view>#hsotd,body[data-view=home] #view>.chips,body[data-view=home] #view>:last-child,body[data-view=home] #view>.sec:has(.presets){column-span:all;-webkit-column-span:all}
+  body[data-view=home] #view>.sec:has(.presets){display:block}
+}
+@media (min-width:600px) and (max-width:767px) and (orientation:portrait){
+  #app{max-width:none;padding-left:26px;padding-right:26px}
+  header{margin:0 -26px;padding:14px 26px}
+  body[data-view=home] .presets{grid-template-columns:repeat(6,1fr)}
+  .card{width:140px}.card .lg{width:140px;height:140px}
+}
 </style>
 </head>
 <body>
@@ -697,7 +749,7 @@ const TABS=[['home','home'],['dial','dial'],['sport','ball'],['search','search']
 let view='home',renderTok=0;const VIEWS={};
 $('#tabs').innerHTML=TABS.map(([t,i])=>`<button data-tab="${t}" aria-label="${t}">${ic(i)}</button>`).join('');
 function go(v){view=v;$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===v));window.scrollTo(0,0);render()}
-function render(){const tok=++renderTok;VIEWS[view]($('#view'),tok)}
+function render(){document.body.dataset.view=view;const tok=++renderTok;VIEWS[view]($('#view'),tok)}
 const sec=(t,body,sub='',n='')=>`<section class="sec"><div class="sh"><h2>${n?`<i>${n}</i>`:''}${t}</h2>${sub?`<p>${sub}</p>`:''}</div>${body}</section>`;
 const skRows=n=>Array.from({length:n},()=>'<div class="sk" style="height:60px;margin:8px 0"></div>').join('');
 const skCards=()=>`<div class="hs">${Array.from({length:4},()=>'<div class="sk" style="flex:none;width:132px;height:172px"></div>').join('')}</div>`;
@@ -1799,6 +1851,17 @@ go('home');renderMini();if(cur)meta();poke();setTimeout(onboard,700);
 
 if(!NAT&&'serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(NAT){natSync('presets');natSync('favs');natSync('recent');NAT.setVolume(S.vol);document.body.classList.add('native')}
+
+/* iPhone/iPad in Safari: suggest Add to Home Screen. Safari can clear a website's saved data (presets, favourites) after
+   7 days without a visit; home-screen web apps are kept. Shown once, then again after 30 days if dismissed. */
+(function(){try{
+  if(!document.documentElement.classList.contains('ios')||NAT||navigator.standalone||matchMedia('(display-mode: standalone)').matches)return;
+  if(Date.now()-(LS.get('a2hsAt',0)||0)<30*864e5)return;
+  setTimeout(()=>{if(document.getElementById('a2hs'))return;const d=document.createElement('div');d.id='a2hs';d.setAttribute('role','status');
+    const sh='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-label="Share"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+    d.innerHTML=`<div style="flex:1"><b>Add it to your Home Screen</b>Tap ${sh} <b style="display:inline;font:inherit;font-weight:600">Share</b>, then <b style="display:inline;font:inherit;font-weight:600">Add to Home Screen</b>. It opens like an app and keeps your presets and favourites safe.</div><button class="x" type="button">Got it</button>`;
+    d.querySelector('.x').onclick=()=>{LS.set('a2hsAt',Date.now());d.remove()};document.body.appendChild(d)},5000)
+}catch(e){}})();
 </script>
 </body>
 </html>
