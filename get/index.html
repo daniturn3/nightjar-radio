@@ -12,102 +12,141 @@
 <link rel="icon" href="../icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
-:root{--bg:#0c0e16;--cream:#f3ecdf;--mut:#a3a7b8;--line:rgba(234,242,255,.1);--acc:#ffb347;--cor:#ff6b4a;--sky:#86b4ff}
+:root{--bg:#0c0e16;--cream:#f3ecdf;--mut:#a9adbd;--line:rgba(234,242,255,.1);--acc:#ffb347;--cor:#ff6b4a;--sky:#86b4ff}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--cream);font:16px/1.55 'Space Grotesk',system-ui,sans-serif}
 body{background:radial-gradient(90% 60% at 80% -10%,rgba(63,111,224,.35),transparent 60%),radial-gradient(70% 50% at -10% 40%,rgba(255,138,92,.14),transparent 60%),var(--bg);min-height:100vh}
-main{max-width:620px;margin:0 auto;padding:44px 20px 60px}
-.hero{text-align:center}.hero img{width:112px;height:112px;border-radius:28px;box-shadow:0 22px 50px -18px #000,0 0 60px -10px rgba(134,180,255,.5)}
-h1{font:600 clamp(40px,11vw,58px)/1 'Fraunces',serif;margin:20px 0 6px}h1 em{font-style:italic;font-weight:400;color:#ffd08a}
+main{max-width:640px;margin:0 auto;padding:44px 20px 50px}
+a{color:inherit}
+.hero{text-align:center}.hero img{width:104px;height:104px;border-radius:26px;box-shadow:0 22px 50px -18px #000,0 0 60px -10px rgba(134,180,255,.5)}
+h1{font:600 clamp(40px,11vw,58px)/1 'Fraunces',serif;margin:18px 0 8px}h1 em{font-style:italic;font-weight:400;color:#ffd08a}
 .tag{font:500 11px 'JetBrains Mono',monospace;letter-spacing:.3em;text-transform:uppercase;color:var(--sky)}
-.lead{color:var(--mut);font-size:18px;margin:16px auto 0;max-width:460px}
-.btns{display:flex;flex-direction:column;gap:12px;margin:30px auto 0;max-width:380px}
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 20px;border-radius:18px;font-weight:600;font-size:17px;text-decoration:none;color:var(--cream);border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.lead{color:var(--mut);font-size:17.5px;margin:16px auto 0;max-width:440px}
+.btns{display:flex;flex-direction:column;gap:10px;margin:28px auto 0;max-width:360px}
+.btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:15px 20px;border-radius:18px;font-weight:600;font-size:17px;text-decoration:none;color:var(--cream);border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.btn small{font-weight:400;font-size:12.5px;opacity:.75;min-height:1em}
 .btn.main{background:linear-gradient(135deg,var(--acc),var(--cor));color:#1a1210;border:0;box-shadow:0 18px 40px -16px var(--cor)}
-.betal{display:block;margin:14px auto 0;max-width:420px;padding:12px 16px;border-radius:16px;border:1px dashed rgba(255,255,255,.22);color:var(--cream);text-decoration:none;font-size:15px;text-align:center}.betal span{display:block;margin-top:4px;font-size:12.5px;opacity:.65}.betal small{opacity:.7}
-.btn small{font-weight:400;opacity:.75;font-size:13px}
-.card{margin-top:34px;padding:22px;border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
-.card h2{font:italic 400 26px 'Fraunces',serif;margin:0 0 12px}
-ol{margin:0;padding-left:22px}ol li{margin:8px 0}ol b{color:#fff}
-.feat{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:34px}
-.feat div{padding:16px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line)}.feat b{display:block;margin:6px 0 2px}.feat span{font-size:13.5px;color:var(--mut)}.feat i{font-style:normal;font-size:24px}
-.dlcount{margin-top:14px;font:500 13px 'JetBrains Mono',monospace;letter-spacing:.06em;color:var(--mut);min-height:18px}
-.note{font-size:13.5px;color:var(--mut)}
-.gal{margin-top:40px}.gal h2{font:italic 400 28px 'Fraunces',serif;text-align:center;margin:0 0 16px}
-.strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:6px 20px 16px;scrollbar-width:none}.strip::-webkit-scrollbar{display:none}
+.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin-top:16px;font:500 12px 'JetBrains Mono',monospace;letter-spacing:.04em;color:var(--mut)}.trust span:empty{display:none}.trust span::before{content:'✓ ';color:#8fd9a8}
+.betal{display:inline-block;margin-top:16px;font-size:14px;color:var(--mut);text-decoration:none;border-bottom:1px dashed rgba(255,255,255,.3)}.betal b{color:var(--cream)}
+h2{font:italic 400 28px 'Fraunces',serif;margin:0 0 14px;text-align:center}
+section{margin-top:46px}
+.gal{margin-top:46px}
+.strip{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -20px;padding:6px 20px 14px;scrollbar-width:none}.strip::-webkit-scrollbar{display:none}
 figure{margin:0;flex:none;width:200px;scroll-snap-align:center;text-align:center}
 .phone{border-radius:30px;padding:7px;background:linear-gradient(160deg,#3a3f52,#14161f);box-shadow:0 24px 50px -22px #000,inset 0 0 0 1px rgba(255,255,255,.12)}
 .phone img{display:block;width:100%;aspect-ratio:540/1169;border-radius:24px;background:#0c0e16}
 figcaption{margin-top:10px;font-size:13.5px;color:var(--mut)}
-@media(min-width:700px){.strip{flex-wrap:wrap;justify-content:center;overflow:visible}figure{width:240px}}
-footer .bmc{display:inline-block;margin:14px 0 12px;padding:11px 20px;border-radius:999px;background:#ffdd00;color:#1a1210;font-weight:600;text-decoration:none}
-footer{text-align:center;margin-top:44px;color:var(--mut);font-size:13px}footer b{display:block;font:600 18px 'Fraunces',serif;color:var(--cream)}footer b em{font-style:italic;font-weight:400;color:#ffd08a}
+@media(min-width:700px){.strip{flex-wrap:wrap;justify-content:center;overflow:visible;margin:0;padding:6px 0 14px}figure{width:calc((100% - 48px) / 4)}figcaption{font-size:12.5px}.gal .note{display:none}}
+.note{font-size:13px;color:var(--mut);margin:8px 0 0}.c{text-align:center}
+.feat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.feat div{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+.feat i{font-style:normal;font-size:22px;line-height:1.2}.feat b{display:block;font-size:15px}.feat span{font-size:13px;color:var(--mut);line-height:1.4}
+@media(max-width:420px){.feat{grid-template-columns:1fr}}
+.tabs{display:flex;gap:6px;padding:5px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:14px}
+.tabs button{flex:1;padding:11px 6px;border:0;border-radius:12px;background:none;color:var(--mut);font:600 14px 'Space Grotesk',sans-serif;cursor:pointer}
+.tabs button[aria-selected=true]{background:rgba(255,179,71,.16);color:var(--cream)}
+.panel{padding:20px 22px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.panel h3{margin:0 0 8px;font:600 17px 'Space Grotesk',sans-serif}
+ol{margin:0;padding-left:22px}ol li{margin:7px 0}ol b{color:#fff}
+.panel p{font-size:13.5px;color:var(--mut);margin:12px 0 0}
+.js .panel[hidden]{display:none}.nojs .tabs{display:none}.nojs .panel+.panel{margin-top:14px}
+footer{text-align:center;margin-top:50px;color:var(--mut);font-size:13px;line-height:1.9}
+footer .name{display:block;font:600 18px 'Fraunces',serif;color:var(--cream)}footer .name em{font-style:italic;font-weight:400;color:#ffd08a}
+footer .bmc{display:inline-block;margin:12px 0 10px;padding:10px 20px;border-radius:999px;background:#ffdd00;color:#1a1210;font-weight:600;text-decoration:none}
+footer nav a{text-decoration:none;color:var(--cream);opacity:.85}footer nav a+a::before{content:'·';margin:0 9px;opacity:.5}
 </style>
-</head>
-<body>
+</head><body class="nojs">
 <main>
   <div class="hero">
     <img src="../icon-512.png" alt="Nightjar Radio icon">
     <h1>Nightjar <em>Radio</em></h1>
     <div class="tag">Live radio after dark</div>
-    <p class="lead">Free live radio from over 50,000 stations around the world — presets, a real tuning dial, a spinning globe, song titles and a wake-up alarm.</p>
-    <div class="btns">
-      <a class="btn main" id="apk" href="https://github.com/daniturn3/nightjar-radio/releases/download/radio-app/nightjar-radio.apk">⬇ Download for Android <small id="build"></small></a>
-      <a class="btn" href="../">📱 Open in browser <small>iPhone &amp; PC</small></a>
+    <p class="lead">Free live radio from over 50,000 stations around the world — with presets, a tuning dial and a spinning globe.</p>
+    <div class="btns" id="btns">
+      <a class="btn main" id="apk" href="https://github.com/daniturn3/nightjar-radio/releases/download/radio-app/nightjar-radio.apk">⬇ Download for Android<small id="build"></small></a>
+      <a class="btn" id="web" href="../">📱 Open in your browser<small>iPhone, iPad &amp; computer</small></a>
     </div>
-    <div class="dlcount" id="dlc"></div>
-    <a class="betal" id="betal" hidden href="https://github.com/daniturn3/nightjar-radio/releases/download/radio-pubbeta/nightjar-radio.apk">⚡ Want new features first? <b>Get the Beta</b> <small id="bbuild"></small><span>Gets new versions before everyone else — may have the odd bug. You can switch back to Stable in Settings.</span></a>
+    <div class="trust"><span>Free</span><span>No adverts</span><span>No sign-up</span><span id="dlc"></span></div>
+    <a class="betal" id="betal" hidden href="https://github.com/daniturn3/nightjar-radio/releases/download/radio-pubbeta/nightjar-radio.apk">⚡ Want new features first? <b>Get the Beta</b> <span id="bbuild"></span></a>
   </div>
 
-  <div class="gal"><h2>Take a look</h2><div class="strip"><figure><div class="phone"><img src="shots/home.webp" alt="Home — presets & station of the day" loading="lazy"></div><figcaption>Home — presets & station of the day</figcaption></figure><figure><div class="phone"><img src="shots/player.webp" alt="The radio, with song titles" loading="lazy"></div><figcaption>The radio, with song titles</figcaption></figure><figure><div class="phone"><img src="shots/globe.webp" alt="Spin the globe" loading="lazy"></div><figcaption>Spin the globe</figcaption></figure><figure><div class="phone"><img src="shots/dial.webp" alt="Turn the dial" loading="lazy"></div><figcaption>Turn the dial</figcaption></figure><figure><div class="phone"><img src="shots/wooden.webp" alt="Wooden radio skin" loading="lazy"></div><figcaption>Wooden radio skin</figcaption></figure><figure><div class="phone"><img src="shots/carstereo.webp" alt="Car stereo skin" loading="lazy"></div><figcaption>Car stereo skin</figcaption></figure><figure><div class="phone"><img src="shots/alarm.webp" alt="Wake-up radio" loading="lazy"></div><figcaption>Wake-up radio</figcaption></figure><figure><div class="phone"><img src="shots/wrapped.webp" alt="Radio Wrapped" loading="lazy"></div><figcaption>Radio Wrapped</figcaption></figure></div><p class="note" style="text-align:center">Swipe to see more · station names are examples</p></div>
-  <div class="feat">
-    <div><i>📻</i><b>Six presets</b><span>Just like a real radio — one tap to tune in.</span></div>
-    <div><i>🌍</i><b>Spin the globe</b><span>Land somewhere it’s night-time right now.</span></div>
-    <div><i>🎵</i><b>Song titles</b><span>See what’s playing, when stations share it.*</span></div>
-    <div><i>⏰</i><b>Wake-up radio</b><span>Fade in to your favourite station.*</span></div>
-    <div><i>🚗</i><b>Android Auto</b><span>Your stations on the car screen.*</span></div>
-    <div><i>🧩</i><b>Widgets</b><span>Presets and controls on your home screen.*</span></div>
-  </div>
-  <p class="note">* In the Android app.</p>
+  <div class="gal"><h2>Take a look</h2><div class="strip"><figure><div class="phone"><img src="shots/home.webp" alt="Home — presets & station of the day" loading="lazy"></div><figcaption>Home — presets & station of the day</figcaption></figure><figure><div class="phone"><img src="shots/player.webp" alt="The radio, with song titles" loading="lazy"></div><figcaption>The radio, with song titles</figcaption></figure><figure><div class="phone"><img src="shots/globe.webp" alt="Spin the globe" loading="lazy"></div><figcaption>Spin the globe</figcaption></figure><figure><div class="phone"><img src="shots/dial.webp" alt="Turn the dial" loading="lazy"></div><figcaption>Turn the dial</figcaption></figure><figure><div class="phone"><img src="shots/wooden.webp" alt="Wooden radio skin" loading="lazy"></div><figcaption>Wooden radio skin</figcaption></figure><figure><div class="phone"><img src="shots/carstereo.webp" alt="Car stereo skin" loading="lazy"></div><figcaption>Car stereo skin</figcaption></figure><figure><div class="phone"><img src="shots/alarm.webp" alt="Wake-up radio" loading="lazy"></div><figcaption>Wake-up radio</figcaption></figure><figure><div class="phone"><img src="shots/wrapped.webp" alt="Radio Wrapped" loading="lazy"></div><figcaption>Radio Wrapped</figcaption></figure></div><p class="note c">Swipe to see more · station names are examples</p></div>
+  
+  <section>
+    <h2>What’s inside</h2>
+    <div class="feat">
+      <div><i>📻</i><span><b>Six presets</b>Like a real radio — one tap to tune in.</span></div>
+      <div><i>🌍</i><span><b>Spin the globe</b>Land somewhere it’s night-time right now.</span></div>
+      <div><i>🎛️</i><span><b>Turn the dial</b>Swipe through stations in your favourite style.</span></div>
+      <div><i>🎵</i><span><b>What was that song?</b>See song titles and look back at what played.</span></div>
+      <div><i>🌙</i><span><b>Bedtime</b>A calm station and a sleep timer that fades out.</span></div>
+      <div><i>⏰</i><span><b>Wake-up radio</b>Fade in to your favourite station.*</span></div>
+      <div><i>🚗</i><span><b>Android Auto</b>Your stations on the car screen.*</span></div>
+      <div><i>🧩</i><span><b>Widgets</b>Presets and controls on your home screen.*</span></div>
+    </div>
+    <p class="note">* In the Android app.</p>
+  </section>
 
-  <div class="card">
-    <h2>Installing on Android</h2>
-    <ol>
-      <li>Tap <b>Download for Android</b> above (in Chrome).</li>
-      <li>When it’s downloaded, tap the file to open it.</li>
-      <li>If asked, allow Chrome to <b>install unknown apps</b>, then go back.</li>
-      <li>Tap <b>Install</b>. If Google Play Protect warns you, tap <b>More details → Install anyway</b> — this happens with any app that isn’t from the Play Store.</li>
-      <li>Open Nightjar Radio. Future updates pop up inside the app.</li>
-    </ol>
-  </div>
+  <section>
+    <h2>How to install</h2>
+    <div class="tabs" role="tablist">
+      <button role="tab" id="t-and" aria-controls="p-and" aria-selected="true">Android</button>
+      <button role="tab" id="t-ios" aria-controls="p-ios" aria-selected="false">iPhone &amp; iPad</button>
+      <button role="tab" id="t-pc" aria-controls="p-pc" aria-selected="false">Computer</button>
+    </div>
+    <div class="panel" id="p-and" role="tabpanel" aria-labelledby="t-and">
+      <h3>Android</h3>
+      <ol>
+        <li>Tap <b>Download for Android</b> above (in Chrome).</li>
+        <li>When it’s downloaded, tap the file to open it.</li>
+        <li>If asked, allow Chrome to <b>install unknown apps</b>, then go back.</li>
+        <li>Tap <b>Install</b>. If Play Protect warns you, tap <b>More details → Install anyway</b>.</li>
+        <li>Open Nightjar Radio. Future updates pop up inside the app.</li>
+      </ol>
+      <p>The warning appears for any app that isn’t from the Play Store.</p>
+    </div>
+    <div class="panel" id="p-ios" role="tabpanel" aria-labelledby="t-ios">
+      <h3>iPhone &amp; iPad</h3>
+      <ol>
+        <li>Open <b>radio.churr.co.uk</b> in <b>Safari</b> (or tap the button above).</li>
+        <li>Tap the <b>Share</b> button, then <b>Add to Home Screen</b>.</li>
+        <li>Open it from your home screen — it works like an app, full screen.</li>
+      </ol>
+      <p>Why the home screen? Safari can clear a website’s saved data if you don’t visit for a week — on your home screen, your presets and favourites are kept safe.</p>
+    </div>
+    <div class="panel" id="p-pc" role="tabpanel" aria-labelledby="t-pc">
+      <h3>Windows, Mac or Chromebook</h3>
+      <ol>
+        <li>Open <b>radio.churr.co.uk</b> in <b>Chrome</b> or <b>Edge</b> (or click the button above).</li>
+        <li>Click the <b>Install</b> icon at the right of the address bar (or <b>⋮</b> menu → <b>Install Nightjar Radio</b>).</li>
+        <li>It opens in its own window. Right-click its icon for shortcuts like <b>Bedtime</b> and <b>Spin the globe</b>.</li>
+      </ol>
+    </div>
+  </section>
 
-  <div class="card">
-    <h2>On Windows, Mac or Chromebook</h2>
-    <ol>
-      <li>Tap <b>Open in browser</b> above, in <b>Chrome</b> or <b>Edge</b>.</li>
-      <li>Click the <b>Install</b> icon at the right of the address bar (or the <b>⋮</b> menu → <b>Install Nightjar Radio</b>).</li>
-      <li>It opens in its own window and goes in your Start menu or Dock. Right-click its icon for shortcuts like <b>Bedtime</b> and <b>Spin the globe</b>.</li>
-    </ol>
-  </div>
-
-  <div class="card">
-    <h2>On iPhone &amp; iPad</h2>
-    <ol>
-      <li>Tap <b>Open in browser</b> above, in <b>Safari</b>.</li>
-      <li>Tap the <b>Share</b> button, then <b>Add to Home Screen</b>.</li>
-      <li>Open it from your home screen — it works like an app, full screen.</li>
-    </ol>
-    <p style="font-size:13px;opacity:.8;margin:10px 0 0">Why the home screen? Safari can clear a website’s saved data if you don’t visit for a week — added to your home screen, your presets and favourites are kept safe.</p>
-  </div>
-
-  <footer><b>Nightjar <em>Radio</em></b>Made in the UK 🇬🇧 · Free, no adverts, no sign-up<br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Enjoying it? Buy me a coffee</a> · <a href="../privacy/" style="color:inherit">Privacy</a> · <a href="../terms/">Terms</a> · <a href="../credits/">Credits</a><br>Stations from radio-browser.info</footer>
+  <footer>
+    <span class="name">Nightjar <em>Radio</em></span>
+    Made in the UK 🇬🇧 · Free, no adverts, no sign-up<br>
+    <a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Enjoying it? Buy me a coffee</a><br>
+    <nav><a href="../privacy/">Privacy</a><a href="../terms/">Terms</a><a href="../credits/">Credits</a></nav>
+    Stations from radio-browser.info · © 2026 Daniel
+  </footer>
 </main>
 <script>
+document.body.className='js';
+const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),android=/Android/.test(navigator.userAgent);
+/* Tabs: pick the visitor's device automatically */
+const tabs=[...document.querySelectorAll('[role=tab]')];
+function pick(t){tabs.forEach(b=>{const on=b===t;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;document.getElementById(b.getAttribute('aria-controls')).hidden=!on})}
+tabs.forEach(b=>b.onclick=()=>pick(b));
+pick(document.getElementById(ios?'t-ios':android?'t-and':'t-pc'));
+/* iPhone/iPad and computers: opening in the browser comes first */
+if(!android){const b=document.getElementById('btns'),w=document.getElementById('web'),a=document.getElementById('apk');b.prepend(w);w.classList.add('main');a.classList.remove('main');
+  w.innerHTML=ios?'📱 Open Nightjar Radio<small>Then Share → Add to Home Screen</small>':'💻 Open Nightjar Radio<small>Works in Chrome, Edge, Safari &amp; Firefox</small>'}
 fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-app').then(r=>r.json()).then(d=>{
   const m=/build (\d+)/i.exec(d.name||'');const a=(d.assets||[]).find(x=>/\.apk$/.test(x.name));
   if(m)document.getElementById('build').textContent='Build '+m[1]+(a?' · '+(a.size/1048576).toFixed(1)+' MB':'');
-  Promise.all([fetch('../stats/downloads.json?'+Date.now()).then(x=>x.json()).catch(()=>[]),fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-pubbeta').then(x=>x.ok?x.json():{}).catch(()=>({}))]).then(([h,bd])=>{const b=m?+m[1]:0,bb=+((/build (\d+)/i.exec(bd.name||'')||[0,0])[1]),bn=((bd.assets||[]).find(x=>x.name==='nightjar-radio.apk')||{}).download_count||0,t=h.filter(x=>!((x.channel||'stable')==='stable'&&x.build===b)&&!(x.channel==='beta'&&x.build===bb)).reduce((s,x)=>s+x.downloads,0)+(a?a.download_count:0)+bn;if(t>=10)document.getElementById('dlc').textContent='⬇ Downloaded '+t.toLocaleString('en-GB')+' times'})}).catch(()=>{});
-Promise.all(['radio-pubbeta','radio-app'].map(t=>fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/'+t).then(r=>r.ok?r.json():{}).catch(()=>({})))).then(([d,st])=>{if(/iPhone|iPad/.test(navigator.userAgent))return;const m=/build (\d+)/i.exec(d.name||''),s=/build (\d+)/i.exec(st.name||'');if(!m||(s&&+m[1]<=+s[1]))return;document.getElementById('bbuild').textContent='· build '+m[1];document.getElementById('betal').hidden=false});
-if(/iPhone|iPad/.test(navigator.userAgent)){const b=document.querySelector('.btns');b.prepend(b.children[1]);b.children[0].classList.add('main');b.children[1].classList.remove('main')}
+  Promise.all([fetch('../stats/downloads.json?'+Date.now()).then(x=>x.json()).catch(()=>[]),fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/radio-pubbeta').then(x=>x.ok?x.json():{}).catch(()=>({}))]).then(([h,bd])=>{const b=m?+m[1]:0,bb=+((/build (\d+)/i.exec(bd.name||'')||[0,0])[1]),bn=((bd.assets||[]).find(x=>x.name==='nightjar-radio.apk')||{}).download_count||0,t=h.filter(x=>!((x.channel||'stable')==='stable'&&x.build===b)&&!(x.channel==='beta'&&x.build===bb)).reduce((s,x)=>s+x.downloads,0)+(a?a.download_count:0)+bn;if(t>=10)document.getElementById('dlc').textContent=t.toLocaleString('en-GB')+' downloads'})}).catch(()=>{});
+Promise.all(['radio-pubbeta','radio-app'].map(t=>fetch('https://api.github.com/repos/daniturn3/nightjar-radio/releases/tags/'+t).then(r=>r.ok?r.json():{}).catch(()=>({})))).then(([d,st])=>{if(ios)return;const m=/build (\d+)/i.exec(d.name||''),s=/build (\d+)/i.exec(st.name||'');if(!m||(s&&+m[1]<=+s[1]))return;document.getElementById('bbuild').textContent='· build '+m[1];document.getElementById('betal').hidden=false});
 </script>
 </body>
 </html>
