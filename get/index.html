@@ -8,7 +8,11 @@
 <meta name="description" content="Free live radio from over 50,000 stations worldwide. Download the Nightjar Radio app for Android or use it on iPhone.">
 <meta property="og:title" content="Nightjar Radio — live radio after dark">
 <meta property="og:description" content="Free live radio from over 50,000 stations worldwide.">
-<meta property="og:image" content="https://radio.churr.co.uk/icon-512.png">
+<meta property="og:image" content="https://radio.churr.co.uk/get/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Nightjar Radio — live radio after dark, on a phone">
+<meta property="og:url" content="https://radio.churr.co.uk/get/"><meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../icon-192.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
 <style>
@@ -55,6 +59,10 @@ footer .bmc{display:inline-block;margin:12px 0 10px;padding:10px 20px;border-rad
 footer nav a{text-decoration:none;color:var(--cream);opacity:.85}footer nav a+a::before{content:'·';margin:0 9px;opacity:.5}
 .plus{margin:22px 0 10px;text-align:center;font:600 15px 'Space Grotesk',sans-serif;color:var(--cream)}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.chips span{padding:8px 13px;border-radius:999px;font-size:13.5px;background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--cream)}
+.faq details{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.03);margin-bottom:8px}
+.faq summary{cursor:pointer;list-style:none;padding:15px 44px 15px 18px;font-weight:600;position:relative}.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:22px;color:var(--acc);transition:transform .2s}.faq details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
+.faq p{margin:0;padding:0 18px 16px;color:var(--mut);font-size:14.5px}.faq a{color:var(--sky)}
 </style>
 </head><body class="nojs">
 <main>
@@ -71,7 +79,7 @@ footer nav a{text-decoration:none;color:var(--cream);opacity:.85}footer nav a+a:
     <a class="betal" id="betal" hidden href="https://github.com/daniturn3/nightjar-radio/releases/download/radio-pubbeta/nightjar-radio.apk">⚡ Want new features first? <b>Get the Beta</b> <span id="bbuild"></span></a>
   </div>
 
-  <div class="gal"><h2>Take a look</h2><div class="strip"><figure><div class="phone"><img src="shots/home.webp" alt="Home — presets & station of the day" loading="lazy"></div><figcaption>Home — presets & station of the day</figcaption></figure><figure><div class="phone"><img src="shots/player.webp" alt="The radio, with song titles" loading="lazy"></div><figcaption>The radio, with song titles</figcaption></figure><figure><div class="phone"><img src="shots/globe.webp" alt="Spin the globe" loading="lazy"></div><figcaption>Spin the globe</figcaption></figure><figure><div class="phone"><img src="shots/dial.webp" alt="Turn the dial" loading="lazy"></div><figcaption>Turn the dial</figcaption></figure><figure><div class="phone"><img src="shots/wooden.webp" alt="Wooden radio skin" loading="lazy"></div><figcaption>Wooden radio skin</figcaption></figure><figure><div class="phone"><img src="shots/carstereo.webp" alt="Car stereo skin" loading="lazy"></div><figcaption>Car stereo skin</figcaption></figure><figure><div class="phone"><img src="shots/alarm.webp" alt="Wake-up radio" loading="lazy"></div><figcaption>Wake-up radio</figcaption></figure><figure><div class="phone"><img src="shots/wrapped.webp" alt="Radio Wrapped" loading="lazy"></div><figcaption>Radio Wrapped</figcaption></figure></div><p class="note c">Swipe to see more · station names are examples</p></div>
+  <div class="gal"><h2>Take a look</h2><div class="strip"><figure><div class="phone"><img src="shots/home.webp" alt="Home — Christmas Radio, presets &amp; more" loading="lazy"></div><figcaption>Home — Christmas Radio, presets &amp; more</figcaption></figure><figure><div class="phone"><img src="shots/player.webp" alt="Now playing, with song titles" loading="lazy"></div><figcaption>Now playing, with song titles</figcaption></figure><figure><div class="phone"><img src="shots/globe.webp" alt="Spin the globe" loading="lazy"></div><figcaption>Spin the globe</figcaption></figure><figure><div class="phone"><img src="shots/dial.webp" alt="Turn the dial" loading="lazy"></div><figcaption>Turn the dial</figcaption></figure><figure><div class="phone"><img src="shots/wooden.webp" alt="Wooden radio skin" loading="lazy"></div><figcaption>Wooden radio skin</figcaption></figure><figure><div class="phone"><img src="shots/boombox.webp" alt="Boombox skin" loading="lazy"></div><figcaption>Boombox skin</figcaption></figure><figure><div class="phone"><img src="shots/carstereo.webp" alt="Car stereo skin" loading="lazy"></div><figcaption>Car stereo skin</figcaption></figure><figure><div class="phone"><img src="shots/wrapped.webp" alt="Your Radio Wrapped" loading="lazy"></div><figcaption>Your Radio Wrapped</figcaption></figure></div><p class="note c">Swipe to see more · station names are examples</p></div>
   
   <section>
     <h2>What’s inside</h2>
@@ -125,6 +133,11 @@ footer nav a{text-decoration:none;color:var(--cream);opacity:.85}footer nav a+a:
         <li>It opens in its own window. Right-click its icon for shortcuts like <b>Bedtime</b> and <b>Spin the globe</b>.</li>
       </ol>
     </div>
+  </section>
+
+  <section>
+    <h2>Questions</h2>
+    <div class="faq"><details><summary>Is it really free?</summary><p>Yes. No adverts, no subscription and no sign-up. Nightjar Radio is made by one person in the UK as a hobby — if you enjoy it, you can buy me a coffee.</p></details><details><summary>Why isn’t it on the Play Store?</summary><p>It’s a small independent app, so it’s shared here directly instead. Once installed, it tells you when there’s an update and installs it for you.</p></details><details><summary>Is it safe to install?</summary><p>The Play Protect warning appears for any app that doesn’t come from the Play Store. Nightjar Radio has no adverts and no trackers, and asks only for what it needs (like notifications for the player). The <a href="../privacy/">privacy policy</a> explains exactly what it keeps.</p></details><details><summary>Does it use much data?</summary><p>Most stations use about 30–60 MB an hour. On mobile data, the app’s Data saver switches to a lighter stream when a station has one, and Settings shows how much you’ve used this month.</p></details><details><summary>Is there an iPhone app?</summary><p>Not a separate one — on iPhone and iPad, open the website in Safari and add it to your Home Screen. It then opens full screen like an app.</p></details><details><summary>Why won’t a station play?</summary><p>Stations sometimes go offline, and some only let listeners in their own country. The app tells you when it can, and you can always spin to another one.</p></details></div>
   </section>
 
   <footer>
