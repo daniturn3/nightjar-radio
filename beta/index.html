@@ -2055,6 +2055,15 @@ if(NAT){natSync('presets');natSync('favs');natSync('recent');NAT.setVolume(S.vol
     d.innerHTML=`<div style="flex:1"><b>Add it to your Home Screen</b>Tap ${sh} <b style="display:inline;font:inherit;font-weight:600">Share</b>, then <b style="display:inline;font:inherit;font-weight:600">Add to Home Screen</b>. It opens like an app and keeps your presets and favourites safe.</div><button class="x" type="button">Got it</button>`;
     d.querySelector('.x').onclick=()=>{LS.set('a2hsAt',Date.now());d.remove()};document.body.appendChild(d)},5000)
 }catch(e){}})();
+
+/* Stations sometimes move their stream to a new address. Once a day, refresh saved stations from Radio Browser so presets and favourites keep working. */
+async function refreshSaved(force){try{if(!force&&Date.now()-(LS.get('urlChk',0)||0)<864e5)return;LS.set('urlChk',Date.now());
+  const keys=['presets','favs','recent'],ids=[...new Set(keys.flatMap(k=>(S[k]||[]).filter(Boolean).map(x=>x.u)).filter(u=>/^[0-9a-f-]{36}$/i.test(u||'')))];if(!ids.length)return;
+  const fresh={};for(let i=0;i<ids.length;i+=40){const d=await rb('/json/stations/byuuid?uuids='+ids.slice(i,i+40).join(','));(Array.isArray(d)?d:[]).forEach(x=>{const m=mk(x);if(m.u&&m.url)fresh[m.u]=m})}
+  const ch=new Set();keys.forEach(k=>{S[k]=(S[k]||[]).map(x=>{const f=x&&fresh[x.u];if(!f)return x;const y={...x};let c=false;
+    if(f.url!==x.url){y.url=f.url;c=true}if(f.fav&&f.fav!==x.fav){y.fav=f.fav;c=true}['br','cd','hls'].forEach(q=>{if(f[q]!=null&&f[q]!==x[q]){y[q]=f[q];c=true}});if(c)ch.add(k);return c?y:x})});
+  if(ch.size){save(...ch);logErr('saved stations refreshed: '+[...ch].join(','))}}catch{}}
+setTimeout(()=>refreshSaved(),9000);
 </script>
 </body>
 </html>
