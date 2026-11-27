@@ -1550,6 +1550,7 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   <button class="mi" data-dev="${iso(new Date(xm.getFullYear(),10,16))}">🎄 Christmas Radio starts</button>
   ${bd?`<button class="mi" data-dev="${iso(new Date(y,+bd.slice(0,2)-1,+bd.slice(3)))}">🎂 Your birthday</button>`:''}
   <button class="mi" id="dev_all">📅 Every event — pick any to preview <span class="dim">›</span></button>
+  <button class="mi" id="dev_af">🙃 Preview the April Fools joke <span class="dim">· Android app</span></button>
   ${ev.slice(0,4).map(e=>`<button class="mi" data-dev="${iso(new Date(e.st.getTime()+864e5))}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· day 2, ${e.st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></button>`).join('')}
   ${ev.length?`<button class="mi" data-dev="${iso(new Date(ev[0].st.getTime()-5*864e5))}">⏳ Countdown to ${esc(THEMES[ev[0].id].name)}</button>`:''}
   <div style="display:flex;gap:8px;margin:8px 0 14px"><input type="date" id="dev_d" style="flex:1"><button class="pill" id="dev_go">Go</button></div>
@@ -1567,6 +1568,7 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   $$('#sheet [data-dev]').forEach(b=>b.onclick=()=>devSet(b.dataset.dev||null));
   $('#dev_all').onclick=()=>devAllSheet();
   $('#dev_go').onclick=()=>{const v=$('#dev_d').value;if(v)devSet(iso(v+'T12:00:00'))};
+  $('#dev_af').onclick=()=>{closeSheet();setTimeout(()=>afRun(true),600)};
   $('#dev_inbox').onclick=()=>{const u=LS.get('devInbox','');if(u)devOpen(u);else{$('#dev_set').hidden=false;$('#dev_url').focus()}};
   const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
   $('#dev_save').onclick=()=>{const u=$('#dev_url').value.trim();if(u&&!/^https:\/\/(docs|drive)\.google\.com\//.test(u)){toast('That doesn’t look like a Google Sheets link');return}LS.set('devInbox',u);toast(u?'📬 Inbox link saved':'Inbox link removed');devSheet()}}
@@ -2209,6 +2211,38 @@ setTimeout(()=>{try{if(!NAT||!NAT.wasStopped)return;const t=+NAT.wasStopped();if
   sheet(`<h3>🔋 The radio was stopped</h3><p class="dim" style="font-size:14px;line-height:1.5;margin:0 0 14px">Your phone’s battery saver closed Nightjar Radio while it was playing${new Date(t).toDateString()===new Date().toDateString()?' today':''}. ${ok?'Battery saving is already off for the app, so check your phone’s own app manager too — on Tecno and Infinix it’s <b>Phone Master → App auto-start</b> (allow Nightjar Radio).':'Let it run in the background so it keeps playing with the screen off.'}</p>
   <div class="btnrow">${ok?'':'<button class="pill" id="kbat" style="background:var(--acc);color:#1a1210">Allow background running</button>'}<button class="pill" id="kok">${ok?'OK':'Not now'}</button></div>`);
   if($('#kbat'))$('#kbat').onclick=()=>{NAT.askBattery();closeSheet()};$('#kok').onclick=()=>closeSheet()}catch(e){}},4500);
+
+/* April Fools (Android app only, 1 April, until 12 noon UK time, once per person; never in the car).
+   Words scramble and fly about, the station goes warbly for about a minute, then everything springs back. */
+const afUK=()=>{const p=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',month:'numeric',day:'numeric',hour:'numeric',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));return +p.month===4&&+p.day===1&&+p.hour<12};
+const afCan=()=>{try{return !!(NAT&&NAT.garble)&&!(NAT.inCar&&NAT.inCar())}catch{return false}};
+let afT=0;function afCheck(){if(LS.get('af'+new Date().getFullYear(),false)||!afCan()||!afUK()||document.hidden||document.getElementById('afx'))return;afRun()}
+function afRun(force){if(document.getElementById('afx'))return;if(!force&&!afCan())return;if(!force)LS.set('af'+new Date().getFullYear(),true);
+  const RM=matchMedia('(prefers-reduced-motion: reduce)').matches,vw=innerWidth,vh=innerHeight;
+  if(!playing&&S.last&&NAT)try{play(S.last)}catch{}
+  const els=[...document.querySelectorAll('h1,h2,h3,p,b,span,button,small,label,a,div')].filter(e=>e.childNodes.length===1&&e.firstChild.nodeType===3&&e.textContent.trim().length>1&&!e.closest('#afx')&&(r=>r.bottom>0&&r.top<vh&&r.width>0)(e.getBoundingClientRect())).slice(0,140);
+  const keep=els.map(e=>({e,t:e.textContent,tr:e.style.transform,ts:e.style.transition,d:e.style.display}));
+  const mix=t=>t.split(' ').map(w=>w.length<3?w:w[0]+[...w.slice(1,-1)].sort(()=>Math.random()-.5).join('')+w.slice(-1)).join(' ');
+  const bar=document.createElement('div');bar.id='afx';bar.setAttribute('role','status');
+  bar.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 92px);z-index:9999;background:#171a28;border:1px solid #ffb347;border-radius:16px;padding:12px 14px;display:flex;gap:10px;align-items:center;color:#f3ecdf;font:14px system-ui;box-shadow:0 12px 30px #000b;transition:opacity .3s';
+  bar.innerHTML='<div style="flex:1"><b style="display:block">📻 Uh oh… interference</b><span style="color:#a3a7b8">Something’s messing with the signal</span></div><button style="flex:none;font:600 13px system-ui;border:0;border-radius:99px;padding:10px 12px;background:#2a2e44;color:#f3ecdf">Stop the joke</button>';
+  document.body.appendChild(bar);
+  const timers=[];let done=false;const T=(f,ms)=>timers.push(setTimeout(f,ms));
+  /* 1: letters start swapping */
+  let n=0;const iv=setInterval(()=>{n++;keep.forEach(k=>{if(Math.random()<.35)k.e.textContent=mix(k.t)})},180);timers.push(iv);
+  /* 2: words fly about */
+  if(!RM)T(()=>keep.forEach(k=>{const r=k.e.getBoundingClientRect();if(getComputedStyle(k.e).display==='inline')k.e.style.display='inline-block';
+    k.e.style.transition='transform 1.4s cubic-bezier(.2,.7,.2,1)';k.e.style.transform=`translate(${(Math.random()*vw-r.left-r.width/2)*.8}px,${(Math.random()*vh-r.top-r.height/2)*.8}px) rotate(${Math.random()*80-40}deg)`}),1800);
+  /* 3: the radio goes warbly, with bursts of static */
+  const sv=S.staticfx;T(()=>{try{NAT.garble(true)}catch{};S.staticfx=true;let on=false;const st=setInterval(()=>{on=!on;try{on?staticOn():staticOff()}catch{}},900+Math.random()*700);timers.push(st)},1200);
+  const back=()=>{if(done)return;done=true;timers.forEach(t=>{clearTimeout(t);clearInterval(t)});try{NAT.garble(false)}catch{};try{staticOff()}catch{};S.staticfx=sv
+    keep.forEach(k=>{k.e.textContent=k.t;k.e.style.transition='transform .9s cubic-bezier(.34,1.56,.64,1)';k.e.style.transform=k.tr||''});
+    setTimeout(()=>keep.forEach(k=>{k.e.style.transition=k.ts;k.e.style.display=k.d}),1000);
+    bar.innerHTML='<div style="flex:1"><b style="display:block">🙃 April Fool!</b><span style="color:#a3a7b8">Nothing’s broken. Happy 1st April from Nightjar Radio</span></div>';
+    try{burst(vw/2,vh/2,['✦','♪','☆'],['#86b4ff','#ffd08a','#b8a2ff'],14)}catch{}
+    setTimeout(()=>{bar.style.opacity='0';setTimeout(()=>bar.remove(),400)},6000)};
+  bar.querySelector('button').onclick=back;T(back,62000)}
+setTimeout(()=>{afCheck();setInterval(afCheck,5000)},6000);
 </script>
 </body>
 </html>
