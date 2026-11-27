@@ -826,6 +826,7 @@ function tidySong(s){s=unent(String(s||'')).trim();if(!s||!/\b[A-Za-z_]+="/.test
   let t=tag('text')||tag('title')||tag('song'),a=tag('artist');const pre=s.split(/\s*-?\s*\b[A-Za-z_]+="/)[0].replace(/\s*-\s*$/,'').trim();if(!a)a=pre;
   if(!t){if(pre)return pre;return ''}
   return a&&a.toLowerCase()!==t.toLowerCase()?a+' - '+t:t}
+try{const h=LS.get('songs',[]);if(h.some(x=>/\b[A-Za-z_]+="/.test(x.s||'')))LS.set('songs',h.map(x=>({...x,s:tidySong(x.s)})).filter(x=>x.s))}catch{}
 function unent(s){if(!s||s.indexOf('&')<0)return s;const N={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',mdash:'—',ndash:'–',hellip:'…',rsquo:'’',lsquo:'‘',rdquo:'”',ldquo:'“'};
   return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(m,c)=>c[0]==='#'?(()=>{const n=c[1]==='x'||c[1]==='X'?parseInt(c.slice(2),16):+c.slice(1);try{return n>0&&n<0x110000?String.fromCodePoint(n):m}catch{return m}})():(N[c.toLowerCase()]??m))}
 function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}

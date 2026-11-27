@@ -801,8 +801,16 @@ window.njrNative=e=>{if(cast.on)return;const was=playing;if(e.n>0)natLoaded=true
   if(reconn&&!wasRc)toast('📶 Signal dropped — reconnecting…');if(wasRc&&playing)toast('✓ Back on air');
   if(e.err&&e.err!==natErr){buffering=false;logErr('player: '+e.err+' · '+(cur?.n||''));toast('Couldn’t tune in to '+(cur?.n||'that station')+' — try another station');trouble('play')}natErr=e.err||'';
   if(playing&&!was)logStart();if(!playing&&was)logEnd();
-  if((e.song||'')!==song){song=unent(e.song||'');showSong()}setState()};
+  {const ns=tidySong(e.song||'');if(ns!==song){song=ns;showSong()}}setState()};
 /* Some stations send song titles with HTML codes in them (e.g. &#8212; for a dash) — turn them back into the real characters. */
+/* Some stations (iHeart and others) send their whole tag list as the song, e.g.
+   ARTIST - text="Title" song_spot="M" length="00:04:28" amgArtworkURL="…". Keep just "Artist - Title". */
+function tidySong(s){s=unent(String(s||'')).trim();if(!s||!/\b[A-Za-z_]+="/.test(s))return s;
+  const tag=k=>{const m=s.match(new RegExp('\\b'+k+'="([^"]*)"','i'));return m?m[1].trim():''};
+  let t=tag('text')||tag('title')||tag('song'),a=tag('artist');const pre=s.split(/\s*-?\s*\b[A-Za-z_]+="/)[0].replace(/\s*-\s*$/,'').trim();if(!a)a=pre;
+  if(!t){if(pre)return pre;return ''}
+  return a&&a.toLowerCase()!==t.toLowerCase()?a+' - '+t:t}
+try{const h=LS.get('songs',[]);if(h.some(x=>/\b[A-Za-z_]+="/.test(x.s||'')))LS.set('songs',h.map(x=>({...x,s:tidySong(x.s)})).filter(x=>x.s))}catch{}
 function unent(s){if(!s||s.indexOf('&')<0)return s;const N={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',mdash:'—',ndash:'–',hellip:'…',rsquo:'’',lsquo:'‘',rdquo:'”',ldquo:'“'};
   return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(m,c)=>c[0]==='#'?(()=>{const n=c[1]==='x'||c[1]==='X'?parseInt(c.slice(2),16):+c.slice(1);try{return n>0&&n<0x110000?String.fromCodePoint(n):m}catch{return m}})():(N[c.toLowerCase()]??m))}
 function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
@@ -1898,7 +1906,7 @@ function npPeek(sts,force){if(!npOK())return 0;const m=npMode();if(!force&&(m===
   const now=Date.now(),seen=new Set(),need=sts.filter(st=>st&&st.u&&/^https?:/i.test(st.url||'')&&!st.hls&&!seen.has(st.u)&&seen.add(st.u)).filter(st=>{const c=NPC[st.u];if(force&&c)c.ask=1;if(!c)return true;if(c.pending&&now-c.pending<15e3)return false;return now-c.at>NPFRESH}).slice(0,30);
   if(!need.length){npPaint();return 0}need.forEach(st=>{NPU[st.url]=st.u;NPC[st.u]=Object.assign(NPC[st.u]||{t:'',at:0},{pending:now},force?{ask:1}:{})});
   try{NAT.peek(JSON.stringify(need.map(st=>st.url)))}catch{}return need.length}
-window.njrPeek=e=>{if(!e||!e.u)return;const id=NPU[e.u];if(!id)return;const o=NPC[id]||{};NPC[id]={t:unent(String(e.t||'')),at:Date.now(),pending:0,ask:o.ask};npPaint()};
+window.njrPeek=e=>{if(!e||!e.u)return;const id=NPU[e.u];if(!id)return;const o=NPC[id]||{};NPC[id]={t:tidySong(String(e.t||'')),at:Date.now(),pending:0,ask:o.ask};npPaint()};
 const npAuto=()=>S.presets.filter(Boolean).concat(S.favs);
 function npButtons(){if(!npOK())return;$$('#view .sec').forEach(sc=>{if(sc.querySelector('.npbtn')||!sc.querySelector('[data-st]'))return;const h=sc.querySelector('.sh');if(!h)return;
   const b=document.createElement('button');b.className='npbtn';b.textContent='♪ What’s on?';b.onclick=ev=>{ev.stopPropagation();const sts=[...sc.querySelectorAll('[data-st]')].map(npSt);
