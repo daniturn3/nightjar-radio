@@ -1014,8 +1014,11 @@ const HSEC=[['sotd','Station of the day','✦','A new pick every day','#ffb36b',
  ['vc','Windows Down Radio','🌴','Sunny-drive stations · until 18 Dec','#ff6fb5','#40d6d6'],['near','Near you','📍','Local stations, closest first','#86d9a8','#2fb38a'],['globe','Around the world now','🌍','Spin the globe','#86b4ff','#4f6cff'],
  ['recent','Tune back in','↺','Stations you played lately','#b8a2ff','#7b5cff'],['country','Popular in your country','🏠','Top stations where you live','#ffad6b','#e5533d'],['world','Most loved worldwide','❤','The world’s most-played','#ff8a8a','#e0435f'],['night','Late-night picks','🌙','Mellow stations for after dark','#7f8cff','#3a3f9e']];
 function homeAll(){const def=HSEC.map(h=>h[0]).filter(id=>(id!=='vc'||vcOn())&&(id!=='xmas'||xmasOn())),saved=LS.get('homeOrder',[]).filter(id=>def.includes(id));
-  def.forEach((id,i)=>{if(!saved.includes(id)){const prev=def.slice(0,i).reverse().find(x=>saved.includes(x));saved.splice(prev?saved.indexOf(prev)+1:0,0,id)}});return saved}
-const homeOrder=()=>{const hid=LS.get('homeHide',[]);let o=homeAll().filter(id=>!hid.includes(id));if(xmasOn()&&o.includes('xmas'))o=['xmas',...o.filter(x=>x!=='xmas')];return o};
+  const raw=LS.get('homeOrder',[]);
+  def.forEach((id,i)=>{if(!saved.includes(id)){const prev=def.slice(0,i).reverse().find(x=>saved.includes(x));saved.splice(prev?saved.indexOf(prev)+1:0,0,id)}});
+  /* Christmas Radio starts at the top in season — until you move it yourself */
+  if(xmasOn()&&!raw.includes('xmas')&&saved.includes('xmas'))saved.splice(0,0,...saved.splice(saved.indexOf('xmas'),1));return saved}
+const homeOrder=()=>{const hid=LS.get('homeHide',[]);return homeAll().filter(id=>!hid.includes(id))};
 function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
   sheet(`<h3>Customise Home</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Move sections up or down, and switch off the ones you don’t use.</p>
   <div class="hcl">${ord.map((id,i)=>{const h=HSEC.find(x=>x[0]===id),on=!hid.includes(id);return`<div class="hcr${on?'':' off'}" style="--a:${h[4]};--b:${h[5]}"><span class="hcn">${String(i+1).padStart(2,'0')}</span><span class="hce">${h[2]}</span><div class="hct"><b>${esc(h[1])}</b><small>${on?esc(h[3]):'Hidden'}</small></div>
