@@ -893,10 +893,10 @@ function gReal(){const Q=GT.g,S=Q.S,D=GT.day,N=GT.night,out=Q.img.data,R=Math.PI
   const ls=sl+lam,scx=Math.cos(sf)*Math.cos(ls),scy=Math.cos(sf)*Math.sin(ls),scz=Math.sin(sf),A=scx*cd-scz*sd,C=scz*cd+scx*sd;let hx=scy,hy=C,hz=A+1;const hl=Math.hypot(hx,hy,hz);hx/=hl;hy/=hl;hz/=hl;
   const{X,Y,Z,idx}=Q,P2=2*Math.PI;for(let q=0;q<idx.length;q++){const k=idx[q],a=Z[k],bb=X[k],c=Y[k],x=a*cd+c*sd,z=c*cd-a*sd,lat=Math.asin(z>1?1:z<-1?-1:z);let lon=Math.atan2(bb,x)-lam;lon=((lon+Math.PI)%P2+P2)%P2-Math.PI;
     const u=(lon/Math.PI+1)/2,v=.5-lat/Math.PI,ti=((v*D.h|0)*D.w+(u*D.w|0))*4,ni=((v*N.h|0)*N.w+(u*N.w|0))*4,cl=Math.cos(lat),dot=cl*Math.cos(lon)*sx+cl*Math.sin(lon)*sy+Math.sin(lat)*sz;
-    let dk=(dot+.08)/.25;dk=dk<0?0:dk>1?1:dk;dk=dk*dk*(3-2*dk);const nk=1-dk,li=(.25+.85*(dot>0?dot:0))*1.08,limb=.35+.65*Math.pow(a,.6);
+    let dk=(dot+.08)/.25;dk=dk<0?0:dk>1?1:dk;dk=dk*dk*(3-2*dk);const nk=1-dk,li=(.45+.75*(dot>0?dot:0))*1.1,limb=.5+.5*Math.pow(a,.6);
     const r=Math.max(0,(D.d[ti]-18)*1.18),g=Math.max(0,(D.d[ti+1]-18)*1.18),b=Math.max(0,(D.d[ti+2]-14)*1.12);let spec=0;if(dk>0&&b>r+12&&b>g){const nh=bb*hx+c*hy+a*hz;if(nh>0)spec=Math.pow(nh,140)*90*dk}
     const city=Math.max(0,(N.d[ni]+N.d[ni+1])/2-45)*2.4*nk,o=k*4;
-    out[o]=Math.min(255,(r*li*dk+r*.07*nk)*limb+spec+N.d[ni]*.3*nk+city);out[o+1]=Math.min(255,(g*li*dk+g*.08*nk)*limb+spec+N.d[ni+1]*.3*nk+city*.78);out[o+2]=Math.min(255,(b*li*dk+b*.14*nk)*limb+spec*.9+N.d[ni+2]*.45*nk+city*.42);out[o+3]=255}
+    out[o]=Math.min(255,(r*li*dk+r*.3*nk)*limb+spec+N.d[ni]*.15*nk+city);out[o+1]=Math.min(255,(g*li*dk+g*.32*nk)*limb+spec+N.d[ni+1]*.15*nk+city*.78);out[o+2]=Math.min(255,(b*li*dk+b*.42*nk)*limb+spec*.9+N.d[ni+2]*.25*nk+city*.42);out[o+3]=255}
   Q.cx.putImageData(Q.img,0,0)}
 function gDraw(){const cv=$('#globe');if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),cw=cv.clientWidth;if(!cw)return;const W=Math.round(cw*dpr);if(cv.width!==W||cv.height!==W){cv.width=cv.height=W}
   const c=cv.getContext('2d'),R=W/2-2*dpr,cx=W/2;c.clearRect(0,0,W,W);
@@ -907,7 +907,7 @@ function gDraw(){const cv=$('#globe');if(!cv)return;const dpr=Math.min(2,deviceP
     let g=c.createRadialGradient(cx,cx,R2*.995,cx,cx,R2*1.12);g.addColorStop(0,'rgba(120,180,255,.55)');g.addColorStop(.35,'rgba(90,150,255,.22)');g.addColorStop(1,'rgba(60,120,255,0)');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R2*1.13,0,Math.PI*2);c.arc(cx,cx,R2*.995,0,Math.PI*2,true);c.fill('evenodd');
     c.save();c.beginPath();c.arc(cx,cx,R2,0,7);c.clip();c.imageSmoothingQuality='high';c.drawImage(GT.g.c,cx-R2,cx-R2,R2*2,R2*2);c.restore();
     g=c.createRadialGradient(cx,cx,R2*.82,cx,cx,R2);g.addColorStop(0,'rgba(150,200,255,0)');g.addColorStop(1,'rgba(150,200,255,.10)');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R2,0,7);c.fill();
-    c.beginPath();path(G.borders);c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=.6*dpr;c.stroke();
+    c.beginPath();path(G.borders);c.strokeStyle='rgba(255,246,220,.32)';c.lineWidth=.7*dpr;c.stroke();
     if(G.lit)for(const[f,t]of G.lit){const a=1-(now-t)/1400;if(a<=0){G.lit.delete(f);continue}c.save();c.globalAlpha=Math.min(1,a*1.1)*.7;c.shadowColor='#ffcf6a';c.shadowBlur=22*dpr*a;c.beginPath();path(f);c.fillStyle='#ffd36b';c.fill();c.globalAlpha=1;c.strokeStyle='#fff5d6';c.lineWidth=1.2*dpr;c.stroke();c.restore()}
     if(G.sel){const pulse=.75+.25*Math.sin((now-G.t0)/320);c.save();c.shadowColor='#ffcf6a';c.shadowBlur=18*dpr*pulse;c.beginPath();path(G.sel);c.globalAlpha=.6;c.fillStyle='#ffc857';c.fill();c.restore();c.beginPath();path(G.sel);c.strokeStyle='#fff5d6';c.lineWidth=1.4*dpr;c.stroke()}
     gPinDraw(c,pr,W,dpr);return}
@@ -1068,7 +1068,7 @@ VIEWS.home=async(el,tok)=>{const cn=(COUNTRIES.find(c=>c[0]===S.country)||[S.cou
     vc:()=>vcOn()?vcH():'',
     xmas:()=>xmasOn()?xcH():'',
     near:()=>sec('Near you',nearH(),S.geo?'Local stations, closest first':'',N()),
-    globe:()=>sec('Around the world now',globeH(),'Spin the globe to land somewhere it’s night-time, morning — or anywhere — right now',N()),
+    globe:()=>sec('Around the world now',globeH(),'Pick a time of day, then give it a spin',N()),
     recent:()=>S.recent.length?sec('Tune back in',cards(S.recent.slice(0,12),'Recently played'),'',N()):'',
     country:()=>sec(`Popular in ${esc(cn)} ${flag(S.country)}`,`<div id="hcountry">${skCards()}</div>`,'',N()),
     world:()=>sec('Most loved worldwide','<div id="hworld">'+skRows(6)+'</div>','The world’s most-played stations',N()),
