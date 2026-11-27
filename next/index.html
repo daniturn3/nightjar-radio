@@ -893,6 +893,8 @@ function gData(){if(G.feats)return true;if(!window.d3?.geoOrthographic||!window.
   G.feats=topojson.feature(W,W.objects.countries).features;G.land=topojson.merge(W,W.objects.countries.geometries);G.borders=topojson.mesh(W,W.objects.countries,(a,b)=>a!==b);G.grat=d3.geoGraticule10();return true}
 function sunPos(){const n=new Date(),doy=(Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate())-Date.UTC(n.getUTCFullYear(),0,0))/864e5,dec=-23.44*Math.cos(2*Math.PI/365*(doy+10)),h=n.getUTCHours()+n.getUTCMinutes()/60;return[-(h-12)*15,dec]}
 /* Realistic globe (Test): NASA Blue Marble (day) + Black Marble (city lights), drawn pixel by pixel with live day/night. Falls back to the flat globe until the pictures load. */
+/* Launches for everyone on Earth Day, 22 April 2027 (UK time); the Test site has it now. */
+const G2=()=>/\/next\//.test(location.pathname)||Date.now()>=Date.UTC(2027,3,21,23);
 const GT={};function gTex(){if(GT.busy)return;GT.busy=1;[['day','img/earth-day.jpg'],['night','img/earth-night.jpg']].forEach(([k,src])=>{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);GT[k]={w:im.width,h:im.height,d:x.getImageData(0,0,im.width,im.height).data};G.drawn=false;if($('#globe')&&!playful())gDraw()}catch{}};im.src=src})}
 function gGeom(S){const n=S*S,X=new Float32Array(n),Y=new Float32Array(n),Z=new Float32Array(n),idx=[];for(let j=0;j<S;j++)for(let i=0;i<S;i++){const x=(i+.5)/S*2-1,y=1-(j+.5)/S*2,r2=x*x+y*y;if(r2<1){const k=j*S+i;X[k]=x;Y[k]=y;Z[k]=Math.sqrt(1-r2);idx.push(k)}}
   const c=document.createElement('canvas');c.width=c.height=S;const cx=c.getContext('2d');return{S,X,Y,Z,idx:Uint32Array.from(idx),c,cx,img:cx.createImageData(S,S)}}
@@ -909,8 +911,8 @@ function gReal(){const Q=GT.g,S=Q.S,D=GT.day,N=GT.night,out=Q.img.data,R=Math.PI
 function gDraw(){const cv=$('#globe');if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),cw=cv.clientWidth;if(!cw)return;const W=Math.round(cw*dpr);if(cv.width!==W||cv.height!==W){cv.width=cv.height=W}
   const c=cv.getContext('2d'),R=W/2-2*dpr,cx=W/2;c.clearRect(0,0,W,W);
   if(!gData()){const g=c.createRadialGradient(cx*.75,cx*.65,R*.1,cx,cx,R);g.addColorStop(0,'#3a7bd5');g.addColorStop(1,'#071636');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R,0,7);c.fill();return}
-  if(!GT.busy)gTex();
-  if(GT.day&&GT.night){const R2=W/2*.88,S=Math.min(380,Math.round(R2*2/dpr*Math.min(dpr,1.5)));if(!GT.g||GT.g.S!==S)GT.g=gGeom(S);gReal();
+  if(G2()&&!GT.busy)gTex();
+  if(G2()&&GT.day&&GT.night){const R2=W/2*.88,S=Math.min(380,Math.round(R2*2/dpr*Math.min(dpr,1.5)));if(!GT.g||GT.g.S!==S)GT.g=gGeom(S);gReal();
     const pr=d3.geoOrthographic().scale(R2).translate([cx,cx]).rotate(G.rot).clipAngle(90).precision(.6),path=d3.geoPath(pr,c),now=performance.now();
     let g=c.createRadialGradient(cx,cx,R2*.995,cx,cx,R2*1.12);g.addColorStop(0,'rgba(120,180,255,.55)');g.addColorStop(.35,'rgba(90,150,255,.22)');g.addColorStop(1,'rgba(60,120,255,0)');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R2*1.13,0,Math.PI*2);c.arc(cx,cx,R2*.995,0,Math.PI*2,true);c.fill('evenodd');
     c.save();c.beginPath();c.arc(cx,cx,R2,0,7);c.clip();c.imageSmoothingQuality='high';c.drawImage(GT.g.c,cx-R2,cx-R2,R2*2,R2*2);c.restore();
