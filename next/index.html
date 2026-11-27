@@ -1534,6 +1534,44 @@ function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.
   if(n){save('favs');if(view==='library'||view==='home')render();mark&&mark()}}catch{}}
 /*@TESTONLY*/
 /* Developer tools — only in Daniel's Test copy. Everything between these markers is cut out when publishing to Beta. */
+/* Phone self-test (Test app only): checks the real app on this phone and lists what passed. */
+async function selfTest(){const R=[],errs=[],t0=Date.now(),wait=ms=>new Promise(r=>setTimeout(r,ms)),until=async(f,ms)=>{const e=Date.now()+ms;while(Date.now()<e){try{if(f())return true}catch{}await wait(250)}return false};
+  const onErr=e=>errs.push(String(e.message||e.reason||e));addEventListener('error',onErr);addEventListener('unhandledrejection',onErr);
+  const paint=(done)=>{const ok=R.filter(x=>x[0]==='ok').length,bad=R.filter(x=>x[0]==='bad').length,inf=R.filter(x=>x[0]==='info').length;
+    sheet(`<h3>🧪 Phone self-test</h3><p class="dim" style="margin:0 0 10px">${done?`Done in ${Math.round((Date.now()-t0)/1000)}s · <b style="color:#5fd39a">${ok} passed</b> · <b style="color:#ff6b4a">${bad} failed</b> · ${inf} to note`:'Running… keep the app open'}</p>
+    <div style="display:flex;flex-direction:column;gap:6px">${R.map(([k,n,d])=>`<div style="display:flex;gap:8px;align-items:flex-start;font-size:14px"><span>${k==='ok'?'✅':k==='bad'?'❌':k==='run'?'⏳':'ℹ️'}</span><div><b>${esc(n)}</b>${d?`<div class="dim" style="font-size:12px">${esc(d)}</div>`:''}</div></div>`).join('')}</div>
+    ${done?'<div class="btnrow" style="margin-top:14px"><button class="pill" id="st_copy">Share results</button><button class="pill" id="st_close">Close</button></div>':''}`);
+    if(done){$('#st_close').onclick=()=>closeSheet();$('#st_copy').onclick=()=>{const t='Nightjar self-test · build '+(NAT&&NAT.version?NAT.version():'web')+' · '+new Date().toLocaleString('en-GB')+'\n'+R.map(([k,n,d])=>(k==='ok'?'PASS':k==='bad'?'FAIL':'INFO')+' · '+n+(d?' — '+d:'')).join('\n');if(NAT&&NAT.share)NAT.share('Self-test results',t);else navigator.clipboard?.writeText(t).then(()=>toast('Copied'))}}};
+  const step=async(name,fn)=>{R.push(['run',name,'']);paint();let k='ok',d='';try{const r=await fn();if(r===false)k='bad';else if(r&&typeof r==='object'){k=r.k||'ok';d=r.d||''}else if(typeof r==='string')d=r}catch(e){k='bad';d=String(e&&e.message||e)}R[R.length-1]=[k,name,d];paint()};
+  await step('Android app connected',()=>!!NAT||{k:'bad',d:'Not running inside the Android app'});
+  if(NAT){await step('App build',()=>({d:'Build '+NAT.version()}));
+    await step('New Android Auto in this build',()=>!!(NAT.aaV2&&NAT.aaV2()));
+    await step('April Fools sound wobble available',()=>!!NAT.garble);
+    await step('Notifications allowed',()=>NAT.notifOk&&NAT.notifOk()?true:{k:'bad',d:'Turn on notifications for the app, or controls won’t show'});
+    await step('Battery saver lets it run in the background',()=>NAT.batteryOk&&NAT.batteryOk()?true:{k:'info',d:'Battery optimisation is on: the phone may stop the radio with the screen off'});
+    await step('Network',()=>({k:'info',d:NAT.unmetered&&NAT.unmetered()?'Wi-Fi (or unmetered)':'Mobile data'}));
+    await step('Casting',()=>({k:'info',d:NAT.castAvailable&&NAT.castAvailable()?'A cast device is available':'No cast device found right now'}));
+    await step('Alarm readable',()=>({d:NAT.getAlarm&&NAT.getAlarm()?'Alarm is set':'No alarm set'}));
+    await step('Song log readable',()=>{JSON.parse(NAT.takeSongs()||'[]');return true})}
+  await step('Saved settings read and write',()=>{LS.set('selftest',t0);const ok=LS.get('selftest',0)===t0;localStorage.removeItem('njr_selftest');return ok});
+  await step('Saved stations look healthy',()=>Array.isArray(S.favs)&&Array.isArray(S.recent)?{d:`${S.favs.length} favourites · ${(S.presets||[]).filter(Boolean).length} presets · ${S.recent.length} recent`}:false);
+  await step('Song title tidy-up',()=>tidySong('NORMAN HUTCHINS - text="You Brought Us Peace" song_spot="M" length="00:04:28"')==='NORMAN HUTCHINS - You Brought Us Peace'&&tidySong('Queen - Bohemian Rhapsody')==='Queen - Bohemian Rhapsody'&&tidySong('Tom &amp; Jerry')==='Tom & Jerry');
+  await step('Customise Home order is kept',()=>{const was=localStorage.getItem('njr_homeOrder');const all=homeAll(),rev=[...all].reverse();LS.set('homeOrder',rev);const got=homeAll();if(was==null)localStorage.removeItem('njr_homeOrder');else localStorage.setItem('njr_homeOrder',was);return JSON.stringify(got)===JSON.stringify(rev)});
+  await step('Home fits the screen (no sideways scrolling)',()=>document.documentElement.scrollWidth<=innerWidth+2?true:{k:'bad',d:`Page is ${document.documentElement.scrollWidth}px wide on a ${innerWidth}px screen`});
+  let st=null;await step('Radio directory reachable',async()=>{const t=Date.now();const r=await rb('/json/stations/byname/Groove%20Salad?limit=5&hidebroken=true&order=clickcount&reverse=true',0);st=(r||[]).map(mk).find(x=>x.url&&/^https:/.test(x.url))||null;return st?{d:`Answered in ${Date.now()-t} ms`}:{k:'bad',d:'No answer from radio-browser.info'}});
+  if(!st&&S.last)st=S.last;
+  if(st){const before=cur;
+    await step('Plays a station',async()=>{const t=Date.now();play(st);const ok=await until(()=>playing,20000);return ok?{d:`${st.n} started in ${((Date.now()-t)/1000).toFixed(1)}s`}:{k:'bad',d:'Did not start within 20 seconds'}});
+    await step('Song name comes through',async()=>{const ok=await until(()=>song&&song.length>2,30000);return ok?{d:song}:{k:'info',d:'No song name within 30s (some stations don’t send one)'}});
+    await step('Pause',async()=>{toggle();return await until(()=>!playing,6000)});
+    await step('Play again',async()=>{toggle();return await until(()=>playing,15000)});
+    if(NAT&&NAT.garble)await step('Sound wobble switches on and off',async()=>{NAT.garble(true);await wait(2500);NAT.garble(false);await wait(500);return playing?{d:'Listen: it should have wobbled for 2 seconds'}:{k:'bad',d:'Playback stopped during the wobble'}});
+    await step('Stays playing for 20 seconds',async()=>{const e=Date.now()+20000;let drops=0;while(Date.now()<e){if(!playing)drops++;await wait(500)}return drops<3?true:{k:'bad',d:`Dropped out ${drops} times`}});
+    if(NAT)NAT.pause()}
+  await step('Realistic globe pictures load',async()=>{try{gTex()}catch{};return await until(()=>GT.day&&GT.night,15000)?true:{k:'bad',d:'Earth pictures did not load'}});
+  await step('Globe draws fast enough',()=>{if(!GT.day)return{k:'info',d:'Skipped'};if(!GT.g)GT.g=gGeom(300);const t=performance.now();for(let i=0;i<5;i++)gReal();const ms=(performance.now()-t)/5;return ms<45?{d:`${ms.toFixed(0)} ms a frame`}:{k:'bad',d:`${ms.toFixed(0)} ms a frame: the spin may stutter`}});
+  await step('No errors during the test',()=>errs.length?{k:'bad',d:errs.slice(0,3).join(' | ')}:true);
+  removeEventListener('error',onErr);removeEventListener('unhandledrejection',onErr);paint(true)}
 function devOpen(u){if(NAT&&NAT.openUrl)NAT.openUrl(u);else open(u,'_blank','noopener')}
 function devSet(v,cc=null){devNow=v;LS.set('devNow',v);devCC=v?cc:null;LS.set('devCC',devCC);closeSheet();try{applyTheme()}catch{}render();toast(v?'🛠 Previewing as '+new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})+(devCC?' in '+cName(devCC):''):'🛠 Back to today’s date',3000)}
 function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x.toISOString()},at=(d,h)=>{const x=new Date(d);x.setHours(h,0,0,0);return x.toISOString()};
@@ -1550,6 +1588,7 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   <button class="mi" data-dev="${iso(new Date(xm.getFullYear(),10,16))}">🎄 Christmas Radio starts</button>
   ${bd?`<button class="mi" data-dev="${iso(new Date(y,+bd.slice(0,2)-1,+bd.slice(3)))}">🎂 Your birthday</button>`:''}
   <button class="mi" id="dev_all">📅 Every event — pick any to preview <span class="dim">›</span></button>
+  <button class="mi" id="dev_st">🧪 Run the phone self-test <span class="dim">· about 2 minutes</span></button>
   <button class="mi" id="dev_af">🙃 Preview the April Fools joke <span class="dim">· Android app</span></button>
   ${ev.slice(0,4).map(e=>`<button class="mi" data-dev="${iso(new Date(e.st.getTime()+864e5))}">${THEMES[e.id].badge} ${esc(THEMES[e.id].name)} <span class="dim">· day 2, ${e.st.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span></button>`).join('')}
   ${ev.length?`<button class="mi" data-dev="${iso(new Date(ev[0].st.getTime()-5*864e5))}">⏳ Countdown to ${esc(THEMES[ev[0].id].name)}</button>`:''}
@@ -1568,6 +1607,7 @@ function devSheet(){const y=new Date().getFullYear(),iso=d=>{const x=new Date(d)
   $$('#sheet [data-dev]').forEach(b=>b.onclick=()=>devSet(b.dataset.dev||null));
   $('#dev_all').onclick=()=>devAllSheet();
   $('#dev_go').onclick=()=>{const v=$('#dev_d').value;if(v)devSet(iso(v+'T12:00:00'))};
+  $('#dev_st').onclick=()=>{closeSheet();setTimeout(selfTest,500)};
   $('#dev_af').onclick=()=>{closeSheet();setTimeout(()=>afRun(true),600)};
   $('#dev_inbox').onclick=()=>{const u=LS.get('devInbox','');if(u)devOpen(u);else{$('#dev_set').hidden=false;$('#dev_url').focus()}};
   const chg=$('#dev_chg');if(chg)chg.onclick=()=>{$('#dev_set').hidden=false};
