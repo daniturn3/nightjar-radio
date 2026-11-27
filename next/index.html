@@ -880,13 +880,37 @@ function gPlace(cc,rg){const zs=ZONES.filter(z=>z[0]===cc);const z=zs.find(z=>z[
   if(z)return{cc,name:z[1],tz:z[2],ll:ZLL[z[1]]};let nm=cc;try{nm=new Intl.DisplayNames(['en'],{type:'region'}).of(cc)||cc}catch{}
   return{cc,name:nm,tz:CT[cc]?.tz||'UTC',ll:null}}
 const ISO={GB:'826',IE:'372',IS:'352',PT:'620',FR:'250',ES:'724',DE:'276',IT:'380',NL:'528',SE:'752',NO:'578',PL:'616',GR:'300',TR:'792',EG:'818',NG:'566',KE:'404',ZA:'710',AE:'784',IN:'356',TH:'764',SG:'702',ID:'360',PH:'608',TW:'158',KR:'410',JP:'392',AU:'036',NZ:'554',US:'840',CA:'124',MX:'484',JM:'388',CU:'192',CO:'170',PE:'604',BR:'076',AR:'032',CL:'152',AT:'040',BE:'056',CH:'756',DK:'208',FI:'246',CZ:'203',HU:'348',RO:'642',BG:'100',RS:'688',HR:'191',UA:'804',EE:'233',LV:'428',LT:'440',SK:'703',SI:'705',MA:'504',TN:'788',DZ:'012',GH:'288',SN:'686',ET:'231',TZ:'834',UG:'800',CM:'120',AO:'024',ZW:'716',MZ:'508',NA:'516',MG:'450',IL:'376',JO:'400',LB:'422',SA:'682',QA:'634',KW:'414',IR:'364',PK:'586',BD:'050',LK:'144',NP:'524',MM:'104',VN:'704',MY:'458',KH:'116',MN:'496',KZ:'398',RU:'643',GE:'268',AM:'051',AZ:'031',CY:'196',LU:'442',FJ:'242',PG:'598',GT:'320',CR:'188',PA:'591',HN:'340',DO:'214',PR:'630',HT:'332',TT:'780',BS:'044',VE:'862',EC:'218',BO:'068',PY:'600',UY:'858',GL:'304'};
-const G={rot:[10,-25,0],sel:null,pin:null,label:'',raf:0,vis:true,spinning:false,feats:null,t0:performance.now()};
+const G={cen:f=>f._c||(f._c=d3.geoCentroid(f)),wt:f=>f._w||(f._w=Math.sqrt(d3.geoArea(f))),rot:[10,-25,0],sel:null,pin:null,label:'',raf:0,vis:true,spinning:false,feats:null,t0:performance.now()};
 function gData(){if(G.feats)return true;if(!window.d3?.geoOrthographic||!window.topojson||!window.WORLD)return false;const W=window.WORLD;
   G.feats=topojson.feature(W,W.objects.countries).features;G.land=topojson.merge(W,W.objects.countries.geometries);G.borders=topojson.mesh(W,W.objects.countries,(a,b)=>a!==b);G.grat=d3.geoGraticule10();return true}
 function sunPos(){const n=new Date(),doy=(Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate())-Date.UTC(n.getUTCFullYear(),0,0))/864e5,dec=-23.44*Math.cos(2*Math.PI/365*(doy+10)),h=n.getUTCHours()+n.getUTCMinutes()/60;return[-(h-12)*15,dec]}
+/* Realistic globe (Test): NASA Blue Marble (day) + Black Marble (city lights), drawn pixel by pixel with live day/night. Falls back to the flat globe until the pictures load. */
+const GT={};function gTex(){if(GT.busy)return;GT.busy=1;[['day','img/earth-day.jpg'],['night','img/earth-night.jpg']].forEach(([k,src])=>{const im=new Image();im.onload=()=>{try{const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0);GT[k]={w:im.width,h:im.height,d:x.getImageData(0,0,im.width,im.height).data};G.drawn=false;if($('#globe')&&!playful())gDraw()}catch{}};im.src=src})}
+function gGeom(S){const n=S*S,X=new Float32Array(n),Y=new Float32Array(n),Z=new Float32Array(n),idx=[];for(let j=0;j<S;j++)for(let i=0;i<S;i++){const x=(i+.5)/S*2-1,y=1-(j+.5)/S*2,r2=x*x+y*y;if(r2<1){const k=j*S+i;X[k]=x;Y[k]=y;Z[k]=Math.sqrt(1-r2);idx.push(k)}}
+  const c=document.createElement('canvas');c.width=c.height=S;const cx=c.getContext('2d');return{S,X,Y,Z,idx:Uint32Array.from(idx),c,cx,img:cx.createImageData(S,S)}}
+function gReal(){const Q=GT.g,S=Q.S,D=GT.day,N=GT.night,out=Q.img.data,R=Math.PI/180,lam=G.rot[0]*R,dl=G.rot[1]*R,cd=Math.cos(dl),sd=Math.sin(dl);
+  const sp=sunPos(),sl=sp[0]*R,sf=sp[1]*R,sx=Math.cos(sf)*Math.cos(sl),sy=Math.cos(sf)*Math.sin(sl),sz=Math.sin(sf);
+  const ls=sl+lam,scx=Math.cos(sf)*Math.cos(ls),scy=Math.cos(sf)*Math.sin(ls),scz=Math.sin(sf),A=scx*cd-scz*sd,C=scz*cd+scx*sd;let hx=scy,hy=C,hz=A+1;const hl=Math.hypot(hx,hy,hz);hx/=hl;hy/=hl;hz/=hl;
+  const{X,Y,Z,idx}=Q,P2=2*Math.PI;for(let q=0;q<idx.length;q++){const k=idx[q],a=Z[k],bb=X[k],c=Y[k],x=a*cd+c*sd,z=c*cd-a*sd,lat=Math.asin(z>1?1:z<-1?-1:z);let lon=Math.atan2(bb,x)-lam;lon=((lon+Math.PI)%P2+P2)%P2-Math.PI;
+    const u=(lon/Math.PI+1)/2,v=.5-lat/Math.PI,ti=((v*D.h|0)*D.w+(u*D.w|0))*4,ni=((v*N.h|0)*N.w+(u*N.w|0))*4,cl=Math.cos(lat),dot=cl*Math.cos(lon)*sx+cl*Math.sin(lon)*sy+Math.sin(lat)*sz;
+    let dk=(dot+.08)/.25;dk=dk<0?0:dk>1?1:dk;dk=dk*dk*(3-2*dk);const nk=1-dk,li=(.25+.85*(dot>0?dot:0))*1.08,limb=.35+.65*Math.pow(a,.6);
+    const r=Math.max(0,(D.d[ti]-18)*1.18),g=Math.max(0,(D.d[ti+1]-18)*1.18),b=Math.max(0,(D.d[ti+2]-14)*1.12);let spec=0;if(dk>0&&b>r+12&&b>g){const nh=bb*hx+c*hy+a*hz;if(nh>0)spec=Math.pow(nh,140)*90*dk}
+    const city=Math.max(0,(N.d[ni]+N.d[ni+1])/2-45)*2.4*nk,o=k*4;
+    out[o]=Math.min(255,(r*li*dk+r*.07*nk)*limb+spec+N.d[ni]*.3*nk+city);out[o+1]=Math.min(255,(g*li*dk+g*.08*nk)*limb+spec+N.d[ni+1]*.3*nk+city*.78);out[o+2]=Math.min(255,(b*li*dk+b*.14*nk)*limb+spec*.9+N.d[ni+2]*.45*nk+city*.42);out[o+3]=255}
+  Q.cx.putImageData(Q.img,0,0)}
 function gDraw(){const cv=$('#globe');if(!cv)return;const dpr=Math.min(2,devicePixelRatio||1),cw=cv.clientWidth;if(!cw)return;const W=Math.round(cw*dpr);if(cv.width!==W||cv.height!==W){cv.width=cv.height=W}
   const c=cv.getContext('2d'),R=W/2-2*dpr,cx=W/2;c.clearRect(0,0,W,W);
   if(!gData()){const g=c.createRadialGradient(cx*.75,cx*.65,R*.1,cx,cx,R);g.addColorStop(0,'#3a7bd5');g.addColorStop(1,'#071636');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R,0,7);c.fill();return}
+  if(!GT.busy)gTex();
+  if(GT.day&&GT.night){const R2=W/2*.88,S=Math.min(380,Math.round(R2*2/dpr*Math.min(dpr,1.5)));if(!GT.g||GT.g.S!==S)GT.g=gGeom(S);gReal();
+    const pr=d3.geoOrthographic().scale(R2).translate([cx,cx]).rotate(G.rot).clipAngle(90).precision(.6),path=d3.geoPath(pr,c),now=performance.now();
+    let g=c.createRadialGradient(cx,cx,R2*.995,cx,cx,R2*1.12);g.addColorStop(0,'rgba(120,180,255,.55)');g.addColorStop(.35,'rgba(90,150,255,.22)');g.addColorStop(1,'rgba(60,120,255,0)');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R2*1.13,0,Math.PI*2);c.arc(cx,cx,R2*.995,0,Math.PI*2,true);c.fill('evenodd');
+    c.save();c.beginPath();c.arc(cx,cx,R2,0,7);c.clip();c.imageSmoothingQuality='high';c.drawImage(GT.g.c,cx-R2,cx-R2,R2*2,R2*2);c.restore();
+    g=c.createRadialGradient(cx,cx,R2*.82,cx,cx,R2);g.addColorStop(0,'rgba(150,200,255,0)');g.addColorStop(1,'rgba(150,200,255,.10)');c.fillStyle=g;c.beginPath();c.arc(cx,cx,R2,0,7);c.fill();
+    c.beginPath();path(G.borders);c.strokeStyle='rgba(255,255,255,.13)';c.lineWidth=.6*dpr;c.stroke();
+    if(G.lit)for(const[f,t]of G.lit){const a=1-(now-t)/1400;if(a<=0){G.lit.delete(f);continue}c.save();c.globalAlpha=Math.min(1,a*1.1)*.7;c.shadowColor='#ffcf6a';c.shadowBlur=22*dpr*a;c.beginPath();path(f);c.fillStyle='#ffd36b';c.fill();c.globalAlpha=1;c.strokeStyle='#fff5d6';c.lineWidth=1.2*dpr;c.stroke();c.restore()}
+    if(G.sel){const pulse=.75+.25*Math.sin((now-G.t0)/320);c.save();c.shadowColor='#ffcf6a';c.shadowBlur=18*dpr*pulse;c.beginPath();path(G.sel);c.globalAlpha=.6;c.fillStyle='#ffc857';c.fill();c.restore();c.beginPath();path(G.sel);c.strokeStyle='#fff5d6';c.lineWidth=1.4*dpr;c.stroke()}
+    gPinDraw(c,pr,W,dpr);return}
   const pr=d3.geoOrthographic().scale(R).translate([cx,cx]).rotate(G.rot).clipAngle(90).precision(.6),path=d3.geoPath(pr,c);
   let g=c.createRadialGradient(cx*.72,cx*.62,R*.05,cx,cx,R);g.addColorStop(0,'#3d86d6');g.addColorStop(.55,'#164a95');g.addColorStop(1,'#061536');
   c.beginPath();path({type:'Sphere'});c.fillStyle=g;c.fill();
@@ -899,6 +923,8 @@ function gDraw(){const cv=$('#globe');if(!cv)return;const dpr=Math.min(2,deviceP
   g=c.createRadialGradient(cx*.7,cx*.55,0,cx*.7,cx*.55,R*.9);g.addColorStop(0,'rgba(255,255,255,.22)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.fill();
   if(G.sel){const pulse=.75+.25*Math.sin((performance.now()-G.t0)/320);c.save();c.shadowColor='#ffcf6a';c.shadowBlur=14*dpr*pulse;c.beginPath();path(G.sel);c.globalAlpha=.92;c.fillStyle='#ffc857';c.fill();c.restore();c.beginPath();path(G.sel);c.strokeStyle='#fff5d6';c.lineWidth=1.2*dpr;c.stroke()}
   c.beginPath();c.arc(cx,cx,R,0,7);c.strokeStyle='rgba(150,195,255,.5)';c.lineWidth=1.4*dpr;c.stroke();
+  gPinDraw(c,pr,W,dpr)}
+function gPinDraw(c,pr,W,dpr){
   if(G.pin&&d3.geoDistance(G.pin,[-G.rot[0],-G.rot[1]])<1.5){const[x,y]=pr(G.pin),t=((performance.now()-G.t0)%1600)/1600;
     c.beginPath();c.arc(x,y,(5+t*16)*dpr,0,7);c.strokeStyle=`rgba(255,107,74,${1-t})`;c.lineWidth=2*dpr;c.stroke();
     c.beginPath();c.arc(x,y,4.5*dpr,0,7);c.fillStyle='#ff6b4a';c.fill();c.lineWidth=1.5*dpr;c.strokeStyle='#fff';c.stroke();
@@ -924,8 +950,8 @@ function whooshStart(){const c=sfxCtx();if(!c||wh)return;try{const b=c.createBuf
 function whooshSet(sp){if(!wh)return;const t=actx.currentTime;wh.g.gain.setTargetAtTime(Math.min(.11,sp*.11),t,.06);wh.f.frequency.setTargetAtTime(240+sp*1500,t,.06)}
 function whooshStop(){if(!wh)return;const w=wh;wh=null;try{w.g.gain.setTargetAtTime(0,actx.currentTime,.07);setTimeout(()=>{try{w.src.stop()}catch{}},450)}catch{}}
 function gSpinTo(lat,lon,label,feat){return new Promise(res=>{G.sel=null;G.pin=null;G.label='';const from=[...G.rot];let to0=-lon;while(to0<from[0]+740)to0+=360;const to1=Math.max(-55,Math.min(55,-lat*.85)),dur=playful()?7500:0,t0=performance.now();G.spinning=true;let pk=0,pe=0,tickA=from[0];if(dur)whooshStart();
-  const step=t=>{const k=dur?Math.min(1,(t-t0)/dur):1,e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;G.rot=[from[0]+(to0-from[0])*e,from[1]+(to1-from[1])*e,0];if(!playful())gDraw();if(dur){const sp=k>pk?Math.min(1,((e-pe)/(k-pk))/3):0;pk=k;pe=e;whooshSet(sp);if(G.rot[0]-tickA>=15){tickA+=15*Math.floor((G.rot[0]-tickA)/15);sfxTick(.35+sp*.65)}}
-    if(k<1)requestAnimationFrame(step);else{whooshStop();if(dur)sfxChime();G.rot[0]=((G.rot[0]%360)+540)%360-180;G.spinning=false;G.sel=feat||null;G.pin=[lon,lat];G.label=label;G.t0=performance.now();gDraw();res()}};requestAnimationFrame(step)})}
+  const step=t=>{const k=dur?Math.max(0,Math.min(1,(t-t0)/dur)):1,e=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;G.rot=[from[0]+(to0-from[0])*e,from[1]+(to1-from[1])*e,0];if(dur&&G.feats&&GT.day){const nw=performance.now();if(nw>=(G.nextLit||0)&&k<.97){const ctr=[-G.rot[0],-G.rot[1]],vis=G.feats.filter(f=>f!==G.curLit&&d3.geoDistance(G.cen(f),ctr)<1.2);if(vis.length){let tw=vis.reduce((a,x)=>a+G.wt(x),0)*Math.random(),f=vis[0];for(const x of vis){tw-=G.wt(x);if(tw<=0){f=x;break}}G.curLit=f;G.lit=new Map([[f,nw]])}G.nextLit=nw+120+Math.pow(k,2.2)*650}}if(!playful())gDraw();if(dur){const sp=k>pk?Math.min(1,((e-pe)/(k-pk))/3):0;pk=k;pe=e;whooshSet(sp);if(G.rot[0]-tickA>=15){tickA+=15*Math.floor((G.rot[0]-tickA)/15);sfxTick(.35+sp*.65)}}
+    if(k<1)requestAnimationFrame(step);else{whooshStop();G.lit=null;G.curLit=null;G.nextLit=0;if(dur)sfxChime();G.rot[0]=((G.rot[0]%360)+540)%360-180;G.spinning=false;G.sel=feat||null;G.pin=[lon,lat];G.label=label;G.t0=performance.now();gDraw();res()}};requestAnimationFrame(step)})}
 async function globeSpin(){if(globeBusy)return;globeBusy=true;const out=$('#gres');gData();
   const per=PERS.find(p=>p[0]===S.gper)||PERS[0];
   if(out)out.innerHTML=`<div class="gwhere"><span class="gflag">🌍</span><div><b>Spinning…</b><span>Finding somewhere it’s ${per[0]==='any'?'anywhere':per[1].toLowerCase()} right now</span></div></div>`;
