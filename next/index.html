@@ -870,7 +870,7 @@ let sleepAt=0,sleepFade=false;setInterval(()=>{if(!sleepAt)return;const left=sle
 /* ---------- views ---------- */
 const TABS=[['home','home'],['dial','dial'],['sport','ball'],['search','search'],['library','lib']];
 let view='home',renderTok=0;const VIEWS={};
-$('#tabs').innerHTML=TABS.map(([t,i])=>`<button data-tab="${t}" aria-label="${t}">${ic(i)}</button>`).join('');
+$('#tabs').innerHTML=TABS.map(([t,i])=>`<button data-tab="${t}" aria-label="${({home:'Home',dial:'Radio dial',library:'Favourites and library',search:'Search',sport:'Sport',globe:'Globe'})[t]||t}">${ic(i)}</button>`).join('');
 function go(v){view=v;$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===v));window.scrollTo(0,0);render()}
 function render(){const tok=++renderTok;document.body.dataset.view=view;VIEWS[view]($('#view'),tok)}
 const sec=(t,body,sub='',n='')=>`<section class="sec"><div class="sh"><h2>${n?`<i>${n}</i>`:''}${t}</h2>${sub?`<p>${sub}</p>`:''}</div>${body}</section>`;
@@ -1069,8 +1069,8 @@ const homeOrder=()=>{const hid=LS.get('homeHide',[]);return homeAll().filter(id=
 function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
   sheet(`<h3>Customise Home</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Move sections up or down, and switch off the ones you don’t use.</p>
   <div class="hcl">${ord.map((id,i)=>{const h=HSEC.find(x=>x[0]===id),on=!hid.includes(id);return`<div class="hcr${on?'':' off'}" style="--a:${h[4]};--b:${h[5]}"><span class="hcn">${String(i+1).padStart(2,'0')}</span><span class="hce">${h[2]}</span><div class="hct"><b>${esc(h[1])}</b><small>${on?esc(h[3]):'Hidden'}</small></div>
-    <div class="hcm"><button class="hcb" data-hu="${i}" ${i?'':'disabled'} aria-label="Move up">↑</button><button class="hcb" data-hd="${i}" ${i<ord.length-1?'':'disabled'} aria-label="Move down">↓</button></div>
-    <label class="hsw"><input type="checkbox" data-ht="${id}" ${on?'checked':''}><i></i></label></div>`}).join('')}</div>
+    <div class="hcm"><button class="hcb" data-hu="${i}" ${i?'':'disabled'} aria-label="Move ${esc(h[1])} up">↑</button><button class="hcb" data-hd="${i}" ${i<ord.length-1?'':'disabled'} aria-label="Move ${esc(h[1])} down">↓</button></div>
+    <label class="hsw"><input type="checkbox" aria-label="Show ${esc(h[1])} on Home" data-ht="${id}" ${on?'checked':''}><i></i></label></div>`}).join('')}</div>
   <div class="btnrow" style="margin-top:14px"><button class="pill" id="hcreset">Reset to default</button><button class="pill" id="hcdone">Done</button></div>`);
   const save=(o,h)=>{LS.set('homeOrder',o);LS.set('homeHide',h);if(view==='home')render();homeCustom()};
   $$('[data-hu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.hu,o=[...ord];[o[i-1],o[i]]=[o[i],o[i-1]];save(o,hid)});
@@ -1124,7 +1124,7 @@ VIEWS.dial=async(el,tok)=>{window.dialSpin=null;el.innerHTML=`<div class="hero">
   const knob=$('#knob'),turn=()=>{if(knob)knob.style.transform=`rotate(${d.scrollLeft*.75}deg)`};
   const at=()=>Math.max(0,Math.min(N*2-2,Math.round(d.scrollLeft/60)));
   const show=(j,live)=>{const i=j/2,onSt=Number.isInteger(i),st=onSt?dialList[i]:null;$('#freq').innerHTML=`${(88+(j/2)*(20/Math.max(1,N-1))).toFixed(1)}<small>MHz</small>`;
-    $('#dialcard').classList.toggle('lock',!!st);$('#dialcard').innerHTML=st?`${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc([st.c,...st.tags.slice(0,2)].filter(Boolean).join(' · '))}</span></div><button class="ib st${isFav(st)?' on':''}" data-dfav="${i}">${isFav(st)?icf('star'):ic('star')}</button>`:'<div class="dim">· · · static · · ·</div>';
+    $('#dialcard').classList.toggle('lock',!!st);$('#dialcard').innerHTML=st?`${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc([st.c,...st.tags.slice(0,2)].filter(Boolean).join(' · '))}</span></div><button class="ib st${isFav(st)?' on':''}" data-dfav="${i}" aria-label="${isFav(st)?'Remove '+esc(st.n)+' from favourites':'Add '+esc(st.n)+' to favourites'}">${isFav(st)?icf('star'):ic('star')}</button>`:'<div class="dim">· · · static · · ·</div>';
     if(onSt&&live&&i!==lastI){lastI=i;play(st,{list:dialList,name:'The dial · '+dialTag})}
     if(!onSt&&live&&S.staticfx&&playing){/* passing between stations */}};
   const startI=Math.max(0,dialList.findIndex(s=>s.u===cur?.u));d.scrollLeft=startI*2*60;lastI=cur&&dialList[startI]?.u===cur.u?startI:-1;show(startI*2,false);
@@ -1742,7 +1742,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <div class="dbox"><div class="drow"><div><b>Text size</b><span>Makes everything bigger and easier to read</span></div><select class="sel" id="a_ts" style="width:auto">${[['n','Normal'],['l','Large'],['xl','Extra large']].map(([v,l])=>`<option value="${v}" ${(A11Y().ts||'n')===v?'selected':''}>${l}</option>`).join('')}</select></div>
   ${[['hc','High contrast','Brighter text and clearer outlines'],['big','Bigger buttons','Easier to tap'],['plain','Plain font','Swaps the fancy headings for simple, easy-to-read letters'],['rm','Reduce motion','Stops animations, sparkles and spinning'],['sr','Announce songs','Screen readers (like TalkBack) read out each new song']].map(([k,t,d])=>`<div class="drow"><div><b>${t}</b><span>${d}</span></div><label class="hsw" style="--a:#86b4ff;--b:#5b7fe0"><input type="checkbox" class="a11y" data-k="${k}" ${A11Y()[k]?'checked':''} aria-label="${t}"><i></i></label></div>`).join('')}</div>
   <label class="mono" style="display:block;margin:16px 0 6px">Data</label>
-  <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
+  <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" aria-label="Data saver on mobile data" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
   ${dataUse()}</div>
   ${NAT&&NAT.peek?`<label class="mono" style="display:block;margin:16px 0 6px">Song titles in station lists</label><select class="sel" id="s_np">${[['wifi','On Wi-Fi only'],['always','Always (uses a little mobile data)'],['off','Off']].map(([v,l])=>`<option value="${v}" ${npMode()===v?'selected':''}>${l}</option>`).join('')}</select><p class="dim" style="font-size:12px;margin:6px 0 0">Shows what’s playing on your presets and favourites, and on any list when you tap “What’s on?”. Not every station sends song titles.</p>`:''}
   <label class="mono" style="display:block;margin:16px 0 6px">Late-night dim</label><select class="sel" id="s_ld">${[['auto','At night (8pm – 5am)'],['on','Always'],['off','Off']].map(([v,l])=>`<option value="${v}" ${S.ldim===v?'selected':''}>${l}</option>`).join('')}</select>
@@ -2364,6 +2364,11 @@ function afRun(force){if(document.getElementById('afx'))return;if(!force&&!afCan
     setTimeout(()=>{bar.style.opacity='0';setTimeout(()=>bar.remove(),400)},6000)};
   bar.querySelector('button').onclick=back;T(back,62000)}
 setTimeout(()=>{afCheck();setInterval(afCheck,5000)},6000);
+
+/* Screen readers: tell TalkBack which chips/tabs are selected (they're shown with the "on" class). */
+(()=>{let q=0;const sync=()=>{q=0;document.querySelectorAll('.chip,.fxsp button,.fxtabs button,[data-ald],[data-gper],[data-vc],[data-xc],[data-dtag],.schip').forEach(b=>{const on=b.classList.contains('on');if(b.getAttribute('aria-pressed')!==String(on))b.setAttribute('aria-pressed',on)});
+  document.querySelectorAll('#tabs button').forEach(b=>{const on=b.classList.contains('on');if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})};
+  new MutationObserver(()=>{if(!q)q=requestAnimationFrame(sync)}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});sync()})();
 </script>
 </body>
 </html>
