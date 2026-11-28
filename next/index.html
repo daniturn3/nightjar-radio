@@ -1540,6 +1540,10 @@ function faq(){sheet(`<button class="pill" id="faqback" style="margin:4px 0 10px
   $('#faqback').onclick=()=>settings();$('#faqbug').onclick=e=>{e.preventDefault();fbSheet()};
   $$('#sheet details.faq').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)$$('#sheet details.faq').forEach(x=>{if(x!==d)x.open=false})}))}
 
+/* Presets saved/removed with the preset button in Android Auto while the app was closed. */
+function pullCarPresets(){try{if(!NAT||!NAT.presetEdits)return;const e=JSON.parse(NAT.presetEdits()||'[]');if(!e.length)return;let n=0;
+  e.forEach(x=>{if(x.i<0||x.i>5)return;if(x.op==='set'&&x.st&&x.st.u){S.presets[x.i]={tags:[],...x.st};n++}else if(x.op==='clear'){S.presets[x.i]=null;n++}});
+  if(n){save('presets');if(view==='home'||view==='dial')render();try{renderAll()}catch{}}}catch{}}
 /* Favourites added/removed with the 👍 button in Android Auto (or the notification) while the app was closed. */
 function pullCarFavs(){try{if(!NAT||!NAT.favEdits)return;const e=JSON.parse(NAT.favEdits()||'[]');if(!e.length)return;let n=0;
   e.forEach(x=>{if(x.op==='add'&&x.st&&x.st.u&&!S.favs.some(f=>f.u===x.st.u)){S.favs.unshift({tags:[],...x.st});n++}else if(x.op==='del'){const i=S.favs.findIndex(f=>f.u===x.u);if(i>=0){S.favs.splice(i,1);n++}}});
@@ -1723,7 +1727,7 @@ function pullPlays(){try{if(!NAT||!NAT.plays)return;const a=JSON.parse(NAT.plays
   S.log.sort((x,y)=>x.t-y.t);if(S.log.length>4000)S.log=S.log.slice(-4000);save('log');if(rec){save('recent');if(view==='library'||view==='home')render()}}catch{}}
 setTimeout(pullPlays,1700);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullPlays()});
 if(LS.get('country',null)==null&&S.country)save('country');
-setTimeout(pullCarFavs,1500);setTimeout(()=>{try{betaBadge()}catch{}},300);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pullCarFavs()});setInterval(()=>{if(!document.hidden)pullCarFavs()},8000);
+setTimeout(pullCarFavs,1500);setTimeout(()=>{try{betaBadge()}catch{}},300);document.addEventListener('visibilitychange',()=>{if(!document.hidden){pullCarFavs();pullCarPresets()}});setInterval(()=>{if(!document.hidden){pullCarFavs();pullCarPresets()}},8000);
 /* ---------- sheet ---------- */
 let sheetOpen=false;function sheet(h){$('#sheet').innerHTML=h;$('#sheet').classList.add('on');$('#sheetbg').classList.add('on');if(!sheetOpen){sheetOpen=true;history.pushState({sh:1},'')}}
 function closeSheet(pop){if(!sheetOpen)return;sheetOpen=false;$('#sheet').classList.remove('on');$('#sheetbg').classList.remove('on');if(!pop){skipPop++;history.back()}}
