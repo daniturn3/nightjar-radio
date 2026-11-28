@@ -1734,13 +1734,11 @@ function presetMenu(i){const p=S.presets[i];sheet(`<h3>Preset ${i+1}</h3><p clas
   $$('[data-pm]').forEach(b=>b.onclick=()=>{if(b.dataset.pm==='set'){S.presets[i]={...cur};toast(`Saved to preset ${i+1}`)}else{S.presets[i]=null;toast('Preset cleared')}save('presets');closeSheet();renderAll()})}
 function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/864e5):null;
   sheet(`<h3>Settings</h3>
+  <button class="mi" id="s_a11y" style="margin:0 0 6px">♿ <span style="flex:1;text-align:left">Accessibility <span class="dim" style="font-size:12px;display:block">Text size, contrast, bigger buttons, less motion</span></span><span class="dim">›</span></button>
   <label class="mono" style="display:block;margin:6px 0">Home country</label><select class="sel" id="s_cc">${(COUNTRIES.some(c=>c[0]===S.country)?COUNTRIES:[[S.country,cName(S.country)],...COUNTRIES]).map(([c,n])=>`<option value="${c}" ${c===S.country?'selected':''}>${flag(c)} ${n}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Seasonal themes</label><select class="sel" id="s_th"><option value="auto" ${S.theme==='auto'?'selected':''}>Automatic — UK calendar</option><option value="off" ${S.theme==='off'?'selected':''}>Off</option>${Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${S.theme===k?'selected':''}>Preview: ${t.name}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Your birthday (optional)</label><div style="display:flex;gap:8px;align-items:center"><input type="date" class="sel" id="s_bday" style="flex:1;color-scheme:dark" value="${S.bday?'2000-'+S.bday:''}">${S.bday?'<button class="pill" id="s_bdx">Clear</button>':''}</div><p class="dim" style="font-size:12px;margin:6px 0 0">Get a little celebration on the day. Only the day and month are kept, on this phone.</p>
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
-  <label class="mono" style="display:block;margin:16px 0 6px">Accessibility</label>
-  <div class="dbox"><div class="drow"><div><b>Text size</b><span>Makes everything bigger and easier to read</span></div><select class="sel" id="a_ts" style="width:auto">${[['n','Normal'],['l','Large'],['xl','Extra large']].map(([v,l])=>`<option value="${v}" ${(A11Y().ts||'n')===v?'selected':''}>${l}</option>`).join('')}</select></div>
-  ${[['hc','High contrast','Brighter text and clearer outlines'],['big','Bigger buttons','Easier to tap'],['plain','Plain font','Swaps the fancy headings for simple, easy-to-read letters'],['rm','Reduce motion','Stops animations, sparkles and spinning'],['sr','Announce songs','Screen readers (like TalkBack) read out each new song']].map(([k,t,d])=>`<div class="drow"><div><b>${t}</b><span>${d}</span></div><label class="hsw" style="--a:#86b4ff;--b:#5b7fe0"><input type="checkbox" class="a11y" data-k="${k}" ${A11Y()[k]?'checked':''} aria-label="${t}"><i></i></label></div>`).join('')}</div>
   <label class="mono" style="display:block;margin:16px 0 6px">Data</label>
   <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" aria-label="Data saver on mobile data" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
   ${dataUse()}</div>
@@ -1765,9 +1763,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $$('[data-lpage]').forEach(l=>l.onclick=e=>{e.preventDefault();const u=ROOT+l.dataset.lpage;if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')});
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
-  const a11ySet=(k,v)=>{const a={...A11Y(),[k]:v};LS.set('a11y',a);const c=document.documentElement.classList;c.toggle('a-l',a.ts==='l');c.toggle('a-xl',a.ts==='xl');['hc','rm','big','plain'].forEach(x=>c.toggle('a-'+x,!!a[x]));document.body.classList.toggle('calm',!playful())};
-  $('#a_ts').onchange=e=>a11ySet('ts',e.target.value);
-  $$('.a11y').forEach(x=>x.onchange=e=>a11ySet(x.dataset.k,e.target.checked));
+  $('#s_a11y').onclick=()=>a11ySheet();
   if($('#s_cu'))$('#s_cu').onchange=e=>{NAT.setCushion(e.target.value);toast(e.target.value==='normal'?'Normal start':'Saved: it applies next time the radio starts')};
   if($('#s_hp'))$('#s_hp').onchange=e=>{NAT.setHeadphones(e.target.value);toast(e.target.value==='off'?'Headphones won’t start the radio':'Saved: try unplugging and plugging your headphones back in')};
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
@@ -2369,6 +2365,19 @@ setTimeout(()=>{afCheck();setInterval(afCheck,5000)},6000);
 (()=>{let q=0;const sync=()=>{q=0;document.querySelectorAll('.chip,.fxsp button,.fxtabs button,[data-ald],[data-gper],[data-vc],[data-xc],[data-dtag],.schip').forEach(b=>{const on=b.classList.contains('on');if(b.getAttribute('aria-pressed')!==String(on))b.setAttribute('aria-pressed',on)});
   document.querySelectorAll('#tabs button').forEach(b=>{const on=b.classList.contains('on');if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})};
   new MutationObserver(()=>{if(!q)q=requestAnimationFrame(sync)}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});sync()})();
+
+/* Accessibility menu (Settings → Accessibility): text size, contrast, bigger buttons, plain font, less motion, song announcements. */
+function a11ySet(k,v){const a={...A11Y(),[k]:v};LS.set('a11y',a);const c=document.documentElement.classList;c.toggle('a-l',a.ts==='l');c.toggle('a-xl',a.ts==='xl');['hc','rm','big','plain'].forEach(x=>c.toggle('a-'+x,!!a[x]));document.body.classList.toggle('calm',!playful())}
+function a11ySheet(){const A=A11Y();
+  sheet(`<h3>♿ Accessibility</h3><p class="dim" style="font-size:14px;margin:0 0 14px">Make Nightjar Radio easier to see, read and use. Changes happen straight away.</p>
+  <label class="mono" style="display:block;margin:0 0 6px">Text size</label>
+  <div class="btnrow" role="group" aria-label="Text size" style="margin:0 0 14px">${[['n','Normal','15px'],['l','Large','17px'],['xl','Extra large','19px']].map(([v,l,f])=>`<button class="pill${(A.ts||'n')===v?' on':''}" data-ats="${v}" aria-pressed="${(A.ts||'n')===v}" style="font-size:${f};${(A.ts||'n')===v?'background:var(--acc);color:#1a1210':''}">${l}</button>`).join('')}</div>
+  <div class="dbox">${[['hc','High contrast','Brighter text and clearer outlines'],['big','Bigger buttons','Easier to tap'],['plain','Plain font','Swaps the fancy headings for simple, easy-to-read letters'],['rm','Reduce motion','Stops animations, sparkles, snow and spinning'],['sr','Announce songs','Screen readers like TalkBack read out each new song']].map(([k,t,d])=>`<div class="drow"><div><b>${t}</b><span>${d}</span></div><label class="hsw" style="--a:#86b4ff;--b:#5b7fe0"><input type="checkbox" class="a11y" data-k="${k}" ${A[k]?'checked':''} aria-label="${t}"><i></i></label></div>`).join('')}</div>
+  <p class="dim" style="font-size:12px;margin:12px 0 0">Your phone’s own settings (font size, TalkBack, remove animations) work with Nightjar Radio too.</p>
+  <div class="btnrow" style="margin-top:14px"><button class="pill" id="a_back">‹ Settings</button><button class="pill" id="a_done" style="background:var(--acc);color:#1a1210">Done</button></div>`);
+  $$('[data-ats]').forEach(b=>b.onclick=()=>{a11ySet('ts',b.dataset.ats);a11ySheet()});
+  $$('.a11y').forEach(x=>x.onchange=()=>a11ySet(x.dataset.k,x.checked));
+  $('#a_back').onclick=()=>settings();$('#a_done').onclick=()=>closeSheet()}
 </script>
 </body>
 </html>

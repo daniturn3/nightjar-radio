@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* Accessibility settings, applied before anything draws */try{const a=JSON.parse(localStorage.getItem('njr_a11y')||'{}'),c=document.documentElement.classList;if(a.ts==='l')c.add('a-l');if(a.ts==='xl')c.add('a-xl');if(a.hc)c.add('a-hc');if(a.rm)c.add('a-rm');if(a.big)c.add('a-big');if(a.plain)c.add('a-plain')}catch(e){}</script>
+
 <meta charset="utf-8">
 <base href="/nightjar-radio/">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src * data: blob:; media-src * data: blob:; connect-src *; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
@@ -632,6 +634,15 @@ html.ios #sheet{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
   #app{max-width:1900px}
   #mini{left:max(132px,calc((100vw - 1900px) / 2 + 132px));right:max(44px,calc((100vw - 1900px) / 2 + 44px));max-width:1700px}
 }
+
+/* Accessibility (Settings → Accessibility) */
+html.a-l body{zoom:1.12}html.a-xl body{zoom:1.25}
+html.a-hc{--mut:#dcdfea;--dim:#b9bdcc;--line:rgba(234,242,255,.32)}html.a-hc .card,html.a-hc .sec,html.a-hc .sheet,html.a-hc .pill,html.a-hc .chip{border-color:rgba(234,242,255,.35)!important}
+html.a-hc a{text-decoration:underline}
+html.a-rm *,html.a-rm *::before,html.a-rm *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important;scroll-behavior:auto!important}
+html.a-big button,html.a-big .pill,html.a-big .mi,html.a-big select,html.a-big .chip{min-height:48px}html.a-big .pill,html.a-big .chip{padding-left:16px;padding-right:16px}
+html.a-plain{--serif:'Space Grotesk',system-ui,sans-serif}
+.srlive{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -788,7 +799,7 @@ function tidySong(s){s=unent(String(s||'')).trim();if(!s||!/\b[A-Za-z_]+="/.test
 try{const h=LS.get('songs',[]);if(h.some(x=>/\b[A-Za-z_]+="/.test(x.s||'')))LS.set('songs',h.map(x=>({...x,s:tidySong(x.s)})).filter(x=>x.s))}catch{}
 function unent(s){if(!s||s.indexOf('&')<0)return s;const N={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',mdash:'—',ndash:'–',hellip:'…',rsquo:'’',lsquo:'‘',rdquo:'”',ldquo:'“'};
   return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(m,c)=>c[0]==='#'?(()=>{const n=c[1]==='x'||c[1]==='X'?parseInt(c.slice(2),16):+c.slice(1);try{return n>0&&n<0x110000?String.fromCodePoint(n):m}catch{return m}})():(N[c.toLowerCase()]??m))}
-function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
+function showSong(){logSong();renderMini();if(A11Y().sr&&song){let l=document.getElementById('srlive');if(!l){l=document.createElement('div');l.id='srlive';l.className='srlive';l.setAttribute('aria-live','polite');document.body.appendChild(l)}l.textContent='Now playing: '+song+(cur?' on '+cur.n:'')}const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
 au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
@@ -818,7 +829,7 @@ let sleepAt=0,sleepFade=false;setInterval(()=>{if(!sleepAt)return;const left=sle
 /* ---------- views ---------- */
 const TABS=[['home','home'],['dial','dial'],['sport','ball'],['search','search'],['library','lib']];
 let view='home',renderTok=0;const VIEWS={};
-$('#tabs').innerHTML=TABS.map(([t,i])=>`<button data-tab="${t}" aria-label="${t}">${ic(i)}</button>`).join('');
+$('#tabs').innerHTML=TABS.map(([t,i])=>`<button data-tab="${t}" aria-label="${({home:'Home',dial:'Radio dial',library:'Favourites and library',search:'Search',sport:'Sport',globe:'Globe'})[t]||t}">${ic(i)}</button>`).join('');
 function go(v){view=v;$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===v));window.scrollTo(0,0);render()}
 function render(){document.body.dataset.view=view;const tok=++renderTok;VIEWS[view]($('#view'),tok)}
 const sec=(t,body,sub='',n='')=>`<section class="sec"><div class="sh"><h2>${n?`<i>${n}</i>`:''}${t}</h2>${sub?`<p>${sub}</p>`:''}</div>${body}</section>`;
@@ -989,8 +1000,8 @@ const homeOrder=()=>{const hid=LS.get('homeHide',[]);return homeAll().filter(id=
 function homeCustom(){const ord=homeAll(),hid=LS.get('homeHide',[]);
   sheet(`<h3>Customise Home</h3><p class="dim" style="font-size:13px;margin:0 0 12px">Move sections up or down, and switch off the ones you don’t use.</p>
   <div class="hcl">${ord.map((id,i)=>{const h=HSEC.find(x=>x[0]===id),on=!hid.includes(id);return`<div class="hcr${on?'':' off'}" style="--a:${h[4]};--b:${h[5]}"><span class="hcn">${String(i+1).padStart(2,'0')}</span><span class="hce">${h[2]}</span><div class="hct"><b>${esc(h[1])}</b><small>${on?esc(h[3]):'Hidden'}</small></div>
-    <div class="hcm"><button class="hcb" data-hu="${i}" ${i?'':'disabled'} aria-label="Move up">↑</button><button class="hcb" data-hd="${i}" ${i<ord.length-1?'':'disabled'} aria-label="Move down">↓</button></div>
-    <label class="hsw"><input type="checkbox" data-ht="${id}" ${on?'checked':''}><i></i></label></div>`}).join('')}</div>
+    <div class="hcm"><button class="hcb" data-hu="${i}" ${i?'':'disabled'} aria-label="Move ${esc(h[1])} up">↑</button><button class="hcb" data-hd="${i}" ${i<ord.length-1?'':'disabled'} aria-label="Move ${esc(h[1])} down">↓</button></div>
+    <label class="hsw"><input type="checkbox" aria-label="Show ${esc(h[1])} on Home" data-ht="${id}" ${on?'checked':''}><i></i></label></div>`}).join('')}</div>
   <div class="btnrow" style="margin-top:14px"><button class="pill" id="hcreset">Reset to default</button><button class="pill" id="hcdone">Done</button></div>`);
   const save=(o,h)=>{LS.set('homeOrder',o);LS.set('homeHide',h);if(view==='home')render();homeCustom()};
   $$('[data-hu]').forEach(b=>b.onclick=()=>{const i=+b.dataset.hu,o=[...ord];[o[i-1],o[i]]=[o[i],o[i-1]];save(o,hid)});
@@ -1044,7 +1055,7 @@ VIEWS.dial=async(el,tok)=>{window.dialSpin=null;el.innerHTML=`<div class="hero">
   const knob=$('#knob'),turn=()=>{if(knob)knob.style.transform=`rotate(${d.scrollLeft*.75}deg)`};
   const at=()=>Math.max(0,Math.min(N*2-2,Math.round(d.scrollLeft/60)));
   const show=(j,live)=>{const i=j/2,onSt=Number.isInteger(i),st=onSt?dialList[i]:null;$('#freq').innerHTML=`${(88+(j/2)*(20/Math.max(1,N-1))).toFixed(1)}<small>MHz</small>`;
-    $('#dialcard').classList.toggle('lock',!!st);$('#dialcard').innerHTML=st?`${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc([st.c,...st.tags.slice(0,2)].filter(Boolean).join(' · '))}</span></div><button class="ib st${isFav(st)?' on':''}" data-dfav="${i}">${isFav(st)?icf('star'):ic('star')}</button>`:'<div class="dim">· · · static · · ·</div>';
+    $('#dialcard').classList.toggle('lock',!!st);$('#dialcard').innerHTML=st?`${lgo(st)}<div style="min-width:0;flex:1"><b>${esc(st.n)}</b><span>${flag(st.cc)} ${esc([st.c,...st.tags.slice(0,2)].filter(Boolean).join(' · '))}</span></div><button class="ib st${isFav(st)?' on':''}" data-dfav="${i}" aria-label="${isFav(st)?'Remove '+esc(st.n)+' from favourites':'Add '+esc(st.n)+' to favourites'}">${isFav(st)?icf('star'):ic('star')}</button>`:'<div class="dim">· · · static · · ·</div>';
     if(onSt&&live&&i!==lastI){lastI=i;play(st,{list:dialList,name:'The dial · '+dialTag})}
     if(!onSt&&live&&S.staticfx&&playing){/* passing between stations */}};
   const startI=Math.max(0,dialList.findIndex(s=>s.u===cur?.u));d.scrollLeft=startI*2*60;lastI=cur&&dialList[startI]?.u===cur.u?startI:-1;show(startI*2,false);
@@ -1416,12 +1427,13 @@ function presetMenu(i){const p=S.presets[i];sheet(`<h3>Preset ${i+1}</h3><p clas
   $$('[data-pm]').forEach(b=>b.onclick=()=>{if(b.dataset.pm==='set'){S.presets[i]={...cur};toast(`Saved to preset ${i+1}`)}else{S.presets[i]=null;toast('Preset cleared')}save('presets');closeSheet();renderAll()})}
 function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/864e5):null;
   sheet(`<h3>Settings</h3>
+  <button class="mi" id="s_a11y" style="margin:0 0 6px">♿ <span style="flex:1;text-align:left">Accessibility <span class="dim" style="font-size:12px;display:block">Text size, contrast, bigger buttons, less motion</span></span><span class="dim">›</span></button>
   <label class="mono" style="display:block;margin:6px 0">Home country</label><select class="sel" id="s_cc">${(COUNTRIES.some(c=>c[0]===S.country)?COUNTRIES:[[S.country,cName(S.country)],...COUNTRIES]).map(([c,n])=>`<option value="${c}" ${c===S.country?'selected':''}>${flag(c)} ${n}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Seasonal themes</label><select class="sel" id="s_th"><option value="auto" ${S.theme==='auto'?'selected':''}>Automatic — UK calendar</option><option value="off" ${S.theme==='off'?'selected':''}>Off</option>${Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${S.theme===k?'selected':''}>Preview: ${t.name}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Your birthday (optional)</label><div style="display:flex;gap:8px;align-items:center"><input type="date" class="sel" id="s_bday" style="flex:1;color-scheme:dark" value="${S.bday?'2000-'+S.bday:''}">${S.bday?'<button class="pill" id="s_bdx">Clear</button>':''}</div><p class="dim" style="font-size:12px;margin:6px 0 0">Get a little celebration on the day. Only the day and month are kept, on this phone.</p>
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Data</label>
-  <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
+  <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" aria-label="Data saver on mobile data" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
   ${dataUse()}</div>
   ${NAT&&NAT.peek?`<label class="mono" style="display:block;margin:16px 0 6px">Song titles in station lists</label><select class="sel" id="s_np">${[['wifi','On Wi-Fi only'],['always','Always (uses a little mobile data)'],['off','Off']].map(([v,l])=>`<option value="${v}" ${npMode()===v?'selected':''}>${l}</option>`).join('')}</select><p class="dim" style="font-size:12px;margin:6px 0 0">Shows what’s playing on your presets and favourites, and on any list when you tap “What’s on?”. Not every station sends song titles.</p>`:''}
   <label class="mono" style="display:block;margin:16px 0 6px">Late-night dim</label><select class="sel" id="s_ld">${[['auto','At night (8pm – 5am)'],['on','Always'],['off','Off']].map(([v,l])=>`<option value="${v}" ${S.ldim===v?'selected':''}>${l}</option>`).join('')}</select>
@@ -1440,6 +1452,7 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $('#s_priv').onclick=e=>{e.preventDefault();const u=ROOT+'privacy/';if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')};
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
+  $('#s_a11y').onclick=()=>a11ySheet();
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
   $('#s_nl').onchange=e=>{S.nightlight=e.target.checked;save('nightlight');poke()};
   $('#s_pl').onchange=e=>{S.playful=e.target.checked;save('playful');document.body.classList.toggle('calm',!playful())};
@@ -1478,7 +1491,7 @@ setInterval(nlTick,60000);
 $('#nl').addEventListener('click',()=>{const t=Date.now();if(t-nlTap<450)return nlExit();nlTap=t;$('#nl').classList.add('hint');setTimeout(()=>$('#nl').classList.remove('hint'),1500)});
 
 /* ---------- dim, playful ---------- */
-const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;const playful=()=>S.playful===true||(S.playful!==false&&!RM);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;const A11Y=()=>LS.get('a11y',{});const playful=()=>!A11Y().rm&&(S.playful===true||(S.playful!==false&&!RM));
 function applyDim(){const h=new Date().getHours(),on=S.ldim==='on'||(S.ldim==='auto'&&(h>=20||h<5));document.body.classList.toggle('ldim',on)}
 /* ---------- seasonal themes (UK calendar) ---------- */
 function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
@@ -1946,6 +1959,23 @@ async function refreshSaved(force){try{if(!force&&Date.now()-(LS.get('urlChk',0)
     if(f.url!==x.url){y.url=f.url;c=true}if(f.fav&&f.fav!==x.fav){y.fav=f.fav;c=true}['br','cd','hls'].forEach(q=>{if(f[q]!=null&&f[q]!==x[q]){y[q]=f[q];c=true}});if(c)ch.add(k);return c?y:x})});
   if(ch.size){save(...ch);typeof logErr=='function'&&logErr('saved stations refreshed: '+[...ch].join(','))}}catch{}}
 setTimeout(()=>refreshSaved(),9000);
+
+/* Accessibility menu (Settings → Accessibility): text size, contrast, bigger buttons, plain font, less motion, song announcements. */
+function a11ySet(k,v){const a={...A11Y(),[k]:v};LS.set('a11y',a);const c=document.documentElement.classList;c.toggle('a-l',a.ts==='l');c.toggle('a-xl',a.ts==='xl');['hc','rm','big','plain'].forEach(x=>c.toggle('a-'+x,!!a[x]));document.body.classList.toggle('calm',!playful())}
+function a11ySheet(){const A=A11Y();
+  sheet(`<h3>♿ Accessibility</h3><p class="dim" style="font-size:14px;margin:0 0 14px">Make Nightjar Radio easier to see, read and use. Changes happen straight away.</p>
+  <label class="mono" style="display:block;margin:0 0 6px">Text size</label>
+  <div class="btnrow" role="group" aria-label="Text size" style="margin:0 0 14px">${[['n','Normal','15px'],['l','Large','17px'],['xl','Extra large','19px']].map(([v,l,f])=>`<button class="pill${(A.ts||'n')===v?' on':''}" data-ats="${v}" aria-pressed="${(A.ts||'n')===v}" style="font-size:${f};${(A.ts||'n')===v?'background:var(--acc);color:#1a1210':''}">${l}</button>`).join('')}</div>
+  <div class="dbox">${[['hc','High contrast','Brighter text and clearer outlines'],['big','Bigger buttons','Easier to tap'],['plain','Plain font','Swaps the fancy headings for simple, easy-to-read letters'],['rm','Reduce motion','Stops animations, sparkles, snow and spinning'],['sr','Announce songs','Screen readers like TalkBack read out each new song']].map(([k,t,d])=>`<div class="drow"><div><b>${t}</b><span>${d}</span></div><label class="hsw" style="--a:#86b4ff;--b:#5b7fe0"><input type="checkbox" class="a11y" data-k="${k}" ${A[k]?'checked':''} aria-label="${t}"><i></i></label></div>`).join('')}</div>
+  <p class="dim" style="font-size:12px;margin:12px 0 0">Your phone’s own settings (font size, TalkBack, remove animations) work with Nightjar Radio too.</p>
+  <div class="btnrow" style="margin-top:14px"><button class="pill" id="a_back">‹ Settings</button><button class="pill" id="a_done" style="background:var(--acc);color:#1a1210">Done</button></div>`);
+  $$('[data-ats]').forEach(b=>b.onclick=()=>{a11ySet('ts',b.dataset.ats);a11ySheet()});
+  $$('.a11y').forEach(x=>x.onchange=()=>a11ySet(x.dataset.k,x.checked));
+  $('#a_back').onclick=()=>settings();$('#a_done').onclick=()=>closeSheet()}
+/* Screen readers: tell TalkBack which chips/tabs are selected (they're shown with the "on" class). */
+(()=>{let q=0;const sync=()=>{q=0;document.querySelectorAll('.chip,.fxsp button,.fxtabs button,[data-ald],[data-gper],[data-vc],[data-xc],[data-dtag],.schip').forEach(b=>{const on=b.classList.contains('on');if(b.getAttribute('aria-pressed')!==String(on))b.setAttribute('aria-pressed',on)});
+  document.querySelectorAll('#tabs button').forEach(b=>{const on=b.classList.contains('on');if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')})};
+  new MutationObserver(()=>{if(!q)q=requestAnimationFrame(sync)}).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});sync()})();
 </script>
 </body>
 </html>
