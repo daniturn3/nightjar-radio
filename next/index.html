@@ -641,7 +641,7 @@ html.ios #sheet{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
 }
 @media (min-width:1700px) and (orientation:landscape){
   #view,.foot{zoom:1.12}
-  .brand,#setbtn{zoom:1.12}
+  .brand,#setbtn,#a11ybtn{zoom:1.12}
   #tabs{left:max(20px,calc((100vw - 1500px) / 2 + 20px))}
   #app{max-width:1500px}
   #mini{left:max(132px,calc((100vw - 1500px) / 2 + 132px));right:max(44px,calc((100vw - 1500px) / 2 + 44px));max-width:1324px}
@@ -663,12 +663,13 @@ html.a-rm *,html.a-rm *::before,html.a-rm *::after{animation-duration:.001s!impo
 html.a-big button,html.a-big .pill,html.a-big .mi,html.a-big select,html.a-big .chip{min-height:48px}html.a-big .pill,html.a-big .chip{padding-left:16px;padding-right:16px}
 html.a-plain{--serif:'Space Grotesk',system-ui,sans-serif}
 .srlive{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#a11ybtn.fl{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:14px;z-index:40;width:44px;height:44px;background:rgba(23,26,40,.94);border:1px solid rgba(234,242,255,.18);border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 </style>
 </head>
 <body>
 <div class="sky"><div class="aur a1"></div><div class="aur a2"></div><div class="aur a3"></div><div class="aur a4"></div><div class="stars"></div></div>
 <div id="app">
-  <header><div class="brand" id="brand"><img src="icon-192.png" alt=""><span>Nightjar <em>Radio</em></span><small>beta</small></div><div class="sp"></div><button class="ib" data-act="settings" aria-label="Settings" id="setbtn"></button></header>
+  <header><div class="brand" id="brand"><img src="icon-192.png" alt=""><span>Nightjar <em>Radio</em></span><small>beta</small></div><div class="sp"></div><button class="ib" data-act="a11y" aria-label="Accessibility" id="a11ybtn"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='4.5' r='1.6'/><path d='M5 8.5l7 1.5 7-1.5'/><path d='M12 10v5'/><path d='M8.5 21l3.5-6 3.5 6'/></svg></button><button class="ib" data-act="settings" aria-label="Settings" id="setbtn"></button></header>
   <main id="view"></main>
   <footer class="foot"><img src="icon-192.png" alt=""><b>Nightjar <em>Radio</em></b><span>live radio after dark</span><span class="fmark">radio.churr.co.uk</span><br><a class="bmc" href="https://buymeacoffee.com/Daniturn3" target="_blank" rel="noopener">☕ Buy me a coffee</a><br><button class="footbug" data-act="bug">🐞 Report a problem</button></footer>
 </div>
@@ -1400,7 +1401,7 @@ function npFit(){const np=$('#np'),r=np&&np.querySelector('.radio');if(!r)return
   if(over>1){const h=r.getBoundingClientRect().height;r.style.zoom=Math.max(.55,(h-over-2)/h).toFixed(3)}}
 addEventListener('resize',()=>{if(npOpen)npFit()});
 function renderNP(){if(!npOpen||!cur)return;const pi=S.presets.findIndex(p=>p&&p.u===cur.u);const np=$('#np'),L0=list.length?list:S.presets.filter(Boolean),pos=Math.max(0,L0.findIndex(x=>x.u===cur.u));
-  np.innerHTML=`<div class="nph"><button class="ib" data-act="closenp" aria-label="Close">${ic('down')}</button><div class="t"><div class="mono">Tuned to</div><b>${esc(listName||'Nightjar Radio')}</b></div><button class="ib npst" data-act="style" aria-label="Radio style">🎨</button><button class="ib" data-act="car" aria-label="Car mode">${ic('car')}</button><button class="ib" data-act="night" aria-label="Night-light">${ic('moon')}</button></div>
+  np.innerHTML=`<div class="nph"><button class="ib" data-act="closenp" aria-label="Close">${ic('down')}</button><div class="t"><div class="mono">Tuned to</div><b>${esc(listName||'Nightjar Radio')}</b></div><button class="ib npst" data-act="style" aria-label="Radio style">🎨</button><button class="ib" data-act="car" aria-label="Car mode">${ic('car')}</button><button class="ib" data-act="a11y" aria-label="Accessibility"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='4.5' r='1.6'/><path d='M5 8.5l7 1.5 7-1.5'/><path d='M12 10v5'/><path d='M8.5 21l3.5-6 3.5 6'/></svg></button><button class="ib" data-act="night" aria-label="Night-light">${ic('moon')}</button></div>
   ${radioH(pi,L0,pos)}${npQ()}
   ${S.skin==='modern'?'':`<div class="npt"><div class="npinfo"><h2>${esc(cur.n)}</h2><div class="rsong" id="rsong">${song?'♪ '+esc(song):''}</div></div></div>`}
   <div class="ctrls"><button class="ib" data-act="prev" aria-label="Previous station">${ic('prev')}</button><button class="bigplay" data-act="toggle" id="npbig" aria-label="Play or pause">${playing||buffering?icf('pause'):icf('play')}</button><button class="ib" data-act="next" aria-label="Next station">${ic('next')}</button></div>
@@ -2056,7 +2057,7 @@ document.addEventListener('click',e=>{const t=e.target;
   const dt=t.closest('[data-dtag]');if(dt){dialTag=dt.dataset.dtag;LS.set('dialTag',dialTag);return render()}
   const a=t.closest('[data-act]');if(a){const k=a.dataset.act;e.stopPropagation();
     ({toggle,prev:()=>step(-1),next:()=>step(1),closenp:()=>closeNP(),car:carEnter,carx:()=>carExit(),night:()=>{nlEnter();fsOn()},
-      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),bug:()=>fbSheet(),style:styleSheet,npmore:()=>sheet(`<h3>More</h3><button class="mi" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button><button class="mi" data-act="share">${ic('share')}Share this station</button>${eqOK()?`<button class="mi" data-act="eq">🎚 Sound: ${esc(eqName())}</button>`:''}${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button class="mi" data-act="cast">${ic('cast')}${cast.on?'Casting — change device':'Cast to a speaker or TV'}</button>`:''}<button class="mi" data-act="style">🎨 Change radio style</button>`),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
+      favcur:()=>cur&&toggleFav(cur,a),topreset:()=>cur&&presetPicker(cur),settings,a11y:()=>a11ySheet(),bed:bedtime,wrap:()=>wrapPlay(),globe:globeSpin,near:askNear,spin:()=>window.dialSpin&&window.dialSpin(),eq:()=>eqSheet(),songs:()=>songsSheet(),bug:()=>fbSheet(),style:styleSheet,npmore:()=>sheet(`<h3>More</h3><button class="mi" data-act="bed">${ic('moon')}Bedtime — calm station, sleep timer, night-light</button><button class="mi" data-act="share">${ic('share')}Share this station</button>${eqOK()?`<button class="mi" data-act="eq">🎚 Sound: ${esc(eqName())}</button>`:''}${NAT&&NAT.castAvailable&&NAT.castAvailable()?`<button class="mi" data-act="cast">${ic('cast')}${cast.on?'Casting — change device':'Cast to a speaker or TV'}</button>`:''}<button class="mi" data-act="style">🎨 Change radio style</button>`),cast:()=>NAT&&NAT.castPick&&NAT.castPick(),
       share:async()=>{const u=cur.home||ROOT;if(NAT)return NAT.share(cur.n,`I’m listening to ${cur.n} on Nightjar Radio (radio.churr.co.uk) ${u}`);try{await navigator.share({title:cur.n,text:`I’m listening to ${cur.n} on Nightjar Radio (radio.churr.co.uk)`,url:u})}catch{try{await navigator.clipboard.writeText(u);toast('Link copied')}catch{}}},
       sleep:()=>sheet(`<h3>Sleep timer</h3>${[15,30,45,60,90].map(m=>`<button class="mi" data-sl="${m}">${ic('timer')}${m} minutes</button>`).join('')}${sleepAt?`<button class="mi" data-sl="0">${ic('x')}Turn off</button>`:''}`)})[k]?.();return}
   const sl=t.closest('[data-sl]');if(sl){const m=+sl.dataset.sl;sleepAt=m?Date.now()+m*6e4:0;if(NAT)NAT.sleep(m);closeSheet();toast(m?`Fading out in ${m} minutes`:'Sleep timer off');renderNPctl();return}
@@ -2378,6 +2379,9 @@ function a11ySheet(){const A=A11Y();
   $$('[data-ats]').forEach(b=>b.onclick=()=>{a11ySet('ts',b.dataset.ats);a11ySheet()});
   $$('.a11y').forEach(x=>x.onchange=()=>a11ySet(x.dataset.k,x.checked));
   $('#a_back').onclick=()=>settings();$('#a_done').onclick=()=>closeSheet()}
+
+/* Accessibility button: sits in the top bar, and floats in the corner once you scroll, so it can always be reached. */
+addEventListener('scroll',()=>{const b=document.getElementById('a11ybtn'),h=document.querySelector('header');if(!b||!h)return;b.classList.toggle('fl',h.getBoundingClientRect().bottom<0)},{passive:true});
 </script>
 </body>
 </html>
