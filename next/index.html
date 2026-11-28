@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>/* Accessibility settings, applied before anything draws */try{const a=JSON.parse(localStorage.getItem('njr_a11y')||'{}'),c=document.documentElement.classList;if(a.ts==='l')c.add('a-l');if(a.ts==='xl')c.add('a-xl');if(a.hc)c.add('a-hc');if(a.rm)c.add('a-rm');if(a.big)c.add('a-big');if(a.plain)c.add('a-plain')}catch(e){}</script>
+
 <meta charset="utf-8">
 <base href="/nightjar-radio/">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src * data: blob:; media-src * data: blob:; connect-src *; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'none'">
@@ -652,6 +654,15 @@ html.ios #sheet{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
   #app{max-width:1900px}
   #mini{left:max(132px,calc((100vw - 1900px) / 2 + 132px));right:max(44px,calc((100vw - 1900px) / 2 + 44px));max-width:1700px}
 }
+
+/* Accessibility (Settings → Accessibility) */
+html.a-l body{zoom:1.12}html.a-xl body{zoom:1.25}
+html.a-hc{--mut:#dcdfea;--dim:#b9bdcc;--line:rgba(234,242,255,.32)}html.a-hc .card,html.a-hc .sec,html.a-hc .sheet,html.a-hc .pill,html.a-hc .chip{border-color:rgba(234,242,255,.35)!important}
+html.a-hc a{text-decoration:underline}
+html.a-rm *,html.a-rm *::before,html.a-rm *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important;scroll-behavior:auto!important}
+html.a-big button,html.a-big .pill,html.a-big .mi,html.a-big select,html.a-big .chip{min-height:48px}html.a-big .pill,html.a-big .chip{padding-left:16px;padding-right:16px}
+html.a-plain{--serif:'Space Grotesk',system-ui,sans-serif}
+.srlive{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -829,7 +840,7 @@ function tidySong(s){s=unent(String(s||'')).trim();if(!s||!/\b[A-Za-z_]+="/.test
 try{const h=LS.get('songs',[]);if(h.some(x=>/\b[A-Za-z_]+="/.test(x.s||'')))LS.set('songs',h.map(x=>({...x,s:tidySong(x.s)})).filter(x=>x.s))}catch{}
 function unent(s){if(!s||s.indexOf('&')<0)return s;const N={amp:'&',lt:'<',gt:'>',quot:'"',apos:"'",nbsp:' ',mdash:'—',ndash:'–',hellip:'…',rsquo:'’',lsquo:'‘',rdquo:'”',ldquo:'“'};
   return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi,(m,c)=>c[0]==='#'?(()=>{const n=c[1]==='x'||c[1]==='X'?parseInt(c.slice(2),16):+c.slice(1);try{return n>0&&n<0x110000?String.fromCodePoint(n):m}catch{return m}})():(N[c.toLowerCase()]??m))}
-function showSong(){logSong();renderMini();const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
+function showSong(){logSong();renderMini();if(A11Y().sr&&song){let l=document.getElementById('srlive');if(!l){l=document.createElement('div');l.id='srlive';l.className='srlive';l.setAttribute('aria-live','polite');document.body.appendChild(l)}l.textContent='Now playing: '+song+(cur?' on '+cur.n:'')}const r=$('#rsong');if(r)r.textContent=song?'♪ '+song:'';$$('.lsong').forEach(x=>x.textContent=song?'♪ '+song:[cur?.c,cur?.tags?.[0]].filter(Boolean).join(' · '));carTick()}
 au.addEventListener('playing',()=>{if(reconn)toast('✓ Back on air');reconn=false;reconnN=0;webPlayed=cur?.u;playing=true;buffering=false;staticOff();setState();logStart();if(sleepFade)au.volume=stVol(cur)});
 au.addEventListener('pause',()=>{if(!reconn)wantPlay=false;playing=false;buffering=false;staticOff();setState();logEnd()});
 au.addEventListener('waiting',()=>{buffering=true;setState()});
@@ -1727,6 +1738,9 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   <label class="mono" style="display:block;margin:16px 0 6px">Seasonal themes</label><select class="sel" id="s_th"><option value="auto" ${S.theme==='auto'?'selected':''}>Automatic — UK calendar</option><option value="off" ${S.theme==='off'?'selected':''}>Off</option>${Object.entries(THEMES).map(([k,t])=>`<option value="${k}" ${S.theme===k?'selected':''}>Preview: ${t.name}</option>`).join('')}</select>
   <label class="mono" style="display:block;margin:16px 0 6px">Your birthday (optional)</label><div style="display:flex;gap:8px;align-items:center"><input type="date" class="sel" id="s_bday" style="flex:1;color-scheme:dark" value="${S.bday?'2000-'+S.bday:''}">${S.bday?'<button class="pill" id="s_bdx">Clear</button>':''}</div><p class="dim" style="font-size:12px;margin:6px 0 0">Get a little celebration on the day. Only the day and month are kept, on this phone.</p>
   <label class="mono" style="display:block;margin:16px 0 6px">Bedtime sleep timer</label><select class="sel" id="s_bed">${[15,30,45,60,90].map(m=>`<option value="${m}" ${S.bedMin===m?'selected':''}>${m} minutes</option>`).join('')}</select>
+  <label class="mono" style="display:block;margin:16px 0 6px">Accessibility</label>
+  <div class="dbox"><div class="drow"><div><b>Text size</b><span>Makes everything bigger and easier to read</span></div><select class="sel" id="a_ts" style="width:auto">${[['n','Normal'],['l','Large'],['xl','Extra large']].map(([v,l])=>`<option value="${v}" ${(A11Y().ts||'n')===v?'selected':''}>${l}</option>`).join('')}</select></div>
+  ${[['hc','High contrast','Brighter text and clearer outlines'],['big','Bigger buttons','Easier to tap'],['plain','Plain font','Swaps the fancy headings for simple, easy-to-read letters'],['rm','Reduce motion','Stops animations, sparkles and spinning'],['sr','Announce songs','Screen readers (like TalkBack) read out each new song']].map(([k,t,d])=>`<div class="drow"><div><b>${t}</b><span>${d}</span></div><label class="hsw" style="--a:#86b4ff;--b:#5b7fe0"><input type="checkbox" class="a11y" data-k="${k}" ${A11Y()[k]?'checked':''} aria-label="${t}"><i></i></label></div>`).join('')}</div>
   <label class="mono" style="display:block;margin:16px 0 6px">Data</label>
   <div class="dbox"><div class="drow"><div><b>Data saver on mobile data</b><span>Switches to a lighter stream of the same station when one is available</span></div><label class="hsw" style="--a:#86d9a8;--b:#2fb38a"><input type="checkbox" id="s_saver" ${LS.get('saver',false)?'checked':''}><i></i></label></div>
   ${dataUse()}</div>
@@ -1751,6 +1765,9 @@ function settings(){const ago=S.lastBackup?Math.floor((Date.now()-S.lastBackup)/
   $$('[data-lpage]').forEach(l=>l.onclick=e=>{e.preventDefault();const u=ROOT+l.dataset.lpage;if(NAT&&NAT.openUrl)NAT.openUrl(u);else window.open(u,'_blank','noopener')});
   $('#s_cc').onchange=e=>{S.country=e.target.value;save('country');if(view==='home')render()};
   $('#s_ld').onchange=e=>{S.ldim=e.target.value;save('ldim');applyDim()};
+  const a11ySet=(k,v)=>{const a={...A11Y(),[k]:v};LS.set('a11y',a);const c=document.documentElement.classList;c.toggle('a-l',a.ts==='l');c.toggle('a-xl',a.ts==='xl');['hc','rm','big','plain'].forEach(x=>c.toggle('a-'+x,!!a[x]));document.body.classList.toggle('calm',!playful())};
+  $('#a_ts').onchange=e=>a11ySet('ts',e.target.value);
+  $$('.a11y').forEach(x=>x.onchange=e=>a11ySet(x.dataset.k,e.target.checked));
   if($('#s_cu'))$('#s_cu').onchange=e=>{NAT.setCushion(e.target.value);toast(e.target.value==='normal'?'Normal start':'Saved: it applies next time the radio starts')};
   if($('#s_hp'))$('#s_hp').onchange=e=>{NAT.setHeadphones(e.target.value);toast(e.target.value==='off'?'Headphones won’t start the radio':'Saved: try unplugging and plugging your headphones back in')};
   $('#s_sfx').onchange=e=>{S.staticfx=e.target.checked;save('staticfx')};
@@ -1792,7 +1809,7 @@ setInterval(nlTick,60000);
 $('#nl').addEventListener('click',()=>{const t=Date.now();if(t-nlTap<450)return nlExit();nlTap=t;$('#nl').classList.add('hint');setTimeout(()=>$('#nl').classList.remove('hint'),1500)});
 
 /* ---------- dim, playful ---------- */
-const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;const playful=()=>S.playful===true||(S.playful!==false&&!RM);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;const A11Y=()=>LS.get('a11y',{});const playful=()=>!A11Y().rm&&(S.playful===true||(S.playful!==false&&!RM));
 function applyDim(){const h=new Date().getHours(),on=S.ldim==='on'||(S.ldim==='auto'&&(h>=20||h<5));document.body.classList.toggle('ldim',on)}
 /* ---------- seasonal themes (UK calendar) ---------- */
 function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
